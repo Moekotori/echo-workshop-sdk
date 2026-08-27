@@ -1,0 +1,13 @@
+{
+  "contractVersion": 1,
+  "maximumPackageBytes": 2097152,
+  "maximumFiles": 32,
+  "maximumFileBytes": 524288,
+  "supportedAssetExtensions": [
+    ".css",
+    ".html",
+    ".js",
+    ".json",
+    ".mjs"
+  ]
+}

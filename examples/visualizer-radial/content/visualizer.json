@@ -1,0 +1,18 @@
+{
+  "type": "echo-workshop-visualizer-preset",
+  "schemaVersion": 1,
+  "id": "echo.harbor-visualizer-radial",
+  "title": "Harbor Radial Visualizer",
+  "description": "A radial spectrum with a three-stop dusk palette.",
+  "style": "radial",
+  "palette": [
+    "#66ccff",
+    "#c48bff",
+    "#f0b35b"
+  ],
+  "barCount": 72,
+  "smoothing": 0.7,
+  "sensitivity": 1.35,
+  "decay": 0.36,
+  "mirror": false
+}

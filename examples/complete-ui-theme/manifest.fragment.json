@@ -1,0 +1,14 @@
+{
+  "themePresets": [
+    {
+      "id": "aurora-stage",
+      "title": "Aurora Stage",
+      "description": "A complete editable light and dark appearance preset.",
+      "basePreset": "classic",
+      "preview": "linear-gradient(135deg, #08111f 0%, #257f96 58%, #f0b35b 100%)",
+      "swatches": ["#08111f", "#257f96", "#5cc8dc", "#f0b35b"],
+      "light": { "appBg": "#eef8ff", "panel": "#ffffff", "accent": "#257f96", "text": "#234150" },
+      "dark": { "appBg": "#08111f", "panel": "#142234", "accent": "#5cc8dc", "text": "#c8dce8" }
+    }
+  ]
+}

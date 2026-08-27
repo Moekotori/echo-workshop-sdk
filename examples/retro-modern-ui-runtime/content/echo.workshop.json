@@ -1,0 +1,40 @@
+{
+  "type": "echo-workshop-item",
+  "schemaVersion": 1,
+  "id": "echo.retro-modern-ui",
+  "title": "Retro Modern UI",
+  "version": "1.0.0",
+  "content": {
+    "kind": "theme",
+    "entry": "theme.json"
+  },
+  "compatibility": {
+    "minEchoVersion": "26.8.20"
+  },
+  "files": [
+    {
+      "path": "theme.json",
+      "size": 947,
+      "sha256": "08962396d2d509831b5a33be39adbfc056b229a7494d962a2c31fa526514ad12"
+    },
+    {
+      "path": "ui/app.css",
+      "size": 1510,
+      "sha256": "8297927e11ec3ad5efb460dbc3fef51b9bc7b2ff9ef9c801322d810633747b14"
+    },
+    {
+      "path": "ui/app.js",
+      "size": 6131,
+      "sha256": "ce7e7d193997f90e25bd59ec524ee79797f0bee4950210c85194cb329a930350"
+    },
+    {
+      "path": "ui/index.html",
+      "size": 1420,
+      "sha256": "23aacfdbd150297ac483d2fceac07c8205812d5203519938e86caa23c574eda3"
+    }
+  ],
+  "license": {
+    "id": "All-Rights-Reserved",
+    "holder": "ECHO SDK"
+  }
+}

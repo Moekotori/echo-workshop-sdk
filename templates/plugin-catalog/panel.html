@@ -1,0 +1,22 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="panel.css">
+</head>
+<body>
+  <main>
+    <h1>Authorized catalog</h1>
+    <p>Use the host-owned source dialog, or browse this packaged catalog from the panel. Playback stays on Audio Core direct streams.</p>
+    <input id="query" placeholder="Search or leave empty to browse">
+    <div class="actions">
+      <button id="browse" type="button">Browse</button>
+      <button id="play-first" type="button">Play first result</button>
+      <button id="enqueue-first" type="button">Queue first result</button>
+    </div>
+    <pre id="result">Open the host source dialog, or use the buttons above.</pre>
+  </main>
+  <script src="__bridge__.js"></script>
+  <script src="panel.js"></script>
+</body>
+</html>

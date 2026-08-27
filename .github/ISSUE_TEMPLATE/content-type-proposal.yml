@@ -1,0 +1,56 @@
+name: Content-type proposal
+description: RFC for a new Workshop content kind or a shared-contract change.
+title: "[rfc] "
+labels: [rfc, contract]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        New content kinds and shared-contract changes also change the
+        production ECHO host, so they follow the RFC process in
+        GOVERNANCE.md. Maintainers implement accepted proposals host-side
+        first; the SDK surface then lands in a feature release.
+  - type: input
+    id: kind-name
+    attributes:
+      label: Proposed kind name
+      placeholder: e.g. transition-pack
+    validations:
+      required: true
+  - type: textarea
+    id: need
+    attributes:
+      label: Authoring need
+      description: What can authors not express with the existing seven kinds?
+    validations:
+      required: true
+  - type: textarea
+    id: entry-shape
+    attributes:
+      label: Entry-file shape
+      description: Sketch the JSON entry file an item of this kind would ship.
+      render: json
+    validations:
+      required: true
+  - type: textarea
+    id: host-surface
+    attributes:
+      label: Host surface required
+      description: What must ECHO render, execute or expose for this kind to work?
+    validations:
+      required: true
+  - type: checkboxes
+    id: security
+    attributes:
+      label: Security review
+      description: Check everything the proposal involves; each checked item raises the review bar.
+      options:
+        - label: Network access
+        - label: Executable code (JavaScript) beyond declarative JSON/CSS
+        - label: New plug-in permissions or UI-runtime capabilities
+        - label: Changes to an existing schema or contract file
+  - type: textarea
+    id: compatibility
+    attributes:
+      label: Compatibility considerations
+      description: Minimum ECHO version, fallback behavior on older hosts, migration story.

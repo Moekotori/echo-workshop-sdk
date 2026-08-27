@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "appId": "5105090",
+  "publishedFileId": "0",
+  "contentDirectory": "content",
+  "previewFile": "preview.png",
+  "visibility": "private",
+  "description": "The smallest complete ECHO Workshop theme: a colors-layer preset with light and dark tone overrides on the public classic base, and nothing else to maintain.",
+  "changeNote": "SDK 1.11.0 example: minimal colors theme.",
+  "tags": [
+    "Theme"
+  ]
+}

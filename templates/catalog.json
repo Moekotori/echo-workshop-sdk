@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "templates": [
+    { "kind": "theme", "entry": "theme.json", "tag": "Theme", "defaultPreset": "skin" },
+    { "kind": "lyrics-style", "entry": "lyrics-scene.json", "tag": "Lyrics Scene", "defaultPreset": "editorial" },
+    { "kind": "visualizer-preset", "entry": "visualizer.json", "tag": "Visualizer Preset", "defaultPreset": "bars" },
+    { "kind": "dsp-preset", "entry": "dsp-preset.json", "tag": "DSP / EQ Preset", "defaultPreset": "flat" },
+    { "kind": "audio-plugin-profile", "entry": "audio-plugin-profile.json", "tag": "DSP / EQ Preset" },
+    { "kind": "locale-pack", "entry": "locale.json", "tag": "Language Pack" },
+    { "kind": "plugin-package", "entry": "community.echo", "tag": "Sandboxed Plugin", "defaultPreset": "basic" }
+  ],
+  "presets": {
+    "theme": [
+      { "id": "colors", "label": "Light and dark tone overrides" },
+      { "id": "skin", "label": "Declarative chrome skin", "default": true },
+      { "id": "stylesheet", "label": "Packaged CSS", "minEchoVersion": "26.8.20" },
+      { "id": "runtime", "label": "Sandboxed UI runtime", "minEchoVersion": "26.8.20" }
+    ],
+    "lyrics-style": [
+      { "id": "editorial", "label": "Cover plus lyrics grid", "default": true },
+      { "id": "compact", "label": "Folded metadata row" },
+      { "id": "cinema", "label": "Cinema stage with owned transport" },
+      { "id": "cover", "label": "Large artwork column" }
+    ],
+    "visualizer-preset": [
+      { "id": "bars", "label": "Mirrored spectrum bars", "default": true },
+      { "id": "wave", "label": "Waveform" },
+      { "id": "radial", "label": "Radial spectrum" }
+    ],
+    "dsp-preset": [
+      { "id": "flat", "label": "Flat 31-band starting point", "default": true },
+      { "id": "vocal", "label": "Conservative vocal lift" },
+      { "id": "bass", "label": "Conservative low-end lift" }
+    ],
+      "plugin-package": [
+        { "id": "basic", "label": "Single command starter", "default": true },
+        { "id": "complete", "label": "Commands, panel, Agent, providers and importable theme" },
+        { "id": "catalog", "label": "Author-owned searchable direct-stream catalog" },
+        { "id": "lyrics", "label": "Lyrics provider plus current-lyrics panel" }
+      ]
+  },
+  "recipes": [
+    { "id": "css-theme", "kind": "theme", "preset": "stylesheet" },
+    { "id": "custom-ui", "kind": "theme", "preset": "runtime" },
+    { "id": "skin-theme", "kind": "theme", "preset": "skin" },
+    { "id": "colors-theme", "kind": "theme", "preset": "colors" },
+    { "id": "cinema-lyrics", "kind": "lyrics-style", "preset": "cinema" },
+    { "id": "editorial-lyrics", "kind": "lyrics-style", "preset": "editorial" },
+    { "id": "radial-visualizer", "kind": "visualizer-preset", "preset": "radial" },
+    { "id": "bars-visualizer", "kind": "visualizer-preset", "preset": "bars" },
+    { "id": "vocal-eq", "kind": "dsp-preset", "preset": "vocal" },
+    { "id": "plugin-complete", "kind": "plugin-package", "preset": "complete" },
+    { "id": "source-catalog", "kind": "plugin-package", "preset": "catalog" },
+    { "id": "lyrics-source", "kind": "plugin-package", "preset": "lyrics" },
+    { "id": "wenyan-locale", "kind": "locale-pack" }
+  ]
+}

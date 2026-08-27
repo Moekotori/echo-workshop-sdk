@@ -1,0 +1,46 @@
+name: Feature request
+description: Propose an improvement to the CLI, templates, examples or docs.
+title: "[feature] "
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Describe the authoring problem before proposing a mechanism. Requests
+        that would weaken fail-closed validation, add Steam upload to local
+        commands, or integrate third-party platform scraping are out of scope
+        (see GOVERNANCE.md).
+  - type: textarea
+    id: problem
+    attributes:
+      label: The authoring problem
+      description: What are you trying to build or check, and where does the SDK get in the way?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Commands, flags, output or docs you would like to see.
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Content kind affected
+      options:
+        - theme
+        - lyrics-style
+        - visualizer-preset
+        - dsp-preset
+        - audio-plugin-profile
+        - locale-pack
+        - plugin-package
+        - not kind-specific (CLI / docs / schemas)
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you considered
+      description: Workarounds you tried with the current SDK, if any.

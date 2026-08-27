@@ -1,0 +1,29 @@
+{
+  "type": "echo-plugin-package",
+  "version": 1,
+  "exportedAt": "2026-08-24T12:05:17.010Z",
+  "manifest": {
+    "id": "echo.hello-plugin",
+    "name": "Hello Plugin",
+    "version": "1.0.0",
+    "apiVersion": 2,
+    "entry": "plugin.js",
+    "permissions": [
+      "playback:read"
+    ],
+    "contributes": {
+      "commands": [
+        {
+          "id": "hello-echo",
+          "title": "Hello ECHO"
+        }
+      ]
+    }
+  },
+  "files": [
+    {
+      "path": "plugin.js",
+      "content": "/// <reference path=\"../.echo-sdk/echo-workshop-plugin.d.ts\" />\n\n// The smallest useful ECHO Workshop plug-in: one command, one permission\n// (playback:read), no network. Every echo.* call must be covered by a\n// permission declared in content/community.echo; run `next .` to see what\n// the host still allows, and `snippet list` for copy-paste starters.\n\necho.commands.register('hello-echo', { title: 'Hello ECHO' }, async () => {\n  const status = await echo.playback.getStatus();\n  await echo.ui.notify(status.currentTrackId ? 'Hello from your first plug-in. Something is playing.' : 'Hello from your first plug-in. Nothing is playing yet.');\n});\n"
+    }
+  ]
+}

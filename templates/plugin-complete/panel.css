@@ -1,0 +1,6 @@
+:root { color-scheme: dark; }
+body { margin: 0; padding: 28px; font: 15px system-ui; background: #101522; color: #eef5ff; }
+main { display: grid; gap: 12px; max-width: 720px; margin: auto; }
+h1 { color: #8bdcff; }
+input, button, pre { padding: 10px; border-radius: 8px; }
+pre { white-space: pre-wrap; }

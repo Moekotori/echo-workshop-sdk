@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "appId": "5105090",
+  "publishedFileId": "3787239087",
+  "contentDirectory": "content",
+  "previewFile": "preview.png",
+  "visibility": "public",
+  "description": "A curated literary Chinese language pack for ECHO. It covers the current interface and Workshop authoring copy; missing keys fall back to built-in Simplified Chinese. Data-only JSON, no scripts, network access or binaries.",
+  "changeNote": "Version 1.2.0: broader literary-Chinese grammar pass across common interface, community and settings copy.",
+  "tags": [
+    "Language Pack"
+  ]
+}

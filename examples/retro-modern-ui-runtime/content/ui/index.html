@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Retro Modern UI</title>
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <div id="app">
+    <header class="top">
+      <strong id="brand">Retro Modern UI</strong>
+      <input id="search" type="search" placeholder="Search library" autocomplete="off">
+    </header>
+    <main>
+      <section>
+        <h2>Library</h2>
+        <ol id="tracks"></ol>
+      </section>
+      <section>
+        <h2>Albums</h2>
+        <ol id="albums"></ol>
+      </section>
+      <section>
+        <h2>Queue</h2>
+        <ol id="queue"></ol>
+      </section>
+    </main>
+    <footer class="player">
+      <div>
+        <p id="now-title">Nothing playing</p>
+        <p id="now-artist" class="muted"></p>
+        <p id="now-lyrics" class="muted"></p>
+      </div>
+      <div id="spectrum" class="spectrum" aria-hidden="true"></div>
+      <div class="transport">
+        <button id="previous" type="button">Prev</button>
+        <button id="play-pause" type="button">Play</button>
+        <button id="next" type="button">Next</button>
+        <button id="shuffle" type="button">Shuffle</button>
+        <button id="repeat" type="button">Repeat</button>
+        <button id="like" type="button">Like</button>
+      </div>
+    </footer>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+{
+  "type": "echo-workshop-theme-preset",
+  "schemaVersion": 1,
+  "id": "echo.retro-modern-ui",
+  "title": "Retro Modern UI",
+  "description": "A sandboxed library, queue and bottom player that talks to the host through the versioned UI bridge.",
+  "basePreset": "classic",
+  "dark": {
+    "appBg": "#120e0a",
+    "panel": "#1c1610",
+    "accent": "#e2b56a",
+    "heading": "#fff4d8",
+    "text": "#f0e2c8",
+    "muted": "#b39a74"
+  },
+  "light": {
+    "appBg": "#f7efe2",
+    "panel": "#fffaf1",
+    "accent": "#9a5b12",
+    "heading": "#2b1c0d",
+    "text": "#3d2a16"
+  },
+  "swatches": ["#120e0a", "#e2b56a", "#f7efe2"],
+  "runtime": {
+    "entry": "ui/index.html",
+    "capabilities": [
+      "navigation",
+      "playback:read",
+      "playback:control",
+      "library:read",
+      "library:control",
+      "queue:read",
+      "queue:control",
+      "window:control",
+      "lyrics:read",
+      "audio:spectrum",
+      "storage"
+    ]
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "appId": "5105090",
+  "publishedFileId": "0",
+  "contentDirectory": "content",
+  "previewFile": "preview.png",
+  "visibility": "private",
+  "description": "A complete sandboxed Workshop UI with a real library list, queue and persistent bottom player. It uses only the versioned host bridge and never receives local paths.",
+  "changeNote": "SDK 1.2.0 example: full UI runtime.",
+  "tags": ["Theme"]
+}

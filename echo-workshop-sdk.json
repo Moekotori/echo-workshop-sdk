@@ -1,0 +1,62 @@
+{
+  "sdkVersion": 1,
+  "packageVersion": "1.11.0",
+  "manifest": {
+    "type": "echo-workshop-item",
+    "schemaVersions": [1],
+    "contentKinds": [
+      "theme",
+      "lyrics-style",
+      "visualizer-preset",
+      "dsp-preset",
+      "audio-plugin-profile",
+      "locale-pack",
+      "plugin-package"
+    ]
+  },
+  "plugin": {
+    "apiVersions": [1, 2],
+    "currentApiVersion": 2,
+    "declarationFile": "echo-workshop-plugin.d.ts",
+    "contractFile": "contracts/plugin-api.json"
+  },
+  "theme": {
+    "presets": ["colors", "skin", "stylesheet", "runtime"],
+    "stylesheetMinEchoVersion": "26.8.20",
+    "uiRuntimeProtocolVersion": 1,
+    "declarationFile": "echo-workshop-ui-runtime.d.ts"
+  },
+  "lyricsStyle": {
+    "presets": ["editorial", "compact", "cinema", "cover"]
+  },
+  "visualizer": {
+    "presets": ["bars", "wave", "radial"]
+  },
+  "dsp": {
+    "presets": ["flat", "vocal", "bass"],
+    "bandCount": 31
+  },
+  "recipes": [
+    "css-theme",
+    "custom-ui",
+    "skin-theme",
+    "cinema-lyrics",
+    "compact-lyrics",
+    "cover-lyrics",
+    "radial-visualizer",
+    "wave-visualizer",
+    "vocal-eq",
+    "bass-eq",
+    "plugin-complete",
+    "source-catalog",
+    "lyrics-source",
+    "wenyan-locale",
+    "colors-theme",
+    "editorial-lyrics",
+    "bars-visualizer"
+  ],
+  "audioPluginAdapter": {
+    "api": "echo.audio-plugin-adapter",
+    "protocolVersions": [1]
+  }
+}

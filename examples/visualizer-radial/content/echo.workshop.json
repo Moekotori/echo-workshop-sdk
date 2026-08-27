@@ -1,0 +1,25 @@
+{
+  "type": "echo-workshop-item",
+  "schemaVersion": 1,
+  "id": "echo.harbor-visualizer-radial",
+  "title": "Harbor Radial Visualizer",
+  "version": "1.0.0",
+  "content": {
+    "kind": "visualizer-preset",
+    "entry": "visualizer.json"
+  },
+  "compatibility": {
+    "minEchoVersion": "26.8.15"
+  },
+  "files": [
+    {
+      "path": "visualizer.json",
+      "size": 402,
+      "sha256": "4841d0d4a19b85512e9c0290e381ab1e8bd1b217343367e53d8b9f4f9bb136e6"
+    }
+  ],
+  "license": {
+    "id": "All-Rights-Reserved",
+    "holder": "ECHO SDK"
+  }
+}

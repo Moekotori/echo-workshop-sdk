@@ -1,0 +1,25 @@
+{
+  "type": "echo-workshop-item",
+  "schemaVersion": 1,
+  "id": "echo.minimal-theme",
+  "title": "Minimal Theme",
+  "version": "1.0.0",
+  "content": {
+    "kind": "theme",
+    "entry": "theme.json"
+  },
+  "compatibility": {
+    "minEchoVersion": "26.8.15"
+  },
+  "files": [
+    {
+      "path": "theme.json",
+      "size": 571,
+      "sha256": "aa4d5c6dd888cf47b8906f9936c637e7217be3a32ab14af2fe91b5ca78648600"
+    }
+  ],
+  "license": {
+    "id": "All-Rights-Reserved",
+    "holder": "ECHO SDK"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "type": "echo-workshop-item",
+  "schemaVersion": 1,
+  "id": "echo.hello-plugin",
+  "title": "Hello Plugin",
+  "version": "1.0.0",
+  "content": {
+    "kind": "plugin-package",
+    "entry": "community.echo"
+  },
+  "compatibility": {
+    "minEchoVersion": "26.8.15",
+    "pluginApiVersion": 2
+  },
+  "files": [
+    {
+      "path": "community.echo",
+      "size": 1173,
+      "sha256": "1965aa848ae612820a5d61751a5447d6216ed5b6fd9d677e4c16b4403c7a8bac"
+    }
+  ],
+  "license": {
+    "id": "All-Rights-Reserved",
+    "holder": "ECHO SDK"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "appId": "5105090",
+  "publishedFileId": "0",
+  "contentDirectory": "content",
+  "previewFile": "preview.png",
+  "visibility": "private",
+  "description": "A packaged CSS Workshop theme scoped to its own pack id. The host sanitizes the stylesheet and never treats it as a built-in host pack key.",
+  "changeNote": "SDK 1.2.0 example: packaged stylesheet.",
+  "tags": ["Theme"]
+}

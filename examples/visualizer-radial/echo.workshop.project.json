@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "appId": "5105090",
+  "publishedFileId": "0",
+  "contentDirectory": "content",
+  "previewFile": "preview.png",
+  "visibility": "private",
+  "description": "A radial spectrum preset using only host styles bars, wave and radial. Audio Core still owns the analyzer.",
+  "changeNote": "SDK 1.4.0 example: radial visualizer-preset.",
+  "tags": [
+    "Visualizer Preset"
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "type": "echo-workshop-item",
+  "schemaVersion": 1,
+  "id": "echo.locale.lzh",
+  "title": "文言文",
+  "version": "1.2.0",
+  "content": {
+    "kind": "locale-pack",
+    "entry": "locale.json"
+  },
+  "compatibility": {
+    "minEchoVersion": "26.8.20"
+  },
+  "files": [
+    {
+      "path": "locale.json",
+      "size": 441303,
+      "sha256": "e6c803dd8a108ad57dcad79a092ca982faba572918647e06cd4b8a9d843c7ba3"
+    }
+  ],
+  "license": {
+    "id": "All-Rights-Reserved",
+    "holder": "ECHO SDK"
+  }
+}

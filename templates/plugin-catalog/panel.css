@@ -1,0 +1,17 @@
+:root { color-scheme: dark; }
+body {
+  margin: 0;
+  padding: 28px;
+  font: 15px system-ui;
+  background: #101522;
+  color: #eef5ff;
+}
+main { display: grid; gap: 12px; max-width: 720px; margin: auto; }
+h1 { margin: 0; color: #8bdcff; }
+input, button, pre {
+  padding: 10px;
+  border: 0;
+  border-radius: 8px;
+}
+.actions { display: flex; flex-wrap: wrap; gap: 8px; }
+pre { white-space: pre-wrap; background: #182033; }

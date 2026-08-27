@@ -1,0 +1,23 @@
+{
+  "type": "echo-workshop-theme-preset",
+  "schemaVersion": 1,
+  "id": "echo.harbor-stylesheet",
+  "title": "Harbor Stylesheet",
+  "description": "A packaged CSS theme that restyles the existing ECHO chrome after host sanitizing.",
+  "basePreset": "classic",
+  "dark": {
+    "appBg": "#10131a",
+    "panel": "#182231",
+    "accent": "#66ccff",
+    "heading": "#f5fbff",
+    "text": "#d8e8f3"
+  },
+  "light": {
+    "appBg": "#eef8fc",
+    "panel": "#f8fdff",
+    "accent": "#0b78d0",
+    "text": "#254252"
+  },
+  "swatches": ["#10131a", "#66ccff", "#eef8fc"],
+  "stylesheet": "theme.css"
+}

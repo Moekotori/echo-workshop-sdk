@@ -1,0 +1,227 @@
+{
+  "type": "echo-workshop-dsp-preset",
+  "schemaVersion": 1,
+  "id": "echo.harbor-dsp-vocal",
+  "title": "Harbor Vocal EQ",
+  "description": "A conservative vocal-forward 31-band EQ starting point.",
+  "preampDb": -4,
+  "bands": [
+    {
+      "frequencyHz": 20,
+      "gainDb": -1,
+      "q": 1,
+      "filterType": "peaking",
+      "enabled": true
+    },
+    {
+      "frequencyHz": 25,
+      "gainDb": -1,
+      "q": 1,
+      "filterType": "peaking",
+      "enabled": true
+    },
+    {
+      "frequencyHz": 31.5,
+      "gainDb": -1,
+      "q": 1,
+      "filterType": "peaking",
+      "enabled": true
+    },
+    {
+      "frequencyHz": 40,
+      "gainDb": -1,
+      "q": 1,
+      "filterType": "peaking",
+      "enabled": true
+    },
+    {
+      "frequencyHz": 50,
+      "gainDb": -1,
+      "q": 1,
+      "filterType": "peaking",
+      "enabled": true
+    },
+    {
+      "frequencyHz": 63,
+      "gainDb": -1,
+      "q": 1,
+      "filterType": "peaking",
+      "enabled": true
+    },
+    {
+      "frequencyHz": 80,
+      "gainDb": -1,
+      "q": 1,
+      "filterType": "peaking",
+      "enabled": true
+    },
+    {
+      "frequencyHz": 100,
+      "gainDb": -2,
+      "q": 1,
+      "filterType": "peaking",
+      "enabled": true
+    },
+    {
+      "frequencyHz": 125,
+      "gainDb": -2,
+      "q": 1,
+      "filterType": "peaking",
+      "enabled": true
+    },
+    {
+      "frequencyHz": 160,
+      "gainDb": -2,
+      "q": 1,
+      "filterType": "peaking",
+      "enabled": true
+    },
+    {
+      "frequencyHz": 200,
+      "gainDb": -2,
+      "q": 1,
+      "filterType": "peaking",
+      "enabled": true
+    },
+    {
+      "frequencyHz": 250,
+      "gainDb": -2,
+      "q": 1,
+      "filterType": "peaking",
+      "enabled": true
+    },
+    {
+      "frequencyHz": 315,
+      "gainDb": -1,
+      "q": 1,
+      "filterType": "peaking",
+      "enabled": true
+    },
+    {
+      "frequencyHz": 400,
+      "gainDb": -1,
+      "q": 1,
+      "filterType": "peaking",
+      "enabled": true
+    },
+    {
+      "frequencyHz": 500,
+      "gainDb": -1,
+      "q": 1,
+      "filterType": "peaking",
+      "enabled": true
+    },
+    {
+      "frequencyHz": 630,
+      "gainDb": 0,
+      "q": 1,
+      "filterType": "peaking",
+      "enabled": true
+    },
+    {
+      "frequencyHz": 800,
+      "gainDb": 0,
+      "q": 1,
+      "filterType": "peaking",
+      "enabled": true
+    },
+    {
+      "frequencyHz": 1000,
+      "gainDb": 2,
+      "q": 1,
+      "filterType": "peaking",
+      "enabled": true
+    },
+    {
+      "frequencyHz": 1250,
+      "gainDb": 2,
+      "q": 1,
+      "filterType": "peaking",
+      "enabled": true
+    },
+    {
+      "frequencyHz": 1600,
+      "gainDb": 2,
+      "q": 1,
+      "filterType": "peaking",
+      "enabled": true
+    },
+    {
+      "frequencyHz": 2000,
+      "gainDb": 2,
+      "q": 1,
+      "filterType": "peaking",
+      "enabled": true
+    },
+    {
+      "frequencyHz": 2500,
+      "gainDb": 2,
+      "q": 1,
+      "filterType": "peaking",
+      "enabled": true
+    },
+    {
+      "frequencyHz": 3150,
+      "gainDb": 1.5,
+      "q": 1,
+      "filterType": "peaking",
+      "enabled": true
+    },
+    {
+      "frequencyHz": 4000,
+      "gainDb": 1.5,
+      "q": 1,
+      "filterType": "peaking",
+      "enabled": true
+    },
+    {
+      "frequencyHz": 5000,
+      "gainDb": 1.5,
+      "q": 1,
+      "filterType": "peaking",
+      "enabled": true
+    },
+    {
+      "frequencyHz": 6300,
+      "gainDb": 1,
+      "q": 1,
+      "filterType": "peaking",
+      "enabled": true
+    },
+    {
+      "frequencyHz": 8000,
+      "gainDb": 1,
+      "q": 1,
+      "filterType": "peaking",
+      "enabled": true
+    },
+    {
+      "frequencyHz": 10000,
+      "gainDb": 1,
+      "q": 1,
+      "filterType": "peaking",
+      "enabled": true
+    },
+    {
+      "frequencyHz": 12500,
+      "gainDb": 0.5,
+      "q": 1,
+      "filterType": "peaking",
+      "enabled": true
+    },
+    {
+      "frequencyHz": 16000,
+      "gainDb": 0.5,
+      "q": 1,
+      "filterType": "peaking",
+      "enabled": true
+    },
+    {
+      "frequencyHz": 20000,
+      "gainDb": 0.5,
+      "q": 1,
+      "filterType": "peaking",
+      "enabled": true
+    }
+  ]
+}

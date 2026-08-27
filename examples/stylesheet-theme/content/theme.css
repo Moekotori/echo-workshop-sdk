@@ -1,0 +1,38 @@
+html[data-workshop-theme-pack="echo.harbor-stylesheet"] {
+  --color-bg: #10131a;
+  --color-text: #d8e8f3;
+  --color-muted: #91a7b8;
+  --color-accent: #66ccff;
+  --color-accent-strong: #8cdbff;
+  --echo-heading-text: #f5fbff;
+  --theme-app-bg: #10131a;
+  --theme-page-text: #d8e8f3;
+  --theme-heading-text: #f5fbff;
+  --theme-muted-text: #91a7b8;
+  --theme-panel-bg: #182231;
+  --theme-player-bg: #172535;
+  color-scheme: dark;
+}
+
+html[data-workshop-theme-pack="echo.harbor-stylesheet"] body,
+html[data-workshop-theme-pack="echo.harbor-stylesheet"] .app-shell {
+  background: radial-gradient(circle at 12% 8%, rgb(102 204 255 / 0.16), transparent 34%),
+    linear-gradient(160deg, #10131a 0%, #151b26 54%, #0d1218 100%);
+  color: var(--color-text);
+}
+
+html[data-workshop-theme-pack="echo.harbor-stylesheet"] .app-titlebar,
+html[data-workshop-theme-pack="echo.harbor-stylesheet"] .sidebar,
+html[data-workshop-theme-pack="echo.harbor-stylesheet"] .player-bar,
+html[data-workshop-theme-pack="echo.harbor-stylesheet"] .page-surface {
+  background: rgb(24 34 49 / 0.72);
+  border-color: rgb(48 70 90 / 0.45);
+}
+
+html[data-workshop-theme-pack="echo.harbor-stylesheet"] .sidebar {
+  backdrop-filter: blur(18px);
+}
+
+html[data-workshop-theme-pack="echo.harbor-stylesheet"] .player-bar {
+  border-top: 1px solid rgb(102 204 255 / 0.22);
+}

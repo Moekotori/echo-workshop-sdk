@@ -1,0 +1,25 @@
+{
+  "type": "echo-workshop-item",
+  "schemaVersion": 1,
+  "id": "echo.harbor-lyrics-cinema",
+  "title": "Harbor Cinema Lyrics",
+  "version": "1.0.0",
+  "content": {
+    "kind": "lyrics-style",
+    "entry": "lyrics-style.json"
+  },
+  "compatibility": {
+    "minEchoVersion": "26.8.15"
+  },
+  "files": [
+    {
+      "path": "lyrics-style.json",
+      "size": 2848,
+      "sha256": "abd1a251999cf186a53c0638f1b64f60cf76656f875748142ce38ab166528c09"
+    }
+  ],
+  "license": {
+    "id": "All-Rights-Reserved",
+    "holder": "ECHO SDK"
+  }
+}

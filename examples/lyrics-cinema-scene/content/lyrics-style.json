@@ -1,0 +1,120 @@
+{
+  "type": "echo-workshop-lyrics-style",
+  "schemaVersion": 1,
+  "id": "echo.harbor-lyrics-cinema",
+  "title": "Harbor Cinema Lyrics",
+  "description": "A cinema-stage lyrics scene that owns transport because the host mini player is hidden.",
+  "settings": {
+    "lyricsPageStyle": "cinemaStage",
+    "lyricsWordHighlightEnabled": true,
+    "lyricsMusicReactiveVisualsEnabled": true,
+    "lyricsFontSizePx": 48,
+    "lyricsBackgroundMode": "cover"
+  },
+  "scene": {
+    "schemaVersion": 1,
+    "background": "cover-blur",
+    "hostChrome": {
+      "miniPlayer": "hidden"
+    },
+    "root": {
+      "id": "stage",
+      "type": "group",
+      "style": {
+        "display": "flex",
+        "flexDirection": "column",
+        "justifyContent": "flex-end",
+        "gap": "20px",
+        "padding": "48px",
+        "height": "100%"
+      },
+      "responsive": {
+        "compact": {
+          "padding": "20px",
+          "gap": "12px"
+        }
+      },
+      "children": [
+        {
+          "id": "title",
+          "type": "slot",
+          "slot": "title",
+          "style": {
+            "fontSize": "32px",
+            "fontWeight": 700,
+            "color": "#f5fbff"
+          }
+        },
+        {
+          "id": "artist",
+          "type": "slot",
+          "slot": "artist",
+          "style": {
+            "color": "#91a7b8"
+          }
+        },
+        {
+          "id": "lyrics",
+          "type": "slot",
+          "slot": "lyrics",
+          "options": {
+            "showTranslation": true,
+            "wordHighlightEnabled": true
+          },
+          "style": {
+            "minHeight": "180px"
+          }
+        },
+        {
+          "id": "transport",
+          "type": "group",
+          "style": {
+            "display": "flex",
+            "alignItems": "center",
+            "gap": "16px"
+          },
+          "children": [
+            {
+              "id": "prev",
+              "type": "slot",
+              "slot": "previous-track"
+            },
+            {
+              "id": "play",
+              "type": "slot",
+              "slot": "play-toggle"
+            },
+            {
+              "id": "next",
+              "type": "slot",
+              "slot": "next-track"
+            },
+            {
+              "id": "shuffle",
+              "type": "slot",
+              "slot": "shuffle-toggle"
+            },
+            {
+              "id": "repeat",
+              "type": "slot",
+              "slot": "repeat-cycle"
+            },
+            {
+              "id": "like",
+              "type": "slot",
+              "slot": "like-toggle"
+            },
+            {
+              "id": "progress",
+              "type": "slot",
+              "slot": "progress",
+              "style": {
+                "flexGrow": 1
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

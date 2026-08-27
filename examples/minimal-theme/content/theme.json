@@ -1,0 +1,22 @@
+{
+  "type": "echo-workshop-theme-preset",
+  "schemaVersion": 1,
+  "id": "echo.minimal-theme",
+  "title": "Minimal Theme",
+  "description": "The fewest fields a colors-layer theme needs: light and dark tone overrides on a public base preset.",
+  "basePreset": "classic",
+  "dark": {
+    "appBg": "#141218",
+    "panel": "#1e1a26",
+    "accent": "#c48bff",
+    "heading": "#f6f1ff",
+    "text": "#ddd3ec"
+  },
+  "light": {
+    "appBg": "#f6f2fb",
+    "panel": "#fdfbff",
+    "accent": "#7a3ff2",
+    "text": "#3a2f4d"
+  },
+  "swatches": ["#141218", "#c48bff", "#f6f2fb"]
+}

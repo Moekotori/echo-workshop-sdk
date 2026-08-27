@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "appId": "5105090",
+  "publishedFileId": "0",
+  "contentDirectory": "content",
+  "previewFile": "preview.png",
+  "visibility": "private",
+  "description": "A cinema-stage lyrics scene that owns transport because the host mini player is hidden. Slots stay host-owned.",
+  "changeNote": "SDK 1.4.0 example: cinema lyrics-style.",
+  "tags": [
+    "Lyrics Scene"
+  ]
+}

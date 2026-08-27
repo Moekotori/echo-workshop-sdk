@@ -1,0 +1,62 @@
+{
+  "name": "@echo/workshop-sdk",
+  "version": "1.11.0",
+  "description": "Types, schemas and zero-dependency tooling for ECHO Steam Workshop extensions.",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "types": "./echo-workshop-plugin.d.ts",
+  "bin": {
+    "echo-workshop-sdk": "./bin/echo-workshop-sdk.mjs"
+  },
+  "exports": {
+    ".": {
+      "types": "./echo-workshop-plugin.d.ts",
+      "default": "./echo-workshop-sdk.json"
+    },
+    "./descriptor": "./echo-workshop-sdk.json",
+    "./schemas/manifest": "./schemas/echo.workshop.schema.json",
+    "./schemas/project": "./schemas/project.schema.json",
+    "./schemas/plugin-package": "./schemas/plugin-package.schema.json",
+    "./schemas/theme": "./schemas/theme.schema.json",
+    "./schemas/lyrics-style": "./schemas/lyrics-style.schema.json",
+    "./schemas/visualizer": "./schemas/visualizer.schema.json",
+    "./schemas/dsp": "./schemas/dsp.schema.json",
+    "./schemas/audio-plugin-profile": "./schemas/audio-plugin-profile.schema.json",
+    "./schemas/locale-pack": "./schemas/locale-pack.schema.json",
+    "./contracts/plugin-api": "./contracts/plugin-api.json",
+    "./contracts/plugin-package-limits": "./contracts/plugin-package-limits.json",
+    "./contracts/content-kinds": "./contracts/content-kinds.json",
+    "./ui-runtime": {
+      "types": "./echo-workshop-ui-runtime.d.ts"
+    }
+  },
+  "files": [
+    "bin",
+    "lib",
+    "schemas",
+    "contracts",
+    "templates",
+    "examples",
+    "CHANGELOG.md",
+    "MIGRATING.md",
+    "TROUBLESHOOTING.md",
+    "CHEATSHEET.md",
+    "CONTRIBUTING.md",
+    "GOVERNANCE.md",
+    "CODE_OF_CONDUCT.md",
+    "LICENSE",
+    "README.md",
+    "README.zh-CN.md",
+    "echo-workshop-plugin.d.ts",
+    "echo-workshop-ui-runtime.d.ts",
+    "echo-workshop-sdk.json"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "check": "node ./bin/echo-workshop-sdk.mjs doctor",
+    "example": "node ./bin/echo-workshop-sdk.mjs init ./example-plugin --id echo.example-plugin --title \"Example Plugin\" --holder \"Workshop Author\""
+  }
+}

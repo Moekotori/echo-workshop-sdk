@@ -1,0 +1,25 @@
+{
+  "type": "echo-workshop-item",
+  "schemaVersion": 1,
+  "id": "echo.harbor-dsp-vocal",
+  "title": "Harbor Vocal EQ",
+  "version": "1.0.0",
+  "content": {
+    "kind": "dsp-preset",
+    "entry": "dsp.json"
+  },
+  "compatibility": {
+    "minEchoVersion": "26.8.15"
+  },
+  "files": [
+    {
+      "path": "dsp.json",
+      "size": 4152,
+      "sha256": "c887eee8708d65eb35a67d7ba232f8ddaf4b201259b46a4ef12d243678ce81af"
+    }
+  ],
+  "license": {
+    "id": "All-Rights-Reserved",
+    "holder": "ECHO SDK"
+  }
+}

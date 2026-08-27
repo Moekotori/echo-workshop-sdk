@@ -1,0 +1,6 @@
+:root { color-scheme: dark; }
+body { margin: 0; padding: 28px; font: 15px system-ui; background: #101522; color: #eef5ff; }
+main { display: grid; gap: 12px; max-width: 720px; margin: auto; }
+h1, h2 { color: #8bdcff; margin: 0; }
+pre, ol { margin: 0; padding: 12px; border-radius: 8px; background: #182033; white-space: pre-wrap; }
+ol { list-style: none; display: grid; gap: 8px; }

@@ -1,0 +1,30 @@
+{
+  "type": "echo-workshop-item",
+  "schemaVersion": 1,
+  "id": "echo.harbor-stylesheet",
+  "title": "Harbor Stylesheet",
+  "version": "1.0.0",
+  "content": {
+    "kind": "theme",
+    "entry": "theme.json"
+  },
+  "compatibility": {
+    "minEchoVersion": "26.8.20"
+  },
+  "files": [
+    {
+      "path": "theme.css",
+      "size": 1328,
+      "sha256": "36156e03e30de5a01fb45cc04fbff4b655dd69c8de12b7aff7332a8afe8f1f58"
+    },
+    {
+      "path": "theme.json",
+      "size": 590,
+      "sha256": "cd312a6b8a5001e9b3072e17b9d8e68fda4d5c96b4805ac9cbae83971233abef"
+    }
+  ],
+  "license": {
+    "id": "All-Rights-Reserved",
+    "holder": "ECHO SDK"
+  }
+}

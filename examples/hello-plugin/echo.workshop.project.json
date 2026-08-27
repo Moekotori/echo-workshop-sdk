@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "appId": "5105090",
+  "publishedFileId": "0",
+  "contentDirectory": "content",
+  "previewFile": "preview.png",
+  "visibility": "private",
+  "description": "The smallest complete ECHO Workshop plug-in: one sandboxed command with a single playback:read permission, ready to grow into panels, providers or an author-owned catalog.",
+  "changeNote": "SDK 1.11.0 example: minimal sandboxed plug-in.",
+  "tags": [
+    "Sandboxed Plugin"
+  ]
+}

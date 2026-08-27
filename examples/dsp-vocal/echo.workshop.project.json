@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "appId": "5105090",
+  "publishedFileId": "0",
+  "contentDirectory": "content",
+  "previewFile": "preview.png",
+  "visibility": "private",
+  "description": "A conservative 31-band vocal EQ starting point. Native host / Audio Core still owns playback DSP.",
+  "changeNote": "SDK 1.4.0 example: vocal dsp-preset.",
+  "tags": [
+    "DSP / EQ Preset"
+  ]
+}

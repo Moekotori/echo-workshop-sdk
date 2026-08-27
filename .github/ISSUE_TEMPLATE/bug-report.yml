@@ -1,0 +1,64 @@
+name: Bug report
+description: A SDK command, template, schema or declaration misbehaves.
+title: "[bug] "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. Local SDK commands never upload to Steam, so
+        reproduction details are safe to share — but never paste credentials,
+        Steam tickets or personally identifying paths.
+  - type: textarea
+    id: version
+    attributes:
+      label: SDK version surface
+      description: |
+        Paste the output of `node bin/echo-workshop-sdk.mjs version --json`
+        (or `npx echo-workshop-sdk version --json`).
+      render: json
+    validations:
+      required: true
+  - type: input
+    id: command
+    attributes:
+      label: Exact command
+      placeholder: node bin/echo-workshop-sdk.mjs check ./my-theme
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Content kind involved
+      options:
+        - theme
+        - lyrics-style
+        - visualizer-preset
+        - dsp-preset
+        - audio-plugin-profile
+        - locale-pack
+        - plugin-package
+        - not kind-specific (CLI / docs / schemas)
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: What actually happened
+      description: Full CLI output, including the error and any hint lines.
+      render: text
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: OS and Node.js version
+      placeholder: Windows 11 x64 · Node 22.11.0
+    validations:
+      required: true

@@ -1,0 +1,75 @@
+# Standalone CI for the public echo-workshop-sdk mirror.
+# Zero-dependency by design: every gate below runs on bare Node.js.
+name: ECHO Workshop SDK CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  gate:
+    name: Gate (${{ matrix.os }} · Node ${{ matrix.node }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        node: [20, 22]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: SDK self-check
+        run: node bin/echo-workshop-sdk.mjs doctor
+      - name: Syntax-check CLI, libraries, templates and examples
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r -d '' file; do
+            node --check "$file"
+          done < <(find bin lib templates examples -type f \( -name '*.mjs' -o -name '*.js' \) -print0)
+      - name: Initialize, check and test all seven content kinds
+        shell: bash
+        run: |
+          set -euo pipefail
+          for kind in theme lyrics-style visualizer-preset dsp-preset audio-plugin-profile locale-pack plugin-package; do
+            node bin/echo-workshop-sdk.mjs init "$RUNNER_TEMP/sdk-$kind" --kind "$kind"
+            node bin/echo-workshop-sdk.mjs check "$RUNNER_TEMP/sdk-$kind"
+            node bin/echo-workshop-sdk.mjs test "$RUNNER_TEMP/sdk-$kind"
+          done
+      - name: Validate the bundled complete examples
+        shell: bash
+        run: |
+          set -euo pipefail
+          for example in hello-plugin minimal-theme stylesheet-theme retro-modern-ui-runtime lyrics-cinema-scene visualizer-radial dsp-vocal locale-wenyan; do
+            cp -R "examples/$example" "$RUNNER_TEMP/example-$example"
+            node bin/echo-workshop-sdk.mjs validate "$RUNNER_TEMP/example-$example"
+            node bin/echo-workshop-sdk.mjs test "$RUNNER_TEMP/example-$example"
+          done
+
+  types:
+    name: Strict TypeScript declarations
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Compile the public declarations under strict mode
+        run: |
+          npm install --no-save --no-audit --no-fund typescript@5
+          cat > tsconfig.types-check.json <<'JSON'
+          {
+            "compilerOptions": {
+              "strict": true,
+              "noEmit": true,
+              "target": "ES2022",
+              "lib": ["ES2022", "DOM"],
+              "types": []
+            },
+            "files": ["echo-workshop-plugin.d.ts", "echo-workshop-ui-runtime.d.ts"]
+          }
+          JSON
+          npx tsc --project tsconfig.types-check.json --pretty false
