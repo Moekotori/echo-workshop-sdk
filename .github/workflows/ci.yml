@@ -36,6 +36,20 @@ jobs:
           set -euo pipefail
           for kind in theme lyrics-style visualizer-preset dsp-preset audio-plugin-profile locale-pack plugin-package; do
             node bin/echo-workshop-sdk.mjs init "$RUNNER_TEMP/sdk-$kind" --kind "$kind"
+            if [[ "$kind" == "audio-plugin-profile" ]]; then
+              node --input-type=module - "$RUNNER_TEMP/sdk-$kind/content/audio-plugin-profile.json" <<'NODE'
+          import { readFile, writeFile } from 'node:fs/promises';
+          const path = process.argv[2];
+          const profile = JSON.parse(await readFile(path, 'utf8'));
+          profile.plugin = {
+            classId: '00112233445566778899AABBCCDDEEFF',
+            name: 'CI Fixture Effect',
+            vendor: 'ECHO SDK',
+          };
+          await writeFile(path, `${JSON.stringify(profile, null, 2)}\n`, 'utf8');
+          NODE
+              node bin/echo-workshop-sdk.mjs sync "$RUNNER_TEMP/sdk-$kind"
+            fi
             node bin/echo-workshop-sdk.mjs check "$RUNNER_TEMP/sdk-$kind"
             node bin/echo-workshop-sdk.mjs test "$RUNNER_TEMP/sdk-$kind"
           done
