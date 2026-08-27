@@ -35,7 +35,7 @@ jobs:
         run: |
           set -euo pipefail
           for kind in theme lyrics-style visualizer-preset dsp-preset audio-plugin-profile locale-pack plugin-package; do
-            node bin/echo-workshop-sdk.mjs init "$RUNNER_TEMP/sdk-$kind" --kind "$kind"
+            node bin/echo-workshop-sdk.mjs init "$RUNNER_TEMP/sdk-$kind" --kind "$kind" --holder "ECHO SDK"
             if [[ "$kind" == "audio-plugin-profile" ]]; then
               node --input-type=module - "$RUNNER_TEMP/sdk-$kind/content/audio-plugin-profile.json" <<'NODE'
           import { readFile, writeFile } from 'node:fs/promises';
