@@ -683,6 +683,7 @@ const doctor = async () => {
     'CONTRIBUTING.md',
     'GOVERNANCE.md',
     'CODE_OF_CONDUCT.md',
+    'SECURITY.md',
     'examples/retro-modern-ui-runtime/content/ui/app.js',
     'examples/lyrics-cinema-scene/content/lyrics-style.json',
     'examples/visualizer-radial/content/visualizer.json',

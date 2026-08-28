@@ -1,13 +1,21 @@
 # ECHO 创意工坊 SDK
 
-这是给作者用的便携工具箱。当前候选包版本 `1.11.0`，清单 schema `1`，插件 API `2`。它在 `1.10.0` 完整本地门禁的基础上补齐作者项目 Schema，并在本地提前拒绝非法发布路径、描述、可见性和标签；额外语言仍只活在工坊 JSON 里，本体仍只有五套内置语言。
+[![ECHO Workshop SDK CI](https://github.com/Moekotori/echo-workshop-sdk/actions/workflows/ci.yml/badge.svg)](https://github.com/Moekotori/echo-workshop-sdk/actions/workflows/ci.yml)
+
+[公开仓库](https://github.com/Moekotori/echo-workshop-sdk) · [最新版本](https://github.com/Moekotori/echo-workshop-sdk/releases/latest) · [私密报告安全问题](https://github.com/Moekotori/echo-workshop-sdk/security/advisories/new) · [English](./README.md)
+
+这是给作者用的便携工具箱。当前 GitHub 包版本 `1.11.1`，清单 schema `1`，插件 API `2`。它在 `1.11.0` 作者契约基础上补齐公开仓库元数据、私密安全报告入口和可复现的最小权限 CI；额外语言仍只活在工坊 JSON 里，本体仍只有五套内置语言。
 
 这些命令**永远不会上传**到 Steam。发布只能在 ECHO 创作台或仓库作者 CLI 里单独确认。
 
 ## 最快上手
 
+从 [GitHub 最新版本](https://github.com/Moekotori/echo-workshop-sdk/releases/latest) 下载 `echo-workshop-sdk-1.11.1.tgz`，再在本机安装或解包。该包刻意不发布到 npm。
+
 ```powershell
-node .\bin\echo-workshop-sdk.mjs init .\harbor --recipe css-theme
+npm install .\echo-workshop-sdk-1.11.1.tgz
+npx echo-workshop-sdk version --json
+npx echo-workshop-sdk init .\harbor --recipe css-theme
 cd .\harbor
 npm run next
 npm run check
@@ -78,20 +86,23 @@ node .\bin\echo-workshop-sdk.mjs fix .\my-theme
 
 整包 CSS 必须写在 `html[data-workshop-theme-pack="<id>"]` 下面。不能用 `FINAL`、`nyanCat`、`darkSideMoon` 当 `basePreset`。
 
-公开工坊 SDK 起步包是 [3784997717](https://steamcommunity.com/sharedfiles/filedetails/?id=3784997717) 的 `1.10.0`；`1.11.0` 目前只是本地候选。以后更新公开项必须继续用这一项，不要新建。
+公开工坊 SDK 起步包 [3784997717](https://steamcommunity.com/sharedfiles/filedetails/?id=3784997717) 当前是 `1.10.0`；独立 GitHub 包是 `1.11.1`，两条发布线分别推进。以后更新 Steam 公开项必须继续用这一项，不要新建。
 
 ## 独立 GitHub 镜像仓库
 
-SDK 还有一个独立的公开 GitHub 镜像仓库（建议名 `echo-workshop-sdk`），由 ECHO
+SDK 的独立公开仓库是
+[Moekotori/echo-workshop-sdk](https://github.com/Moekotori/echo-workshop-sdk)，由 ECHO
 仓库内的 `npm run workshop:sdk:export-mirror` 从本文件夹生成。想 fork SDK、提
 issue 或提 PR，都去镜像仓库；流程见 [CONTRIBUTING.md](./CONTRIBUTING.md)、
-[GOVERNANCE.md](./GOVERNANCE.md) 和[行为准则](./CODE_OF_CONDUCT.md)。镜像里生成的
+[GOVERNANCE.md](./GOVERNANCE.md)、[行为准则](./CODE_OF_CONDUCT.md)和
+[安全策略](./SECURITY.md)。镜像里生成的
 `MIRROR.md` 记录导出的 SDK 版本；`.github/workflows/ci.yml` 会在每次 push / PR
 上跑独立门禁（doctor、语法检查、七类内容 init/check/test、示例校验、严格
 TypeScript 声明编译）。
 
 私有 ECHO 仓库中的本文件夹是事实源；Steam 起步包 3784997717 面向通过 Steam
-安装的作者，装的是同一个包。镜像上被接受的贡献会由维护者合回事实源、跑完生产侧
+安装的作者，按独立节奏发布对应版本。镜像上被接受的贡献会由维护者合回事实源、
+跑完生产侧
 校验后重新导出，并在 CHANGELOG 中署名。镜像本身永远不发布到 Steam 或 npm。
 
 ## 许可

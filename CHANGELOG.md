@@ -1,5 +1,12 @@
 # ECHO Workshop SDK changelog
 
+## 1.11.1 — 2026-08-28
+
+- Added canonical GitHub repository, homepage and issue metadata to the standalone package while keeping `private: true` so npm publication remains an explicit future decision.
+- Added a public `SECURITY.md` and a direct GitHub private-vulnerability-reporting path for validation bypasses, sandbox/API discrepancies, unsafe network behavior and credential exposure.
+- Updated standalone and generated-project CI to current `actions/checkout` and `actions/setup-node` releases, pinned both actions by commit, restricted the token to read-only contents, added bounded timeouts and concurrency cancellation, and pinned the TypeScript declaration check to `5.9.3`.
+- Linked the real public repository and latest GitHub release from both READMEs, with offline `.tgz` installation instructions for `1.11.1`.
+
 ## 1.11.0 — 2026-08-24
 
 - Added an exported JSON Schema for `echo.workshop.project.json`, covering the fixed ECHO AppID, PublishedFileID, safe content/preview paths, visibility, listing copy and bounded unique tags.

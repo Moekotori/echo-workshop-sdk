@@ -1,10 +1,14 @@
 # ECHO Workshop SDK
 
-This folder is the portable developer kit for ECHO Steam Workshop. SDK version `1` targets Workshop manifest schema `1` and sandbox plug-in API `2`. Package version `1.11.0` adds a machine-readable authoring-project contract and fail-closed project metadata validation on top of the `1.10.0` local check gate. The five built-in app languages stay in ECHO. ECHO does not ship a third-party streaming platform.
+[![ECHO Workshop SDK CI](https://github.com/Moekotori/echo-workshop-sdk/actions/workflows/ci.yml/badge.svg)](https://github.com/Moekotori/echo-workshop-sdk/actions/workflows/ci.yml)
+
+[Public repository](https://github.com/Moekotori/echo-workshop-sdk) · [Latest release](https://github.com/Moekotori/echo-workshop-sdk/releases/latest) · [Report a vulnerability](https://github.com/Moekotori/echo-workshop-sdk/security/advisories/new) · [中文说明](./README.zh-CN.md)
+
+This folder is the portable developer kit for ECHO Steam Workshop. SDK version `1` targets Workshop manifest schema `1` and sandbox plug-in API `2`. Package version `1.11.1` adds public-repository metadata, a private vulnerability-reporting path, and reproducible least-privilege CI on top of the `1.11.0` authoring contract. The five built-in app languages stay in ECHO. ECHO does not ship a third-party streaming platform.
 
 The public Steam Workshop starter is
 [`3784997717`](https://steamcommunity.com/sharedfiles/filedetails/?id=3784997717)
-at published package version `1.10.0`; `1.11.0` is the next local release candidate until it is published. Later updates must keep that PublishedFileID.
+at published package version `1.10.0`. The standalone GitHub package is `1.11.1`; GitHub and Steam releases advance independently. Later Steam updates must keep that PublishedFileID.
 
 It contains:
 
@@ -26,8 +30,12 @@ The JSON Schemas improve editor feedback. ECHO's production parser remains autho
 
 ## Quick start from the packed SDK
 
+Download `echo-workshop-sdk-1.11.1.tgz` from the [latest GitHub release](https://github.com/Moekotori/echo-workshop-sdk/releases/latest), then install or unpack it locally. The package is intentionally not published to npm.
+
 ```powershell
-node .\bin\echo-workshop-sdk.mjs init .\harbor --recipe css-theme
+npm install .\echo-workshop-sdk-1.11.1.tgz
+npx echo-workshop-sdk version --json
+npx echo-workshop-sdk init .\harbor --recipe css-theme
 cd .\harbor
 npm run next
 npm run check
@@ -111,12 +119,14 @@ Generated plug-in projects reference `.echo-sdk/echo-workshop-plugin.d.ts`. The 
 
 ## Standalone GitHub mirror
 
-The SDK also lives as a standalone public GitHub repository (recommended name
-`echo-workshop-sdk`), generated from this folder with
+The SDK lives at
+[Moekotori/echo-workshop-sdk](https://github.com/Moekotori/echo-workshop-sdk),
+generated from this folder with
 `npm run workshop:sdk:export-mirror` inside the ECHO repository. The mirror is
 where to fork the SDK and where to file issues and pull requests; see
-[CONTRIBUTING.md](./CONTRIBUTING.md), [GOVERNANCE.md](./GOVERNANCE.md) and the
-[code of conduct](./CODE_OF_CONDUCT.md). Its generated `MIRROR.md` records the
+[CONTRIBUTING.md](./CONTRIBUTING.md), [GOVERNANCE.md](./GOVERNANCE.md), the
+[code of conduct](./CODE_OF_CONDUCT.md) and [security policy](./SECURITY.md).
+Its generated `MIRROR.md` records the
 exported SDK version, and `.github/workflows/ci.yml` runs the standalone gate
 (doctor, syntax checks, init/check/test for all seven kinds, example
 validation and a strict TypeScript declaration compile) on every push and
@@ -125,7 +135,8 @@ pull request.
 This folder inside the private ECHO repository remains the source of truth,
 and the Steam Workshop starter item
 [`3784997717`](https://steamcommunity.com/sharedfiles/filedetails/?id=3784997717)
-ships the same package for authors who install through Steam. Accepted mirror
+ships its separately released package for authors who install through Steam.
+Accepted mirror
 contributions are folded back into the source of truth, verified against the
 production host, and re-exported with credit in the changelog. The mirror
 never publishes to Steam or npm.

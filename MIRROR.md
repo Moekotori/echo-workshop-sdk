@@ -2,13 +2,13 @@
 
 This repository is the standalone public mirror of the ECHO Workshop SDK.
 
-- **SDK package version**: `1.11.0`
+- **SDK package version**: `1.11.1`
 - **Source of truth**: the `docs/workshop-sdk/` folder inside the private
-  ECHO application repository (exported from commit `388303cdd8c27a3317ef88279b6ea6efebeb132b`).
+  ECHO application repository (exported from commit `0397a9e8bfe3b7f210793b5b1c1a80bded941ac2`).
 - **How it is synced**: maintainers run `npm run workshop:sdk:export-mirror`
-  in the private repository and push the result here. Commit history on this
-  mirror may be rewritten on re-export; use tags and this file, not commit
-  hashes, as stable references.
+  in the private repository and push the result here. Normal re-exports append
+  commits and do not rewrite tagged history; use release tags and this file as
+  the stable mapping back to the source-of-truth commit.
 - **Where to contribute**: issues and pull requests are welcome here — see
   [CONTRIBUTING.md](./CONTRIBUTING.md) and [GOVERNANCE.md](./GOVERNANCE.md).
   Accepted changes are folded back into the source of truth, verified against

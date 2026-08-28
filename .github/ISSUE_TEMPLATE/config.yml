@@ -1,5 +1,8 @@
 blank_issues_enabled: false
 contact_links:
+  - name: Report a vulnerability privately
+    url: https://github.com/Moekotori/echo-workshop-sdk/security/advisories/new
+    about: Security-sensitive reports must use GitHub private vulnerability reporting, not a public issue.
   - name: ECHO Workshop SDK Starter on Steam
     url: https://steamcommunity.com/sharedfiles/filedetails/?id=3784997717
     about: The published starter item that ships this SDK. Subscription and Steam-side questions go there.

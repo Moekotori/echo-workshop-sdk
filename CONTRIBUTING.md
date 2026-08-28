@@ -1,7 +1,9 @@
 # Contributing to the ECHO Workshop SDK
 
 Thank you for helping improve the SDK. This document applies to the standalone
-public mirror (recommended repository name `echo-workshop-sdk`) and to the
+public mirror
+[Moekotori/echo-workshop-sdk](https://github.com/Moekotori/echo-workshop-sdk)
+and to the
 `docs/workshop-sdk/` folder inside the private ECHO repository, which is the
 source of truth. See [GOVERNANCE.md](./GOVERNANCE.md) for how the two relate.
 
@@ -20,9 +22,8 @@ source of truth. See [GOVERNANCE.md](./GOVERNANCE.md) for how the two relate.
 - **Pull requests** — fixes to the CLI, libraries, templates, examples,
   schemas, declarations and documentation are all welcome.
 
-Do not report security issues in public issues. Describe the impact privately
-to the maintainers first (a Steam Workshop item comment asking for a private
-channel is enough; do not post the details themselves publicly).
+Do not report security issues in public issues. Follow [SECURITY.md](./SECURITY.md)
+and use the repository's private vulnerability report form instead.
 
 ## Local development
 
@@ -104,4 +105,4 @@ Be kind; assume good intent; moderation decisions rest with the maintainers.
 - 红线：不加运行时依赖；不削弱 fail-closed 校验；SDK 命令永不上传 Steam；
   不加平台抓取、下载器或鉴权绕行。
 - 改了用户可见行为要同时更新中英文 README 和 CHANGELOG。
-- 贡献以 MIT 许可提交；安全问题请先私下联系维护者，不要公开细节。
+- 贡献以 MIT 许可提交；安全问题按 [SECURITY.md](./SECURITY.md) 通过 GitHub 私密报告入口提交，不要公开细节。

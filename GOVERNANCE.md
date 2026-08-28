@@ -9,8 +9,9 @@ how the public mirror relates to the ECHO application repository.
   ECHO application repository. The production Workshop host and the SDK share
   contracts (`contracts/*.json`) there, and the private repository's checks
   verify both sides against each other on every change.
-- **Public mirror**: a standalone repository (recommended name
-  `echo-workshop-sdk`) generated from the source of truth with the export
+- **Public mirror**:
+  [Moekotori/echo-workshop-sdk](https://github.com/Moekotori/echo-workshop-sdk),
+  generated from the source of truth with the export
   tool (`npm run workshop:sdk:export-mirror` in the private repository). The
   mirror contains everything in this package plus `MIRROR.md`, which records
   the exported SDK version.
@@ -22,8 +23,9 @@ how the public mirror relates to the ECHO application repository.
 Issues and pull requests happen on the public mirror. Accepted changes are
 applied to the source of truth by a maintainer (with contributor credit in
 the changelog), re-verified against the production host, and re-exported.
-Mirror history may therefore be rewritten on re-export; treat tags and
-`MIRROR.md`, not commit hashes, as stable references.
+Public mirror history is preserved: normal re-exports append commits and must
+not rewrite tagged history. Treat release tags and `MIRROR.md` as the stable
+mapping back to the private source-of-truth commit.
 
 ## Roles
 
@@ -79,7 +81,8 @@ against accidental npm publishes.
 ## 中文摘要
 
 - 私有 ECHO 仓库中的 `docs/workshop-sdk/` 是唯一事实源；公开镜像
-  （建议仓库名 `echo-workshop-sdk`）由导出脚本生成，issue 和 PR 在镜像上进行，
+  [Moekotori/echo-workshop-sdk](https://github.com/Moekotori/echo-workshop-sdk)
+  由导出脚本生成，issue 和 PR 在镜像上进行，公开后保留提交与 tag 历史，
   被接受的改动由维护者合入事实源、跑完生产侧校验后重新导出。
 - 版本号 `<sdkVersion>.<feature>.<fix>`：major 跟随清单 schema；1.x 内 API
   只能加不能破坏；破坏性修改必须开新的插件 API 版本并写迁移说明。
