@@ -34,7 +34,7 @@
     ],
       "plugin-package": [
         { "id": "basic", "label": "Single command starter", "default": true },
-        { "id": "complete", "label": "Commands, panel, Agent, providers and importable theme" },
+        { "id": "complete", "label": "Parameterized functions, panel, Agent, providers and importable theme" },
         { "id": "catalog", "label": "Author-owned searchable direct-stream catalog" },
         { "id": "lyrics", "label": "Lyrics provider plus current-lyrics panel" }
       ]

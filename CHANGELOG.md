@@ -1,5 +1,12 @@
 # ECHO Workshop SDK changelog
 
+## 1.12.0 — 2026-08-28
+
+- Added declarative parameterized commands: up to 12 host-rendered `string`, `number`, `boolean` or `select` fields, bounded defaults/ranges/options, and an optional confirmation message.
+- Added same-sandbox `echo.commands.execute()` and `echo.commands.list()` helpers so a custom function can compose registered commands without receiving another host permission or crossing plug-in boundaries.
+- Production validation rejects malformed parameter declarations and prevents parameterized commands from being attached to one-click player-bar or track-context actions.
+- Updated the complete plug-in preset with a working custom-function example that combines a host-owned form, command composition and bounded sandbox storage.
+
 ## 1.11.1 — 2026-08-28
 
 - Added canonical GitHub repository, homepage and issue metadata to the standalone package while keeping `private: true` so npm publication remains an explicit future decision.

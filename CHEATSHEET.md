@@ -38,6 +38,14 @@ One page, both languages. All commands are local-only and never upload to Steam.
 
 Add `--json` to `check`, `quality`, `test`, `validate`, `next`, `version`, `doctor`, `snippet`, `api`, `example list` for machine-readable output. `help <command>` or any command with `--help` prints focused usage.
 
+## Custom functions / 自定义功能
+
+- Add `parameters` to a declared command for a host-owned form: `string`, `number`, `boolean`, `select`; maximum 12 fields. / 在命令声明中加入 `parameters`，由宿主生成表单；最多 12 项。
+- Add `confirm` when the function has a meaningful side effect. / 有明显副作用的功能可加入 `confirm` 确认说明。
+- The handler receives one values object; compose another local command with `echo.commands.execute(id, input)`. / 处理函数收到一个参数对象；可用 `echo.commands.execute` 组合本插件命令。
+- Player-bar, track-context and automation actions stay one-click and must target a command without parameters or confirmation. / 播放器按钮、歌曲右键和自动化保持一键执行，只能绑定无需参数或确认的命令。
+- Generate the working example with `init ./dir --kind plugin-package --preset complete`. / 用 `complete` 预设直接生成可运行示例。
+
 ## VS Code tips / 编辑器技巧
 
 - Generated projects map every JSON file to its Schema (`.vscode/settings.json`), so bad fields are underlined while editing. / 生成项目已把所有 JSON 映射到 Schema，编辑时直接标红。

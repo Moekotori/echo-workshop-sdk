@@ -22,4 +22,6 @@ Complete Workshop projects (run `node ../../bin/echo-workshop-sdk.mjs test .`):
 - `dsp-vocal`: a conservative 31-band vocal EQ. Audio Core still owns playback DSP.
 - `locale-wenyan`: a literary Chinese (`lzh`) language pack. Extra languages live only in Workshop JSON; missing keys fall back to Simplified Chinese.
 
+For a parameterized custom-function project, run `init ./my-functions --kind plugin-package --preset complete`. Its `save-library-note` command demonstrates a host-rendered form, confirmation, `echo.commands.execute()` composition and sandbox-only storage without a custom HTML panel for the form.
+
 Run generated projects with `npm test` in the local mock host. Network requests are intentionally disabled there; production requests remain capability-gated and limited to declared hosts.

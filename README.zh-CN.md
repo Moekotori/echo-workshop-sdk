@@ -4,16 +4,16 @@
 
 [公开仓库](https://github.com/Moekotori/echo-workshop-sdk) · [最新版本](https://github.com/Moekotori/echo-workshop-sdk/releases/latest) · [私密报告安全问题](https://github.com/Moekotori/echo-workshop-sdk/security/advisories/new) · [English](./README.md)
 
-这是给作者用的便携工具箱。当前 GitHub 包版本 `1.11.1`，清单 schema `1`，插件 API `2`。它在 `1.11.0` 作者契约基础上补齐公开仓库元数据、私密安全报告入口和可复现的最小权限 CI；额外语言仍只活在工坊 JSON 里，本体仍只有五套内置语言。
+这是给作者用的便携工具箱。当前 GitHub 包版本 `1.12.0`，清单 schema `1`，插件 API `2`。这一版加入宿主生成的参数化功能表单和同沙箱命令组合，让作者不必为了几个输入框就单独制作面板；额外语言仍只活在工坊 JSON 里，本体仍只有五套内置语言。
 
 这些命令**永远不会上传**到 Steam。发布只能在 ECHO 创作台或仓库作者 CLI 里单独确认。
 
 ## 最快上手
 
-从 [GitHub 最新版本](https://github.com/Moekotori/echo-workshop-sdk/releases/latest) 下载 `echo-workshop-sdk-1.11.1.tgz`，再在本机安装或解包。该包刻意不发布到 npm。
+从 [GitHub 最新版本](https://github.com/Moekotori/echo-workshop-sdk/releases/latest) 下载 `echo-workshop-sdk-1.12.0.tgz`，再在本机安装或解包。该包刻意不发布到 npm。
 
 ```powershell
-npm install .\echo-workshop-sdk-1.11.1.tgz
+npm install .\echo-workshop-sdk-1.12.0.tgz
 npx echo-workshop-sdk version --json
 npx echo-workshop-sdk init .\harbor --recipe css-theme
 cd .\harbor
@@ -80,13 +80,19 @@ node .\bin\echo-workshop-sdk.mjs fix .\my-theme
 
 `contracts/plugin-api.json` 是生产宿主直接使用的“方法 → 权限”及常见错误恢复契约。运行 `echo-workshop-sdk api` 查看全部方法，`echo-workshop-sdk api echo.queue.moveItem` 查询单个方法，`echo-workshop-sdk api errors` 查看哪些错误可退避重试。用户拒绝直链来源或一起听上传后不得循环弹窗。
 
+## 参数化自定义功能
+
+清单里的命令现在可以声明最多 12 个 `parameters`，支持 `string`、`number`、`boolean` 和 `select`，也可以加一段 `confirm` 确认说明。ECHO 会用宿主界面生成并校验表单，再把一个结构化对象交给命令处理函数。创建歌单工具、可配置跳转、元数据辅助等小功能不再需要为了几个输入框自造 HTML 面板。参数化或需要确认的命令从插件功能坞启动；播放器按钮、歌曲右键菜单和自动化仍只能绑定无需交互的一键命令。
+
+同一沙箱内可以用 `await echo.commands.execute('command-id', input)` 复用其他命令，`echo.commands.list()` 可列出运行时已经注册的命令。这两个组合接口不增加权限，也不能跨插件调用。业务值仍应在处理函数中做防御性归一化。`complete` 插件模板已经演示宿主表单、确认、命令组合和受限沙箱存储。
+
 `validate` 会拒绝私网、本机、通配、重复和畸形 `networkHosts`，也会拒绝没有 `network:request` / `playback:share` 能力依据的域名声明。mock 会在 fixture 阶段拒绝未声明域名和自定义端口；生产网络请求与一起听上传会先解析公网地址，再固定连接到已校验地址，同时保留原域名的 Host/TLS 身份。为兼容性仍接受 HTTP(S)，作者应优先使用 HTTPS。
 
 便携 CLI 与 ECHO 宿主共用 `contracts/plugin-package-limits.json`：插件包最多 32 个文件，单个 UTF-8 文件最多 512 KiB，序列化整包最多 2 MiB；素材扩展名限 `.css`、`.html`、`.js`、`.mjs`、`.json`。三份共享契约（插件 API、包限额、内容类型）都可通过包导出被外部工具直接 import。插件入口仍须为 `.js`，`.mjs` 可作为被导入的模块素材。内层插件 `apiVersion` 必须与外层 Workshop 清单的 `compatibility.pluginApiVersion` 完全一致。
 
 整包 CSS 必须写在 `html[data-workshop-theme-pack="<id>"]` 下面。不能用 `FINAL`、`nyanCat`、`darkSideMoon` 当 `basePreset`。
 
-公开工坊 SDK 起步包 [3784997717](https://steamcommunity.com/sharedfiles/filedetails/?id=3784997717) 当前是 `1.10.0`；独立 GitHub 包是 `1.11.1`，两条发布线分别推进。以后更新 Steam 公开项必须继续用这一项，不要新建。
+公开工坊 SDK 起步包 [3784997717](https://steamcommunity.com/sharedfiles/filedetails/?id=3784997717) 当前是 `1.10.0`；独立 GitHub 包是 `1.12.0`，两条发布线分别推进。以后更新 Steam 公开项必须继续用这一项，不要新建。
 
 ## 独立 GitHub 镜像仓库
 

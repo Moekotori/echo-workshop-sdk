@@ -104,7 +104,35 @@
         "id": { "$ref": "#/$defs/contributionId" },
         "title": { "$ref": "#/$defs/title" },
         "description": { "$ref": "#/$defs/description" },
-        "timeoutMs": { "type": "integer", "minimum": 1 }
+        "timeoutMs": { "type": "integer", "minimum": 1 },
+        "confirm": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "parameters": {
+          "type": "array",
+          "maxItems": 12,
+          "items": { "$ref": "#/$defs/commandParameter" }
+        }
+      }
+    },
+    "commandParameter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "type"],
+      "properties": {
+        "id": { "$ref": "#/$defs/contributionId" },
+        "title": { "$ref": "#/$defs/title" },
+        "description": { "$ref": "#/$defs/description" },
+        "type": { "enum": ["string", "select", "boolean", "number"] },
+        "defaultValue": { "type": ["string", "number", "boolean", "null"] },
+        "options": {
+          "type": "array",
+          "maxItems": 24,
+          "items": { "$ref": "#/$defs/settingOption" }
+        },
+        "placeholder": { "type": "string", "maxLength": 120 },
+        "min": { "type": "number" },
+        "max": { "type": "number" },
+        "step": { "type": "number", "exclusiveMinimum": 0 },
+        "required": { "type": "boolean" }
       }
     },
     "trackContextMenu": {

@@ -4,11 +4,11 @@
 
 [Public repository](https://github.com/Moekotori/echo-workshop-sdk) · [Latest release](https://github.com/Moekotori/echo-workshop-sdk/releases/latest) · [Report a vulnerability](https://github.com/Moekotori/echo-workshop-sdk/security/advisories/new) · [中文说明](./README.zh-CN.md)
 
-This folder is the portable developer kit for ECHO Steam Workshop. SDK version `1` targets Workshop manifest schema `1` and sandbox plug-in API `2`. Package version `1.11.1` adds public-repository metadata, a private vulnerability-reporting path, and reproducible least-privilege CI on top of the `1.11.0` authoring contract. The five built-in app languages stay in ECHO. ECHO does not ship a third-party streaming platform.
+This folder is the portable developer kit for ECHO Steam Workshop. SDK version `1` targets Workshop manifest schema `1` and sandbox plug-in API `2`. Package version `1.12.0` adds host-rendered parameterized functions and same-sandbox command composition, so authors can build useful tools without creating a custom panel for every interaction. The five built-in app languages stay in ECHO. ECHO does not ship a third-party streaming platform.
 
 The public Steam Workshop starter is
 [`3784997717`](https://steamcommunity.com/sharedfiles/filedetails/?id=3784997717)
-at published package version `1.10.0`. The standalone GitHub package is `1.11.1`; GitHub and Steam releases advance independently. Later Steam updates must keep that PublishedFileID.
+at published package version `1.10.0`. The standalone GitHub package is `1.12.0`; GitHub and Steam releases advance independently. Later Steam updates must keep that PublishedFileID.
 
 It contains:
 
@@ -30,10 +30,10 @@ The JSON Schemas improve editor feedback. ECHO's production parser remains autho
 
 ## Quick start from the packed SDK
 
-Download `echo-workshop-sdk-1.11.1.tgz` from the [latest GitHub release](https://github.com/Moekotori/echo-workshop-sdk/releases/latest), then install or unpack it locally. The package is intentionally not published to npm.
+Download `echo-workshop-sdk-1.12.0.tgz` from the [latest GitHub release](https://github.com/Moekotori/echo-workshop-sdk/releases/latest), then install or unpack it locally. The package is intentionally not published to npm.
 
 ```powershell
-npm install .\echo-workshop-sdk-1.11.1.tgz
+npm install .\echo-workshop-sdk-1.12.0.tgz
 npx echo-workshop-sdk version --json
 npx echo-workshop-sdk init .\harbor --recipe css-theme
 cd .\harbor
@@ -114,6 +114,12 @@ These commands never upload or publish anything. Steam upload remains an explici
 Generated plug-in projects reference `.echo-sdk/echo-workshop-plugin.d.ts`. The declaration covers the sanitized track, album, artist, genre, playlist, queue, like, direct-source and listen-together results returned by API 2. Editor completion therefore follows the public sandbox contract; authors do not need application source types or host internals. Run `echo-workshop-sdk guide types` for the shortest setup reminder.
 
 `contracts/plugin-api.json` is the machine-readable method-to-permission and common-error contract used by the production host. Run `echo-workshop-sdk api`, filter with `echo-workshop-sdk api echo.queue.moveItem`, or inspect recovery guidance with `echo-workshop-sdk api errors`. A permission change is subscriber-visible; never loop on user-denied direct-source or sharing prompts.
+
+## Parameterized custom functions
+
+A declared command may include up to 12 `parameters` (`string`, `number`, `boolean` or `select`) plus an optional `confirm` message. ECHO renders and validates the form in host UI, then passes one structured object to the registered handler. Use this for small tools such as playlist builders, configurable navigation actions or metadata helpers instead of shipping a panel just to collect a few values. Parameterized or confirmation-gated commands are launched from the plug-in function dock; one-click player-bar, track-context and automation actions must continue to target commands that need no interaction.
+
+Commands can reuse other commands in the same sandbox with `await echo.commands.execute('command-id', input)`, and `echo.commands.list()` returns the runtime's registered command titles. These local composition helpers add no permission and cannot cross into another plug-in. Handlers should still normalize business-level values defensively. The `complete` plug-in preset demonstrates a host-generated form, confirmation, command composition and bounded sandbox storage.
 
 `validate` rejects private, local, wildcard, duplicate and malformed `networkHosts`, plus host declarations without `network:request` or `playback:share`. The mock rejects undeclared destinations and custom ports before a fixture can pass. Production network requests and playback-sharing uploads resolve a public address and connect to that validated address while preserving the declared Host/TLS identity. HTTP(S) remains accepted for compatibility, but authors should use HTTPS for requests and uploads.
 

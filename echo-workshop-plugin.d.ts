@@ -309,10 +309,22 @@ interface EchoWorkshopSandboxLyrics {
   syncedText: string | null;
 }
 
+interface EchoWorkshopRegisteredCommand {
+  id: string;
+  title: string;
+}
+
+type EchoWorkshopCommandInput = Record<string, string | number | boolean | null>;
+
 interface EchoWorkshopApi {
   commands: {
     /** A trackContextMenus command receives one sanitized EchoWorkshopTrack as its first argument. */
-    register(id: string, metadata: { title: string }, handler: (...args: unknown[]) => unknown | Promise<unknown>): void;
+    /** A parameterized command receives one host-validated EchoWorkshopCommandInput as its first argument. */
+    register<TInput = unknown, TResult = unknown>(id: string, metadata: { title: string }, handler: (input: TInput, ...args: unknown[]) => TResult | Promise<TResult>): void;
+    /** Compose declared commands inside the same sandbox without adding a host permission. */
+    execute<TResult = unknown>(id: string, input?: unknown): Promise<TResult>;
+    /** Return commands registered by this plug-in runtime. */
+    list(): ReadonlyArray<EchoWorkshopRegisteredCommand>;
   };
   events: {
     on(eventName: 'playback:status' | 'audio:spectrum' | 'queue:changed' | 'library:changed' | 'library:liked-changed' | 'settings:changed', handler: (payload: unknown) => unknown): EchoWorkshopUnsubscribe;

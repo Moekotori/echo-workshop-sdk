@@ -1,6 +1,6 @@
 {
   "sdkVersion": 1,
-  "packageVersion": "1.11.1",
+  "packageVersion": "1.12.0",
   "manifest": {
     "type": "echo-workshop-item",
     "schemaVersions": [1],

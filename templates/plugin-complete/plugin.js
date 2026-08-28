@@ -4,6 +4,22 @@ echo.commands.register('library-summary', { title: 'Library summary' }, async ()
   const summary = await echo.library.getSummary();
   await echo.storage.set('lastSummary', summary);
   await echo.ui.notify(`Library has ${summary.trackCount || 0} tracks.`);
+  return summary;
+});
+
+echo.commands.register('save-library-note', { title: 'Save a custom library note' }, async (input = {}) => {
+  const summary = await echo.commands.execute('library-summary');
+  const note = {
+    name: String(input.name || 'library-note'),
+    style: input.style === 'detailed' ? 'detailed' : 'brief',
+    includeAlbums: input.includeAlbums === true,
+    limit: Math.max(1, Math.min(100, Number(input.limit) || 20)),
+    trackCount: summary.trackCount || 0,
+    albumCount: input.includeAlbums === true ? summary.albumCount || 0 : null,
+  };
+  await echo.storage.set(`note:${note.name}`, note);
+  await echo.ui.notify(`Saved ${note.name}.`);
+  return note;
 });
 
 echo.commands.register('inspect-track', { title: 'Inspect track' }, async (track) => {
