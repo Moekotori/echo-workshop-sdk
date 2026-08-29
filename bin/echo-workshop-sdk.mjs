@@ -86,6 +86,7 @@ const nativeShellLimits = JSON.parse(await readFile(resolve(sdkRoot, 'contracts'
 const maximumNativeShellPackageBytes = Number(nativeShellLimits.maximumPackageBytes);
 const maximumNativeShellFiles = Number(nativeShellLimits.maximumFiles);
 const maximumNativeShellFileBytes = Number(nativeShellLimits.maximumFileBytes);
+const allowedNativeShellExtensions = new Set(nativeShellLimits.supportedAssetExtensions);
 const previewPng = createListingPreviewPng();
 const booleanFlags = new Set(['json', 'warn-only', 'help']);
 
@@ -197,6 +198,9 @@ const collectContentInventory = async (root, current = root, kind = null) => {
     if (content.byteLength > maximumBytes) fail(`Content file exceeds ${maximumBytes} bytes: ${relativePath}`);
     if (isExternalPluginAsset && !allowedExternalAssetExtensions.has(extname(relativePath).toLowerCase())) {
       fail(`Unsupported external plug-in asset: ${relativePath}`);
+    }
+    if (kind === 'native-shell' && !allowedNativeShellExtensions.has(extname(relativePath).toLowerCase())) {
+      fail(`Unsupported native-shell asset: ${relativePath}`);
     }
     output.push({ path: relativePath, size: content.byteLength, sha256: hash(content) });
   }
