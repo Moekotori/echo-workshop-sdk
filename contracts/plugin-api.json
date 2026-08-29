@@ -69,6 +69,34 @@
       "method": "echo.audio.getSpectrum",
       "permission": "audio:spectrum"
     },
+    "audio:dsp:getModule": {
+      "method": "echo.audio.dsp.getModule",
+      "permission": "audio:dsp-read"
+    },
+    "audio:dsp:getRackOrder": {
+      "method": "echo.audio.dsp.getRackOrder",
+      "permission": "audio:dsp-read"
+    },
+    "audio:dsp:setModule": {
+      "method": "echo.audio.dsp.setModule",
+      "permission": "audio:dsp-write"
+    },
+    "audio:dsp:setRackOrder": {
+      "method": "echo.audio.dsp.setRackOrder",
+      "permission": "audio:dsp-write"
+    },
+    "audio:offline:open": {
+      "method": "echo.audio.offline.open",
+      "permission": "audio:offline-read"
+    },
+    "audio:offline:read": {
+      "method": "echo.audio.offline.read",
+      "permission": "audio:offline-read"
+    },
+    "audio:offline:close": {
+      "method": "echo.audio.offline.close",
+      "permission": "audio:offline-read"
+    },
     "library:getSummary": {
       "method": "echo.library.getSummary",
       "permission": "library:read"
@@ -252,6 +280,14 @@
     "storage:remove": {
       "method": "echo.storage.remove",
       "permission": "fs:plugin"
+    },
+    "files:export": {
+      "method": "echo.files.export",
+      "permission": "fs:export"
+    },
+    "trusted:invoke": {
+      "method": "echo.trusted.invoke",
+      "permission": "system:full"
     },
     "ui:notify": {
       "method": "echo.ui.notify",

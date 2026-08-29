@@ -43,6 +43,7 @@ import { buildQualityReport } from '../lib/quality-report.mjs';
 import { startMockHost, testWorkshopItem } from '../lib/mock-host.mjs';
 import { createDebouncedRunner, isGeneratedWorkshopChange } from '../lib/watch-utils.mjs';
 import { validateWorkshopNetworkDeclaration } from '../lib/network-policy.mjs';
+import { validateNativeShellEntry } from '../lib/native-shell.mjs';
 import { createListingPreviewPng } from '../lib/preview-png.mjs';
 import { lyricsPageStyles, visualizerStyles } from '../lib/kind-presets.mjs';
 import {
@@ -77,6 +78,14 @@ const maximumPluginPackageBytes = Number(pluginPackageLimits.maximumPackageBytes
 const maximumPluginFiles = Number(pluginPackageLimits.maximumFiles);
 const maximumPluginFileBytes = Number(pluginPackageLimits.maximumFileBytes);
 const allowedSourceExtensions = new Set(pluginPackageLimits.supportedAssetExtensions);
+const externalAssetPrefix = String(pluginPackageLimits.externalAssetPrefix);
+const maximumExternalAssetFileBytes = Number(pluginPackageLimits.maximumExternalAssetFileBytes);
+const maximumExternalAssetBytes = Number(pluginPackageLimits.maximumExternalAssetBytes);
+const allowedExternalAssetExtensions = new Set(pluginPackageLimits.supportedExternalAssetExtensions);
+const nativeShellLimits = JSON.parse(await readFile(resolve(sdkRoot, 'contracts', 'native-shell-limits.json'), 'utf8'));
+const maximumNativeShellPackageBytes = Number(nativeShellLimits.maximumPackageBytes);
+const maximumNativeShellFiles = Number(nativeShellLimits.maximumFiles);
+const maximumNativeShellFileBytes = Number(nativeShellLimits.maximumFileBytes);
 const previewPng = createListingPreviewPng();
 const booleanFlags = new Set(['json', 'warn-only', 'help']);
 
@@ -170,17 +179,25 @@ const collectSourceFiles = async (root, current = root) => {
   return output.sort((left, right) => left.path.localeCompare(right.path));
 };
 
-const collectContentInventory = async (root, current = root) => {
+const collectContentInventory = async (root, current = root, kind = null) => {
   const output = [];
   for (const entry of await readdir(current, { withFileTypes: true })) {
     const path = resolve(current, entry.name);
     if (entry.isSymbolicLink()) fail(`Content symlink is not allowed: ${entry.name}`);
-    if (entry.isDirectory()) { output.push(...await collectContentInventory(root, path)); continue; }
+    if (entry.isDirectory()) { output.push(...await collectContentInventory(root, path, kind)); continue; }
     if (!entry.isFile()) fail(`Special content file is not allowed: ${entry.name}`);
     const relativePath = toSlash(relative(root, path));
     if (relativePath.toLowerCase() === manifestFileName) continue;
     const content = await readFile(path);
-    if (content.byteLength > 16 * 1024 * 1024) fail(`Content file exceeds 16 MB: ${relativePath}`);
+    const normalizedPath = relativePath.toLowerCase();
+    const isExternalPluginAsset = kind === 'plugin-package' && normalizedPath.startsWith(externalAssetPrefix);
+    const maximumBytes = kind === 'native-shell'
+      ? maximumNativeShellFileBytes
+      : isExternalPluginAsset ? maximumExternalAssetFileBytes : 16 * 1024 * 1024;
+    if (content.byteLength > maximumBytes) fail(`Content file exceeds ${maximumBytes} bytes: ${relativePath}`);
+    if (isExternalPluginAsset && !allowedExternalAssetExtensions.has(extname(relativePath).toLowerCase())) {
+      fail(`Unsupported external plug-in asset: ${relativePath}`);
+    }
     output.push({ path: relativePath, size: content.byteLength, sha256: hash(content) });
   }
   return output.sort((left, right) => left.path.localeCompare(right.path));
@@ -217,8 +234,18 @@ const validateProject = async (rootInput) => {
   if (!versionPattern.test(manifest.version) || !workshopTemplateKinds.includes(manifest.content?.kind) || !isSafeRelativePath(manifest.content.entry)) fail('Outer manifest content is invalid');
   if (!versionPattern.test(manifest.compatibility?.minEchoVersion)) fail('Compatibility declaration is invalid');
   if (manifest.content.kind === 'plugin-package' && ![1, 2].includes(manifest.compatibility?.pluginApiVersion)) fail('Plug-in compatibility declaration is invalid');
-  if (!Array.isArray(manifest.files) || manifest.files.length < 1 || manifest.files.length > 512) fail('Outer manifest file inventory is invalid');
-  const inventory = await collectContentInventory(contentRoot);
+  if (!Array.isArray(manifest.files) || manifest.files.length < 1
+    || manifest.files.length > (manifest.content.kind === 'native-shell' ? maximumNativeShellFiles : 512)) {
+    fail('Outer manifest file inventory is invalid');
+  }
+  const inventory = await collectContentInventory(contentRoot, contentRoot, manifest.content.kind);
+  const totalBytes = inventory.reduce((total, file) => total + file.size, 0);
+  const maximumTotalBytes = manifest.content.kind === 'plugin-package'
+    ? maximumExternalAssetBytes
+    : manifest.content.kind === 'native-shell'
+      ? maximumNativeShellPackageBytes
+      : 64 * 1024 * 1024;
+  if (totalBytes > maximumTotalBytes) fail(`Workshop content exceeds ${maximumTotalBytes} bytes`);
   const expected = new Map(inventory.map((file) => [file.path.toLowerCase(), file]));
   for (const file of manifest.files) {
     const actual = expected.get(String(file.path).toLowerCase());
@@ -234,6 +261,7 @@ const validateProject = async (rootInput) => {
   const entry = JSON.parse(packageText);
   if (!entry || typeof entry !== 'object' || Array.isArray(entry)) fail('Workshop entry must be a JSON object');
   if (manifest.content.kind === 'plugin-package') validatePackage(entry, manifest.id, manifest.compatibility.pluginApiVersion);
+  if (manifest.content.kind === 'native-shell') validateNativeShellEntry(entry, manifest.id);
   validateWorkshopNetworkDeclaration(manifest, entry);
   const previewPath = projectPath(root, project.previewFile, 'previewFile');
   const preview = await lstat(previewPath);
@@ -254,7 +282,10 @@ const syncProject = async (rootInput) => {
     validatePackage(packageValue, manifest.id, manifest.compatibility?.pluginApiVersion);
     await writeJson(projectPath(contentRoot, manifest.content.entry, 'content.entry'), packageValue);
   }
-  await writeJson(manifestPath, { ...manifest, files: await collectContentInventory(contentRoot) });
+  await writeJson(manifestPath, {
+    ...manifest,
+    files: await collectContentInventory(contentRoot, contentRoot, manifest.content?.kind),
+  });
   return validateProject(root);
 };
 
@@ -276,12 +307,15 @@ const sdkPackageVersion = async () => {
 
 const copyPortableSdk = async (echoSdkRoot) => {
   await mkdir(resolve(echoSdkRoot, 'bin'), { recursive: true });
+  await mkdir(resolve(echoSdkRoot, 'contracts'), { recursive: true });
   await mkdir(resolve(echoSdkRoot, 'schemas'), { recursive: true });
   await cp(resolve(sdkRoot, 'echo-workshop-plugin.d.ts'), resolve(echoSdkRoot, 'echo-workshop-plugin.d.ts'));
   await cp(resolve(sdkRoot, 'echo-workshop-ui-runtime.d.ts'), resolve(echoSdkRoot, 'echo-workshop-ui-runtime.d.ts'));
+  await cp(resolve(sdkRoot, 'echo-workshop-native-shell.d.ts'), resolve(echoSdkRoot, 'echo-workshop-native-shell.d.ts'));
   await cp(resolve(sdkRoot, 'bin', 'echo-workshop-sdk.mjs'), resolve(echoSdkRoot, 'bin', 'echo-workshop-sdk.mjs'));
   await cp(resolve(sdkRoot, 'bin', 'echo-workshop-sdk.cmd'), resolve(echoSdkRoot, 'bin', 'echo-workshop-sdk.cmd'));
   await cp(resolve(sdkRoot, 'lib'), resolve(echoSdkRoot, 'lib'), { recursive: true });
+  await cp(resolve(sdkRoot, 'contracts'), resolve(echoSdkRoot, 'contracts'), { recursive: true });
   await cp(resolve(sdkRoot, 'schemas'), resolve(echoSdkRoot, 'schemas'), { recursive: true });
   await writeJson(resolve(echoSdkRoot, 'sdk-version.json'), { packageVersion: await sdkPackageVersion() });
 };
@@ -374,6 +408,7 @@ const initProject = async (rootInput, options) => {
       { fileMatch: [`/content/${templateEntryForKind('dsp-preset')}`], url: './.echo-sdk/schemas/dsp.schema.json' },
       { fileMatch: [`/content/${templateEntryForKind('audio-plugin-profile')}`], url: './.echo-sdk/schemas/audio-plugin-profile.schema.json' },
       { fileMatch: [`/content/${templateEntryForKind('locale-pack')}`], url: './.echo-sdk/schemas/locale-pack.schema.json' },
+      { fileMatch: [`/content/${templateEntryForKind('native-shell')}`], url: './.echo-sdk/schemas/native-shell.schema.json' },
     ],
   });
   await writeJson(resolve(root, '.vscode', 'echo-workshop.code-snippets'), createVsCodeSnippetsFile());
@@ -645,6 +680,7 @@ const doctor = async () => {
     'echo-workshop-sdk.json',
     'echo-workshop-plugin.d.ts',
     'echo-workshop-ui-runtime.d.ts',
+    'echo-workshop-native-shell.d.ts',
     'schemas/echo.workshop.schema.json',
     'schemas/project.schema.json',
     'schemas/plugin-package.schema.json',
@@ -653,7 +689,10 @@ const doctor = async () => {
     'schemas/visualizer.schema.json',
     'schemas/dsp.schema.json',
     'schemas/locale-pack.schema.json',
+    'schemas/native-shell.schema.json',
     'contracts/plugin-api.json',
+    'contracts/native-shell.json',
+    'contracts/native-shell-limits.json',
     'contracts/content-kinds.json',
     'templates/plugin-basic/plugin.js',
     'templates/plugin-complete/plugin.js',
@@ -676,6 +715,7 @@ const doctor = async () => {
     'lib/snippets.mjs',
     'lib/watch-utils.mjs',
     'lib/network-policy.mjs',
+    'lib/native-shell.mjs',
     'bin/echo-workshop-sdk.cmd',
     'README.zh-CN.md',
     'TROUBLESHOOTING.md',
@@ -691,6 +731,7 @@ const doctor = async () => {
     'examples/locale-wenyan/content/locale.json',
     'examples/hello-plugin/src/plugin.js',
     'examples/minimal-theme/content/theme.json',
+    'examples/native-shell-taskbar/content/native-shell.json',
   ];
   for (const path of required) await access(resolve(sdkRoot, ...path.split('/')), fsConstants.R_OK);
   const descriptor = await readJson(resolve(sdkRoot, 'echo-workshop-sdk.json'));
@@ -714,6 +755,16 @@ const versionSurface = async () => {
       maximumFileBytes: maximumPluginFileBytes,
       maximumPackageBytes: maximumPluginPackageBytes,
       supportedAssetExtensions: pluginPackageLimits.supportedAssetExtensions,
+      externalAssetPrefix,
+      maximumExternalAssetFileBytes,
+      maximumExternalAssetBytes,
+      supportedExternalAssetExtensions: pluginPackageLimits.supportedExternalAssetExtensions,
+    },
+    nativeShellLimits: {
+      maximumFiles: maximumNativeShellFiles,
+      maximumFileBytes: maximumNativeShellFileBytes,
+      maximumPackageBytes: maximumNativeShellPackageBytes,
+      supportedAssetExtensions: nativeShellLimits.supportedAssetExtensions,
     },
     kinds: workshopTemplateKinds.map((kind) => ({
       kind,
@@ -724,7 +775,7 @@ const versionSurface = async () => {
     recipes: workshopRecipes.map((recipe) => recipe.id),
     guideTopics,
     snippets: snippetNames,
-    contracts: ['contracts/plugin-api.json', 'contracts/plugin-package-limits.json', 'contracts/content-kinds.json'],
+    contracts: ['contracts/plugin-api.json', 'contracts/plugin-package-limits.json', 'contracts/native-shell.json', 'contracts/native-shell-limits.json', 'contracts/content-kinds.json'],
   };
 };
 
@@ -734,6 +785,7 @@ const formatVersionSurface = (surface) => [
   `UI runtime protocol: ${surface.uiRuntimeProtocolVersion} · stylesheet/runtime min ECHO: ${surface.stylesheetMinEchoVersion}`,
   `Content kinds: ${surface.contentKinds.join(', ')}`,
   `Plug-in limits: ${surface.pluginPackageLimits.maximumFiles} files · ${surface.pluginPackageLimits.maximumFileBytes} B/file · ${surface.pluginPackageLimits.maximumPackageBytes} B/package`,
+  `Native-shell limits: ${surface.nativeShellLimits.maximumFiles} files · ${surface.nativeShellLimits.maximumFileBytes} B/file · ${surface.nativeShellLimits.maximumPackageBytes} B/package`,
   `Recipes: ${surface.recipes.length} · guide topics: ${surface.guideTopics.length} · snippets: ${surface.snippets.length} (per-kind entries/tags via --json)`,
   `Machine-readable contracts: ${surface.contracts.join(', ')}`,
 ].join('\n');

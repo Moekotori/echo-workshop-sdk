@@ -45,7 +45,7 @@ Every pull request must pass the mirror CI (`.github/workflows/ci.yml`):
 1. `doctor` — the SDK tree is complete and internally consistent.
 2. `node --check` on every `.mjs`/`.js` file in `bin/`, `lib/`, `templates/`
    and `examples/`.
-3. `init` + `check` + `test` for all seven content kinds
+3. `init` + `check` + `test` for all eight content kinds
    (`theme`, `lyrics-style`, `visualizer-preset`, `dsp-preset`,
    `audio-plugin-profile`, `locale-pack`, `plugin-package`).
 4. `validate` + `test` for the bundled complete example projects.

@@ -1,5 +1,35 @@
 # ECHO Workshop SDK changelog
 
+## 1.15.0 — 2026-08-29
+
+- Added content kind `native-shell`: a Windows system-shell channel that speaks JSON Lines over a named pipe. This is not the sandboxed plug-in VM.
+- Promoted the AudioBand host protocol to official native-shell protocol v1 (`config` / `status` / `quit` inbound, `ready` / `log` / `command` outbound).
+- Added per-kind limits in `contracts/native-shell-limits.json` (512 files, 256 MiB/file, 512 MiB package, `.exe` / `.dll` allowed in the portable authoring gate) so a self-contained WinUI host can be packaged.
+- Added `echo-workshop-native-shell.d.ts`, `schemas/native-shell.schema.json`, `init --kind native-shell`, recipe `native-shell-taskbar`, and an authoring example that checks without the binary.
+- Official ECHO Steam remains fail-closed: the production Workshop validator still rejects packaged `.exe` / `.dll`, and the official client does not spawn subscriber-supplied hosts.
+
+## 1.14.0 — 2026-08-29
+
+- Added subscriber-approved `system:full` for both Steam Workshop and local plug-in packages. A matching `.mjs` `trustedEntry` runs in a dedicated ECHO utility process with normal Node.js file, network, child-process and local-resource access.
+- Added `echo.trusted.invoke(method, input)` so the default sandbox UI can call author-defined trusted methods without moving Node or raw preload objects into the renderer.
+- Enabling shows full-system access as desktop-application-equivalent authority; disabling terminates the utility process. Package updates still require exact capability approval.
+
+- Added the bounded `vocalCut` variant to the host-owned `workshopAudioEffect` slot. It performs realtime center-vocal suppression in Audio Core with adjustable strength and 80–300 Hz bass preservation; plug-ins still receive no realtime PCM callback or native code execution.
+- Added permission-gated DSP control for sandbox plug-ins: `audio:dsp-read` can inspect all eight host rack modules, rack order and the fixed-position `workshopAudioEffect`; `audio:dsp-write` covers the standard rack plus bounded Bitcrusher/Chiptune/Vocal Cut parameters.
+- DSP writes remain renderer control-plane requests routed through existing main/preload IPC and native-host validation. Plug-ins receive no raw IPC, audio buffers, native handle or realtime-thread execution.
+- `dsp-preset` may now declare one bounded, host-executed `audioEffect`: the compatible `bitcrusher` or the new `chiptune` stylizer with pulse, triangle-bass and transient-gated LFSR noise layers.
+- Upgraded ECHO 8-BIT into an interactive sandbox console with NES, Game Boy and Arcade profiles plus host-confirmed pulse, triangle, noise, drive, bit-depth and sample-hold controls.
+- Neither sandbox nor full-trust code runs on the realtime audio thread. Audio Core owns execution, smoothing, Pro entitlement, PCM/DSD bypass and host-confirmed state.
+- Disabling or unsubscribing the Workshop item that owns the active audio effect now clears that effect instead of leaving processing behind.
+
+## 1.13.0 — 2026-08-29
+
+- Added the pure-Workshop offline processing boundary. `audio:offline-read` opens a user-confirmed, host-decoded sequential PCM16 session for a local library track; the plug-in receives bounded chunks and sanitized metadata, never the source path, decoder handle or realtime Audio Core access.
+- Added `fs:export` for bounded MIDI, JSON, text, CSV and MusicXML results. The host owns the save dialog and destination write, and the sandbox receives only saved/cancelled status and byte count.
+- Plug-in Workshop items may carry hash-verified `.wasm`, `.onnx`, `.bin` and `.data` files under the outer `assets/` directory. These assets remain package-local and are available only through `echo-workshop://plugin/...`; undeclared files, other extensions and traversal fail closed.
+- Raised only the outer `plugin-package` envelope to 128 MiB per file and 256 MiB total for model assets. The inner executable/text `.echo` package remains limited to 32 files, 512 KiB per UTF-8 file and 2 MiB serialized; all non-plug-in Workshop kinds retain their 16 MiB/64 MiB limits.
+- The sandbox CSP now permits only the current plug-in package's module/model fetches and workers plus WebAssembly compilation, while keeping sibling plug-in assets, media, child frames, Node, raw IPC, arbitrary filesystem access and undeclared network destinations unavailable.
+
 ## 1.12.0 — 2026-08-28
 
 - Added declarative parameterized commands: up to 12 host-rendered `string`, `number`, `boolean` or `select` fields, bounded defaults/ranges/options, and an optional confirmation message.

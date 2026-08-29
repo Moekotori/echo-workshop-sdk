@@ -1,0 +1,26 @@
+{
+  "type": "object",
+  "properties": {
+    "widgetWidth": {
+      "type": "integer",
+      "minimum": 200,
+      "maximum": 800,
+      "default": 360
+    },
+    "uiScale": {
+      "type": "integer",
+      "minimum": 50,
+      "maximum": 200,
+      "default": 100
+    },
+    "alignment": {
+      "type": "string",
+      "enum": [
+        "left",
+        "center",
+        "right"
+      ],
+      "default": "right"
+    }
+  }
+}

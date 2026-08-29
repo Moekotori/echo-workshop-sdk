@@ -17,7 +17,7 @@
       "additionalProperties": false,
       "required": ["kind", "entry"],
       "properties": {
-        "kind": { "enum": ["theme", "lyrics-style", "visualizer-preset", "dsp-preset", "audio-plugin-profile", "locale-pack", "plugin-package"] },
+        "kind": { "enum": ["theme", "lyrics-style", "visualizer-preset", "dsp-preset", "audio-plugin-profile", "locale-pack", "plugin-package", "native-shell"] },
         "entry": { "$ref": "#/$defs/path" }
       }
     },
@@ -41,7 +41,7 @@
         "required": ["path", "size", "sha256"],
         "properties": {
           "path": { "$ref": "#/$defs/path" },
-          "size": { "type": "integer", "minimum": 0, "maximum": 16777216 },
+          "size": { "type": "integer", "minimum": 0, "maximum": 134217728 },
           "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
         }
       }

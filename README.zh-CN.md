@@ -4,16 +4,18 @@
 
 [公开仓库](https://github.com/Moekotori/echo-workshop-sdk) · [最新版本](https://github.com/Moekotori/echo-workshop-sdk/releases/latest) · [私密报告安全问题](https://github.com/Moekotori/echo-workshop-sdk/security/advisories/new) · [English](./README.md)
 
-这是给作者用的便携工具箱。当前 GitHub 包版本 `1.12.0`，清单 schema `1`，插件 API `2`。这一版加入宿主生成的参数化功能表单和同沙箱命令组合，让作者不必为了几个输入框就单独制作面板；额外语言仍只活在工坊 JSON 里，本体仍只有五套内置语言。
+这是给作者用的便携工具箱。当前 GitHub 包版本 `1.15.0`，清单 schema `1`，插件 API `2`。`1.15.0` 增加 `native-shell`：Windows 系统壳通道，走 named pipe 协议 v1，不是沙箱插件。`1.14.0` 起沙箱只是默认而不是上限：插件可申请 `system:full` 和 `.mjs` trustedEntry。额外语言仍只活在工坊 JSON 里。
+
+尚未发布的 API 还为固定 `workshopAudioEffect` 槽加入受限 `vocalCut` 状态：插件可设置实时中置人声抑制强度和 80–300 Hz 低频保护分频点，实际处理与平滑仍由 Audio Core 持有，插件不会进入实时线程。
 
 这些命令**永远不会上传**到 Steam。发布只能在 ECHO 创作台或仓库作者 CLI 里单独确认。
 
 ## 最快上手
 
-从 [GitHub 最新版本](https://github.com/Moekotori/echo-workshop-sdk/releases/latest) 下载 `echo-workshop-sdk-1.12.0.tgz`，再在本机安装或解包。该包刻意不发布到 npm。
+从 [GitHub 最新版本](https://github.com/Moekotori/echo-workshop-sdk/releases/latest) 下载 `echo-workshop-sdk-1.15.0.tgz`，再在本机安装或解包。该包刻意不发布到 npm。
 
 ```powershell
-npm install .\echo-workshop-sdk-1.12.0.tgz
+npm install .\echo-workshop-sdk-1.15.0.tgz
 npx echo-workshop-sdk version --json
 npx echo-workshop-sdk init .\harbor --recipe css-theme
 cd .\harbor
@@ -49,7 +51,13 @@ scaffold . --preset cinema
 
 歌词 `--preset`：`editorial`（默认）、`compact`、`cinema`、`cover`。  
 可视化 `--preset`：`bars`（默认）、`wave`、`radial`。宿主没有 `particles`。  
-DSP `--preset`：`flat`（默认）、`vocal`、`bass`，都是官方 31 段。
+DSP `--preset`：`flat`（默认）、`vocal`、`bass`、`8bit`，都是官方 31 段；`8bit` 会声明一个由宿主执行的受限 chiptune 风格器，包含方波、三角低频和瞬态门控 LFSR 噪声层。工坊包负责请求的效果参数，Audio Core 负责实时执行和实际生效状态。它属于 PCM 处理；PCM 转 SDM 会先处理，而 Native DSD / DoP 直通不进入这条效果链。
+
+直接生成可编辑的 8-bit 工坊项目：
+
+```powershell
+node .\bin\echo-workshop-sdk.mjs init .\my-8bit --recipe 8bit-audio
+```
 
 已经建好的色板项目，不必重来：
 
@@ -88,11 +96,11 @@ node .\bin\echo-workshop-sdk.mjs fix .\my-theme
 
 `validate` 会拒绝私网、本机、通配、重复和畸形 `networkHosts`，也会拒绝没有 `network:request` / `playback:share` 能力依据的域名声明。mock 会在 fixture 阶段拒绝未声明域名和自定义端口；生产网络请求与一起听上传会先解析公网地址，再固定连接到已校验地址，同时保留原域名的 Host/TLS 身份。为兼容性仍接受 HTTP(S)，作者应优先使用 HTTPS。
 
-便携 CLI 与 ECHO 宿主共用 `contracts/plugin-package-limits.json`：插件包最多 32 个文件，单个 UTF-8 文件最多 512 KiB，序列化整包最多 2 MiB；素材扩展名限 `.css`、`.html`、`.js`、`.mjs`、`.json`。三份共享契约（插件 API、包限额、内容类型）都可通过包导出被外部工具直接 import。插件入口仍须为 `.js`，`.mjs` 可作为被导入的模块素材。内层插件 `apiVersion` 必须与外层 Workshop 清单的 `compatibility.pluginApiVersion` 完全一致。
+便携 CLI 与 ECHO 宿主共用 `contracts/plugin-package-limits.json`。内层可执行/文本 `.echo` 包仍最多 32 个文件、单个 UTF-8 文件最多 512 KiB、序列化整包最多 2 MiB，扩展名限 `.css`、`.html`、`.js`、`.mjs`、`.json`。外层 `plugin-package` 工坊项可以在 `assets/` 下额外携带清单哈希覆盖的 `.wasm`、`.onnx`、`.bin`、`.data`，单文件最多 128 MiB、合计最多 256 MiB；插件用 `new URL('./assets/model.onnx', location.href)` 这类相对 URL 读取，不能访问包外文件。`native-shell` 走单独的 `contracts/native-shell-limits.json`（512 文件、单文件 256 MiB、整包 512 MiB）。官方 Steam 校验仍拒绝订阅者 `.exe` / `.dll`。共享契约都可通过包导出被外部工具直接 import。插件入口仍须为 `.js`，`.mjs` 可作为被导入的模块素材。内层插件 `apiVersion` 必须与外层 Workshop 清单的 `compatibility.pluginApiVersion` 完全一致。
 
 整包 CSS 必须写在 `html[data-workshop-theme-pack="<id>"]` 下面。不能用 `FINAL`、`nyanCat`、`darkSideMoon` 当 `basePreset`。
 
-公开工坊 SDK 起步包 [3784997717](https://steamcommunity.com/sharedfiles/filedetails/?id=3784997717) 当前是 `1.10.0`；独立 GitHub 包是 `1.12.0`，两条发布线分别推进。以后更新 Steam 公开项必须继续用这一项，不要新建。
+公开工坊 SDK 起步包 [3784997717](https://steamcommunity.com/sharedfiles/filedetails/?id=3784997717) 当前是 `1.12.0`；独立 GitHub 包是 `1.15.0`，两条发布线分别推进。以后更新 Steam 公开项必须继续用这一项，不要新建。
 
 ## 独立 GitHub 镜像仓库
 
@@ -103,7 +111,7 @@ issue 或提 PR，都去镜像仓库；流程见 [CONTRIBUTING.md](./CONTRIBUTIN
 [GOVERNANCE.md](./GOVERNANCE.md)、[行为准则](./CODE_OF_CONDUCT.md)和
 [安全策略](./SECURITY.md)。镜像里生成的
 `MIRROR.md` 记录导出的 SDK 版本；`.github/workflows/ci.yml` 会在每次 push / PR
-上跑独立门禁（doctor、语法检查、七类内容 init/check/test、示例校验、严格
+上跑独立门禁（doctor、语法检查、八类内容 init/check/test、示例校验、严格
 TypeScript 声明编译）。
 
 私有 ECHO 仓库中的本文件夹是事实源；Steam 起步包 3784997717 面向通过 Steam

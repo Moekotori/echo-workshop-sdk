@@ -7,7 +7,8 @@
     { "kind": "dsp-preset", "entry": "dsp-preset.json", "tag": "DSP / EQ Preset", "defaultPreset": "flat" },
     { "kind": "audio-plugin-profile", "entry": "audio-plugin-profile.json", "tag": "DSP / EQ Preset" },
     { "kind": "locale-pack", "entry": "locale.json", "tag": "Language Pack" },
-    { "kind": "plugin-package", "entry": "community.echo", "tag": "Sandboxed Plugin", "defaultPreset": "basic" }
+    { "kind": "plugin-package", "entry": "community.echo", "tag": "Sandboxed Plugin", "defaultPreset": "basic" },
+    { "kind": "native-shell", "entry": "native-shell.json", "tag": "Native Shell" }
   ],
   "presets": {
     "theme": [
@@ -30,7 +31,8 @@
     "dsp-preset": [
       { "id": "flat", "label": "Flat 31-band starting point", "default": true },
       { "id": "vocal", "label": "Conservative vocal lift" },
-      { "id": "bass", "label": "Conservative low-end lift" }
+      { "id": "bass", "label": "Conservative low-end lift" },
+      { "id": "8bit", "label": "Host-executed console chiptune stylizer" }
     ],
       "plugin-package": [
         { "id": "basic", "label": "Single command starter", "default": true },
@@ -49,9 +51,11 @@
     { "id": "radial-visualizer", "kind": "visualizer-preset", "preset": "radial" },
     { "id": "bars-visualizer", "kind": "visualizer-preset", "preset": "bars" },
     { "id": "vocal-eq", "kind": "dsp-preset", "preset": "vocal" },
+    { "id": "8bit-audio", "kind": "dsp-preset", "preset": "8bit" },
     { "id": "plugin-complete", "kind": "plugin-package", "preset": "complete" },
     { "id": "source-catalog", "kind": "plugin-package", "preset": "catalog" },
     { "id": "lyrics-source", "kind": "plugin-package", "preset": "lyrics" },
-    { "id": "wenyan-locale", "kind": "locale-pack" }
+    { "id": "wenyan-locale", "kind": "locale-pack" },
+    { "id": "native-shell-taskbar", "kind": "native-shell" }
   ]
 }

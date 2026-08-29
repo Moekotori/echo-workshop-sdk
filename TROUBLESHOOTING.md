@@ -29,6 +29,8 @@ Keep iterating with `check . --warn-only` (reports everything, exits 0); publica
 | `Inner and outer plug-in apiVersion must match` | `community.echo` `manifest.apiVersion` must equal the outer manifest's `compatibility.pluginApiVersion`. |
 | `Plug-in package exceeds the host byte limit` | Contract: at most 32 files, 512 KiB per file, 2 MiB serialized. Split or trim assets. |
 | `Project tags are invalid` | 1–8 unique non-empty tags. Quality additionally warns when a tag is not configured on the ECHO AppID (run `kinds` for the configured tag per content kind). |
+| `native-shell.json has an invalid package header` | Use `type: echo-workshop-native-shell`, `schemaVersion: 1`, `protocolVersion: 1`. |
+| `native-shell exe path is invalid` | Relative `.exe` path only, for example `host/EchoShell.exe`. The binary itself is optional while authoring. |
 
 ## Mock-host (test / dev) denials
 

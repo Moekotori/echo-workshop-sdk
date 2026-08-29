@@ -21,10 +21,11 @@
         "apiVersion": { "enum": [1, 2] },
         "minEchoVersion": { "type": "string", "maxLength": 40 },
         "entry": { "allOf": [{ "$ref": "#/$defs/path" }, { "pattern": "\\.js$" }] },
+        "trustedEntry": { "allOf": [{ "$ref": "#/$defs/path" }, { "pattern": "\\.mjs$" }] },
         "panel": { "allOf": [{ "$ref": "#/$defs/path" }, { "pattern": "\\.html$" }] },
         "permissions": {
           "type": "array",
-          "maxItems": 17,
+          "maxItems": 32,
           "uniqueItems": true,
           "items": {
             "enum": [
@@ -33,6 +34,9 @@
               "playback:control",
               "playback:share",
               "audio:spectrum",
+              "audio:dsp-read",
+              "audio:dsp-write",
+              "audio:offline-read",
               "library:read",
               "library:control",
               "queue:read",
@@ -43,7 +47,9 @@
               "agent:runtime",
               "lyrics:provide",
               "lyrics:read",
-              "fs:plugin"
+              "fs:plugin",
+              "fs:export",
+              "system:full"
             ]
           }
         },

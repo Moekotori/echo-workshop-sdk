@@ -28,6 +28,38 @@
           "enabled": { "type": "boolean" }
         }
       }
+    },
+    "audioEffect": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "bitDepth", "sampleRateHz", "mix"],
+          "properties": {
+            "type": { "const": "bitcrusher" },
+            "bitDepth": { "type": "integer", "minimum": 4, "maximum": 16 },
+            "sampleRateHz": { "type": "integer", "minimum": 1000, "maximum": 192000 },
+            "mix": { "type": "number", "minimum": 0, "maximum": 1 },
+            "outputGainDb": { "type": "number", "minimum": -24, "maximum": 6 }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "bitDepth", "sampleRateHz", "mix", "pulseMix", "triangleMix", "noiseMix", "drive"],
+          "properties": {
+            "type": { "const": "chiptune" },
+            "bitDepth": { "type": "integer", "minimum": 4, "maximum": 16 },
+            "sampleRateHz": { "type": "integer", "minimum": 1000, "maximum": 192000 },
+            "mix": { "type": "number", "minimum": 0, "maximum": 1 },
+            "outputGainDb": { "type": "number", "minimum": -24, "maximum": 6 },
+            "pulseMix": { "type": "number", "minimum": 0, "maximum": 1 },
+            "triangleMix": { "type": "number", "minimum": 0, "maximum": 1 },
+            "noiseMix": { "type": "number", "minimum": 0, "maximum": 1 },
+            "drive": { "type": "number", "minimum": 1, "maximum": 8 }
+          }
+        }
+      ]
     }
   }
 }
