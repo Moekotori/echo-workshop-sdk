@@ -7,7 +7,8 @@
     "Visualizer Preset",
     "DSP / EQ Preset",
     "Language Pack",
-    "Sandboxed Plugin"
+    "Sandboxed Plugin",
+    "Native Shell"
   ],
   "kinds": {
     "theme": { "entry": "theme.json", "tag": "Theme" },
@@ -16,6 +17,7 @@
     "dsp-preset": { "entry": "dsp-preset.json", "tag": "DSP / EQ Preset" },
     "audio-plugin-profile": { "entry": "audio-plugin-profile.json", "tag": "DSP / EQ Preset" },
     "locale-pack": { "entry": "locale.json", "tag": "Language Pack" },
-    "plugin-package": { "entry": "community.echo", "tag": "Sandboxed Plugin" }
+    "plugin-package": { "entry": "community.echo", "tag": "Sandboxed Plugin" },
+    "native-shell": { "entry": "native-shell.json", "tag": "Native Shell" }
   }
 }

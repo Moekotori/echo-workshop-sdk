@@ -1,0 +1,30 @@
+{
+  "type": "echo-workshop-native-shell",
+  "schemaVersion": 1,
+  "id": "echo.native-shell-taskbar",
+  "title": "Native Shell Taskbar",
+  "description": "A Windows taskbar shell process. The host spawns the packaged exe and speaks native-shell protocol v1 over a named pipe.",
+  "protocolVersion": 1,
+  "platforms": [
+    "win32"
+  ],
+  "exe": "host/EchoShell.exe",
+  "renderer": "renderer.js",
+  "config": "config.json",
+  "configSchema": "config.schema.json",
+  "configUi": "config-ui.js",
+  "permissions": [
+    "process:spawn",
+    "ipc:named-pipe",
+    "shell:taskbar",
+    "cover:original",
+    "window:focus",
+    "playback:read",
+    "playback:control",
+    "lyrics:read"
+  ],
+  "pipe": {
+    "argument": "--pipe",
+    "stdio": "ignore"
+  }
+}

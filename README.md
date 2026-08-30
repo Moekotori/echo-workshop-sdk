@@ -4,20 +4,23 @@
 
 [Public repository](https://github.com/Moekotori/echo-workshop-sdk) · [Latest release](https://github.com/Moekotori/echo-workshop-sdk/releases/latest) · [Report a vulnerability](https://github.com/Moekotori/echo-workshop-sdk/security/advisories/new) · [中文说明](./README.zh-CN.md)
 
-This folder is the portable developer kit for ECHO Steam Workshop. SDK version `1` targets Workshop manifest schema `1` and sandbox plug-in API `2`. Package version `1.12.0` adds host-rendered parameterized functions and same-sandbox command composition, so authors can build useful tools without creating a custom panel for every interaction. The five built-in app languages stay in ECHO. ECHO does not ship a third-party streaming platform.
+This folder is the portable developer kit for ECHO Steam Workshop. SDK version `1` targets Workshop manifest schema `1` and plug-in API `2`. Package version `1.15.0` adds `native-shell`, a Windows system-shell channel (named pipe + packaged `.exe`) that is not the sandboxed plug-in VM. `1.14.0` still makes the sandbox a default rather than a ceiling: a plug-in may request `system:full`, declare a packaged `.mjs` `trustedEntry`, and—after explicit subscriber approval—run normal Node.js code in a dedicated ECHO utility process. The five built-in app languages stay in ECHO. ECHO does not ship a third-party streaming platform.
+
+The unreleased API surface also exposes a bounded `workshopAudioEffect.vocalCut` state for realtime center-vocal suppression. Audio Core owns execution and smoothing; plug-ins can set strength and an 80–300 Hz bass-preservation crossover, but still cannot run code on the realtime thread.
 
 The public Steam Workshop starter is
 [`3784997717`](https://steamcommunity.com/sharedfiles/filedetails/?id=3784997717)
-at published package version `1.10.0`. The standalone GitHub package is `1.12.0`; GitHub and Steam releases advance independently. Later Steam updates must keep that PublishedFileID.
+at published package version `1.12.0`. The standalone GitHub package is `1.15.0`; GitHub and Steam releases advance independently. Later Steam updates must keep that PublishedFileID.
 
 It contains:
 
 - `echo-workshop-plugin.d.ts`: editor completion for the sandbox `echo` global;
 - `echo-workshop-ui-runtime.d.ts`: editor completion for the theme UI `postMessage` bridge;
+- `echo-workshop-native-shell.d.ts`: editor completion for native-shell protocol v1;
 - `echo-workshop-sdk.json`: machine-readable supported-version contract;
 - `schemas/`: JSON Schema hints for the authoring project, manifests, themes and `.echo` packages;
 - `bin/echo-workshop-sdk.mjs`: zero-dependency project generator, inspector, mock host and preflight checker;
-- `templates/`: seven official content templates, theme/plugin presets and a GitHub Actions validation workflow;
+- `templates/`: eight official content templates, theme/plugin presets and a GitHub Actions validation workflow;
 - `examples/`: focused plug-in fragments, the day-one `hello-plugin` / `minimal-theme` starters, plus complete theme, lyrics, visualizer, DSP and locale-pack projects.
 
 Chinese author notes: [README.zh-CN.md](./README.zh-CN.md). A bilingual
@@ -30,10 +33,10 @@ The JSON Schemas improve editor feedback. ECHO's production parser remains autho
 
 ## Quick start from the packed SDK
 
-Download `echo-workshop-sdk-1.12.0.tgz` from the [latest GitHub release](https://github.com/Moekotori/echo-workshop-sdk/releases/latest), then install or unpack it locally. The package is intentionally not published to npm.
+Download `echo-workshop-sdk-1.15.0.tgz` from the [latest GitHub release](https://github.com/Moekotori/echo-workshop-sdk/releases/latest), then install or unpack it locally. The package is intentionally not published to npm.
 
 ```powershell
-npm install .\echo-workshop-sdk-1.12.0.tgz
+npm install .\echo-workshop-sdk-1.15.0.tgz
 npx echo-workshop-sdk version --json
 npx echo-workshop-sdk init .\harbor --recipe css-theme
 cd .\harbor
@@ -46,7 +49,7 @@ npm run dev
 
 The SDK is also a standalone npm package: `npm install <path-to-this-folder-or-packed-tgz>` gives you `npx echo-workshop-sdk`. `init`, `check`, `test`, `quality` and `dev` need only Node 20+, not an ECHO installation; publishing still happens in ECHO's Authoring Studio. `version --json` reports the supported schema, plug-in API, protocol and limit surface for external tooling.
 
-`--kind` accepts `theme`, `lyrics-style`, `visualizer-preset`, `dsp-preset`, `audio-plugin-profile`, `locale-pack` or `plugin-package`. `locale-pack` is a JSON string table for a language ECHO does not ship, such as literary Chinese (`lzh`). Missing keys fall back to a built-in locale.
+`--kind` accepts `theme`, `lyrics-style`, `visualizer-preset`, `dsp-preset`, `audio-plugin-profile`, `locale-pack`, `plugin-package` or `native-shell`. `locale-pack` is a JSON string table for a language ECHO does not ship, such as literary Chinese (`lzh`). Missing keys fall back to a built-in locale. `native-shell` is a Windows system-shell host (named pipe + packaged `.exe`), not the sandboxed plug-in VM. Official Steam Workshop validation still rejects subscriber `.exe` / `.dll` files.
 
 Theme `--preset` values:
 
@@ -65,7 +68,13 @@ Lyrics `--preset` values: `editorial` (default), `compact`, `cinema`, `cover`.
 
 Visualizer `--preset` values: `bars` (default), `wave`, `radial`. The host does not accept `particles`.
 
-DSP `--preset` values: `flat` (default), `vocal`, `bass`. All use the official 31-band layout.
+DSP `--preset` values: `flat` (default), `vocal`, `bass`, `8bit`. All use the official 31-band layout; `8bit` declares a bounded host-executed chiptune stylizer with pulse, triangle-bass and transient-gated LFSR noise layers. The Workshop package owns the requested effect parameters, while Audio Core owns realtime execution and effective state. This is PCM processing: PCM-to-SDM is processed before modulation, while Native DSD and DoP passthrough remain outside the effect path.
+
+Create the ready-to-edit 8-bit project with:
+
+```powershell
+node .\bin\echo-workshop-sdk.mjs init .\my-8bit --recipe 8bit-audio
+```
 
 Raise an existing theme later without starting over:
 
@@ -75,7 +84,7 @@ node .\bin\echo-workshop-sdk.mjs scaffold .\my-theme --preset runtime
 
 `npm run check` is the complete local gate: it synchronizes packaged content, validates hashes and schemas, runs the quality report, and executes deterministic fixtures. Use `npm run check -- --json` for one machine-readable result, or `--warn-only` to keep iterating with a passing exit code while failures are still reported; publication still requires a clean check. `doctor`, `validate` and `example list` also accept `--json`. The mock host enforces declared plug-in permissions, so undeclared capability use fails locally. `npm run dev` opens a live author console with gate status, permissions, fixtures, the latest changed file, copyable recovery commands and raw diagnostics; stylesheet, runtime, lyrics, visualizer and DSP projects also get a separate fixture preview. `npm run watch` and the dev console debounce editor save bursts, watch nested files and ignore the generated manifest update. This author-controlled local tool is not the production sandbox and must not be used as proof of Steam-client behavior.
 
-The portable CLI and ECHO host share the plug-in package contract in `contracts/plugin-package-limits.json`: at most 32 files, 512 KiB per UTF-8 file and 2 MiB for the serialized package, with `.css`, `.html`, `.js`, `.mjs` and `.json` assets. All three shared contracts (plug-in API, package limits, content kinds) are importable package exports for external tooling. A plug-in entry remains `.js`; `.mjs` is available to imported module assets. The inner plug-in `apiVersion` must exactly match the outer Workshop manifest's `compatibility.pluginApiVersion`.
+The portable CLI and ECHO host share the plug-in package contract in `contracts/plugin-package-limits.json`. The inner executable/text `.echo` package remains capped at 32 files, 512 KiB per UTF-8 file and 2 MiB serialized, with `.css`, `.html`, `.js`, `.mjs` and `.json` assets. A `plugin-package` Workshop item may additionally carry hash-listed `.wasm`, `.onnx`, `.bin` and `.data` files under `assets/`, capped at 128 MiB each and 256 MiB total. These assets are package-local: load them with a relative URL such as `new URL('./assets/model.onnx', location.href)`. Native-shell items use the separate `contracts/native-shell-limits.json` surface (512 files, 256 MiB/file, 512 MiB package). All shared contracts are importable package exports for external tooling. A plug-in entry remains `.js`; `.mjs` is available to imported module assets. The inner plug-in `apiVersion` must exactly match the outer Workshop manifest's `compatibility.pluginApiVersion`.
 
 Generated projects include VS Code JSON Schema mappings and tasks. Run the default build task for `ECHO Workshop: Check`, or start `ECHO Workshop: Dev console` without remembering CLI paths.
 
@@ -111,9 +120,41 @@ These commands never upload or publish anything. Steam upload remains an explici
 
 ## Public TypeScript contract
 
-Generated plug-in projects reference `.echo-sdk/echo-workshop-plugin.d.ts`. The declaration covers the sanitized track, album, artist, genre, playlist, queue, like, direct-source and listen-together results returned by API 2. Editor completion therefore follows the public sandbox contract; authors do not need application source types or host internals. Run `echo-workshop-sdk guide types` for the shortest setup reminder.
+Generated plug-in projects reference `.echo-sdk/echo-workshop-plugin.d.ts`. The declaration covers the sanitized track, album, artist, genre, playlist, queue, like, direct-source, listen-together and approved full-trust request surfaces returned by API 2. Authors do not need application source types or host internals. Run `echo-workshop-sdk guide types` for the shortest setup reminder.
 
 `contracts/plugin-api.json` is the machine-readable method-to-permission and common-error contract used by the production host. Run `echo-workshop-sdk api`, filter with `echo-workshop-sdk api echo.queue.moveItem`, or inspect recovery guidance with `echo-workshop-sdk api errors`. A permission change is subscriber-visible; never loop on user-denied direct-source or sharing prompts.
+
+## Full-system plug-ins
+
+Full-system access is available to Workshop packages, not only local projects. Declare the capability and a separate trusted module in the inner package manifest:
+
+```json
+{
+  "entry": "plugin.js",
+  "trustedEntry": "trusted.mjs",
+  "permissions": ["system:full"]
+}
+```
+
+`trusted.mjs` runs in a dedicated utility process with normal Node.js access to files, network, child processes and installed native modules. It may export `activate(context)`, `handle(request, context)` and `dispose(context)`. The verified Workshop content root is provided as `context.contentRoot`. The sandbox UI calls it explicitly:
+
+```js
+const result = await echo.trusted.invoke('scan-library', { deep: true });
+```
+
+```js
+// trusted.mjs
+import { readdir } from 'node:fs/promises';
+
+export async function handle({ method, input }, context) {
+  if (method === 'scan-library') {
+    return { input, files: await readdir(context.contentRoot) };
+  }
+  throw new Error(`Unknown method: ${method}`);
+}
+```
+
+ECHO shows `system:full` as desktop-application-equivalent access during enablement. Disabling the plug-in terminates the utility process. Audio output, playback completion and realtime DSP truth remain owned by Audio Core; a full-trust process may request host actions but does not become the playback clock.
 
 ## Parameterized custom functions
 
@@ -134,7 +175,7 @@ where to fork the SDK and where to file issues and pull requests; see
 [code of conduct](./CODE_OF_CONDUCT.md) and [security policy](./SECURITY.md).
 Its generated `MIRROR.md` records the
 exported SDK version, and `.github/workflows/ci.yml` runs the standalone gate
-(doctor, syntax checks, init/check/test for all seven kinds, example
+(doctor, syntax checks, init/check/test for all eight kinds, example
 validation and a strict TypeScript declaration compile) on every push and
 pull request.
 

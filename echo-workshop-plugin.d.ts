@@ -19,6 +19,199 @@ interface EchoWorkshopSpectrum {
   state: string;
 }
 
+interface EchoWorkshopOfflineAudioFormat {
+  sampleRate: number;
+  channels: 1 | 2;
+  sampleFormat: 's16le';
+}
+
+interface EchoWorkshopOfflineAudioSession {
+  sessionId: string;
+  trackId: string;
+  title: string;
+  durationSeconds: number;
+  format: EchoWorkshopOfflineAudioFormat;
+}
+
+interface EchoWorkshopOfflineAudioChunk {
+  sessionId: string;
+  /** Raw interleaved PCM16 LE encoded as base64. Local paths are never exposed. */
+  dataBase64: string;
+  byteLength: number;
+  frames: number;
+  eof: boolean;
+}
+
+interface EchoWorkshopFileExportResult {
+  saved: boolean;
+  byteLength: number;
+}
+
+type EchoWorkshopDspRackModuleId = 'equalizer' | 'convolution' | 'replayGain' | 'compressor'
+  | 'crossfeed' | 'stereoField' | 'channelMatrix' | 'channelBalance';
+type EchoWorkshopDspModuleId = EchoWorkshopDspRackModuleId | 'workshopAudioEffect';
+
+type EchoWorkshopEqFilterType = 'peaking' | 'lowShelf' | 'highShelf' | 'lowPass' | 'highPass' | 'notch';
+
+interface EchoWorkshopDspEqualizerBand {
+  frequencyHz: number;
+  gainDb: number;
+  q: number;
+  filterType?: EchoWorkshopEqFilterType;
+  enabled?: boolean;
+}
+
+interface EchoWorkshopDspEqualizerState {
+  enabled: boolean;
+  preampDb: number;
+  dspHeadroomDb?: number;
+  dspSafetyLimiterEnabled?: boolean;
+  bands: EchoWorkshopDspEqualizerBand[];
+  presetId: string;
+  presetName: string;
+  clippingRisk: boolean;
+}
+
+interface EchoWorkshopDspEqualizerPatch {
+  enabled?: boolean;
+  preampDb?: number;
+  dspHeadroomDb?: number;
+  dspSafetyLimiterEnabled?: boolean;
+  bands?: Array<Partial<EchoWorkshopDspEqualizerBand> & { band: number }>;
+}
+
+interface EchoWorkshopDspConvolutionState {
+  enabled: boolean;
+  status: 'empty' | 'loaded' | 'active' | 'error';
+  irId: string | null;
+  irName: string | null;
+  channelMode: 'none' | 'mono' | 'stereo';
+  sampleRate: number | null;
+  tapCount: number;
+  trimDb: number;
+  latencySamples: number;
+  clippingRisk: boolean;
+  error?: string | null;
+}
+
+interface EchoWorkshopDspReplayGainState {
+  enabled: boolean;
+  mode: 'off' | 'track' | 'album';
+  targetLufs: number;
+  preampDb: number;
+}
+
+interface EchoWorkshopDspCompressorWritableState {
+  enabled: boolean;
+  thresholdDb: number;
+  ratio: number;
+  attackMs: number;
+  releaseMs: number;
+  kneeDb: number;
+  makeupDb: number;
+  mix: number;
+  detectorMode: 'peak' | 'rms';
+  sidechainHighpassEnabled: boolean;
+  sidechainHighpassHz: number;
+  autoRelease: boolean;
+  rangeDb: number;
+  stereoLink: number;
+}
+
+interface EchoWorkshopDspCompressorState extends EchoWorkshopDspCompressorWritableState {
+  inputPeakDb: number[];
+  inputRmsDb: number[];
+  outputPeakDb: number[];
+  outputRmsDb: number[];
+  gainReductionDb: number;
+  gainReductionDbByChannel: number[];
+  outputHeadroomDb: number;
+  clippingRisk: boolean;
+}
+
+interface EchoWorkshopDspCrossfeedState {
+  enabled: boolean;
+  amount: number;
+  cutoffHz: number;
+}
+
+interface EchoWorkshopDspStereoFieldState {
+  enabled: boolean;
+  width: number;
+  centerGainDb: number;
+  sideGainDb: number;
+  clippingRisk: boolean;
+}
+
+interface EchoWorkshopDspChannelMatrixState {
+  enabled: boolean;
+  leftToLeft: number;
+  rightToLeft: number;
+  leftToRight: number;
+  rightToRight: number;
+  clippingRisk: boolean;
+}
+
+interface EchoWorkshopDspChannelBalanceBandGain {
+  leftGainDb: number;
+  rightGainDb: number;
+}
+
+interface EchoWorkshopDspChannelBalanceState {
+  enabled: boolean;
+  balance: number;
+  leftGainDb: number;
+  rightGainDb: number;
+  bandGains?: Partial<Record<'low' | 'mid' | 'high', EchoWorkshopDspChannelBalanceBandGain>>;
+  leftDelayMs?: number;
+  rightDelayMs?: number;
+  swapLeftRight: boolean;
+  monoMode: 'off' | 'sum' | 'left' | 'right';
+  invertLeft: boolean;
+  invertRight: boolean;
+  constantPower: boolean;
+  clippingRisk?: boolean;
+}
+
+interface EchoWorkshopAudioEffectState {
+  enabled: boolean;
+  effect: 'bitcrusher' | 'chiptune' | 'vocalCut';
+  bitDepth: number;
+  sampleRateHz: number;
+  mix: number;
+  outputGainDb: number;
+  pulseMix: number;
+  triangleMix: number;
+  noiseMix: number;
+  drive: number;
+  vocalCutStrength: number;
+  vocalCutBassPreserveHz: number;
+}
+
+interface EchoWorkshopDspModuleStateMap {
+  equalizer: EchoWorkshopDspEqualizerState;
+  convolution: EchoWorkshopDspConvolutionState;
+  replayGain: EchoWorkshopDspReplayGainState;
+  compressor: EchoWorkshopDspCompressorState;
+  crossfeed: EchoWorkshopDspCrossfeedState;
+  stereoField: EchoWorkshopDspStereoFieldState;
+  channelMatrix: EchoWorkshopDspChannelMatrixState;
+  channelBalance: EchoWorkshopDspChannelBalanceState;
+  workshopAudioEffect: EchoWorkshopAudioEffectState;
+}
+
+interface EchoWorkshopDspWritableStateMap {
+  equalizer: EchoWorkshopDspEqualizerPatch;
+  convolution: Pick<EchoWorkshopDspConvolutionState, 'enabled' | 'trimDb'>;
+  replayGain: EchoWorkshopDspReplayGainState;
+  compressor: EchoWorkshopDspCompressorWritableState;
+  crossfeed: EchoWorkshopDspCrossfeedState;
+  stereoField: Omit<EchoWorkshopDspStereoFieldState, 'clippingRisk'>;
+  channelMatrix: Omit<EchoWorkshopDspChannelMatrixState, 'clippingRisk'>;
+  channelBalance: Omit<EchoWorkshopDspChannelBalanceState, 'clippingRisk'>;
+  workshopAudioEffect: EchoWorkshopAudioEffectState;
+}
+
 interface EchoWorkshopPageQuery {
   page?: number;
   pageSize?: number;
@@ -351,6 +544,19 @@ interface EchoWorkshopApi {
   };
   audio: {
     getSpectrum(): Promise<EchoWorkshopSpectrum>;
+    dsp: {
+      getModule<T extends EchoWorkshopDspModuleId>(moduleId: T): Promise<EchoWorkshopDspModuleStateMap[T]>;
+      setModule<T extends EchoWorkshopDspModuleId>(moduleId: T, state: Partial<EchoWorkshopDspWritableStateMap[T]>): Promise<EchoWorkshopDspModuleStateMap[T]>;
+      getRackOrder(): Promise<EchoWorkshopDspRackModuleId[]>;
+      setRackOrder(order: EchoWorkshopDspRackModuleId[]): Promise<EchoWorkshopDspRackModuleId[]>;
+    };
+    offline: {
+      /** Starts a host-decoded local-track PCM stream after per-track user confirmation. */
+      open(options: { trackId: string; sampleRate?: number; channels?: 1 | 2 }): Promise<EchoWorkshopOfflineAudioSession>;
+      /** Reads a bounded sequential PCM chunk. At most one read may be pending per session. */
+      read(sessionId: string, options?: { maxFrames?: number }): Promise<EchoWorkshopOfflineAudioChunk>;
+      close(sessionId: string): Promise<null>;
+    };
   };
   library: {
     getSummary(): Promise<EchoWorkshopLibrarySummary>;
@@ -426,6 +632,17 @@ interface EchoWorkshopApi {
     get<T = unknown>(key: string): Promise<T | null>;
     set(key: string, value: unknown): Promise<null>;
     remove(key: string): Promise<null>;
+  };
+  files: {
+    /** Opens a host save dialog; the plug-in never receives the selected local path. */
+    export(options: { suggestedName: string; mimeType: string; dataBase64: string }): Promise<EchoWorkshopFileExportResult>;
+  };
+  trusted: {
+    /**
+     * Calls the package's trustedEntry in a separate ECHO utility process.
+     * Requires system:full approval. The trusted module has normal Node.js system access.
+     */
+    invoke<TResult = unknown>(method: string, input?: unknown): Promise<TResult>;
   };
   ui: {
     notify(message: string): Promise<null>;

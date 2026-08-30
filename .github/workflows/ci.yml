@@ -38,11 +38,11 @@ jobs:
           while IFS= read -r -d '' file; do
             node --check "$file"
           done < <(find bin lib templates examples -type f \( -name '*.mjs' -o -name '*.js' \) -print0)
-      - name: Initialize, check and test all seven content kinds
+      - name: Initialize, check and test all eight content kinds
         shell: bash
         run: |
           set -euo pipefail
-          for kind in theme lyrics-style visualizer-preset dsp-preset audio-plugin-profile locale-pack plugin-package; do
+          for kind in theme lyrics-style visualizer-preset dsp-preset audio-plugin-profile locale-pack plugin-package native-shell; do
             node bin/echo-workshop-sdk.mjs init "$RUNNER_TEMP/sdk-$kind" --kind "$kind" --holder "ECHO SDK"
             if [[ "$kind" == "audio-plugin-profile" ]]; then
               node --input-type=module - "$RUNNER_TEMP/sdk-$kind/content/audio-plugin-profile.json" <<'NODE'
@@ -65,7 +65,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for example in hello-plugin minimal-theme stylesheet-theme retro-modern-ui-runtime lyrics-cinema-scene visualizer-radial dsp-vocal locale-wenyan; do
+          for example in hello-plugin minimal-theme stylesheet-theme retro-modern-ui-runtime lyrics-cinema-scene visualizer-radial dsp-vocal locale-wenyan native-shell-taskbar; do
             cp -R "examples/$example" "$RUNNER_TEMP/example-$example"
             node bin/echo-workshop-sdk.mjs validate "$RUNNER_TEMP/example-$example"
             node bin/echo-workshop-sdk.mjs test "$RUNNER_TEMP/example-$example"

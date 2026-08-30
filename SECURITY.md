@@ -10,6 +10,13 @@ The portable SDK can model and test the public Workshop contract, but ECHO's
 production parser and sandbox remain authoritative. A local mock-host pass is
 not proof that production accepts or safely executes the same content.
 
+Offline processing remains host-mediated. `audio:offline-read` exposes only
+bounded sequential PCM decoded from a user-confirmed local library track; it
+does not expose the source path, decoder, realtime thread, playback session or
+arbitrary file reads. `fs:export` writes only an allowed bounded result chosen
+through the system save dialog. Model/WASM assets must live under `assets/`, be
+listed and hashed by the outer Workshop manifest, and remain package-local.
+
 ## Reporting a vulnerability
 
 Do not open a public issue for a suspected validation bypass, sandbox escape,

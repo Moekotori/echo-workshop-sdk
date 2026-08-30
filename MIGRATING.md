@@ -1,5 +1,7 @@
 # SDK migration policy
 
+SDK `1.15.0` is additive. Existing theme / lyrics / visualizer / DSP / locale / plug-in projects keep working. New kind `native-shell` is a system-shell channel (Windows exe + named pipe protocol v1). Do not convert a sandboxed plug-in to `native-shell` unless you actually ship a host process. Official Steam Workshop validation still rejects packaged `.exe` / `.dll`.
+
 There is no required migration for existing `1.0.0` through `1.5.0` projects.
 
 SDK `1.8.0` is additive. Shuffle/repeat, theme `storage`, collection play, lyrics transport slots, lyrics click-to-seek, appearance tokens, lyrics peeks, library revision, extra skin stages and `color`/`range` settings are optional. Declaring the new `storage` capability on an older host will fail closed until ECHO knows that capability. Existing runtimes without it keep working.

@@ -1,0 +1,50 @@
+{
+  "type": "echo-workshop-item",
+  "schemaVersion": 1,
+  "id": "echo.native-shell-taskbar",
+  "title": "Native Shell Taskbar",
+  "version": "1.0.0",
+  "content": {
+    "kind": "native-shell",
+    "entry": "native-shell.json"
+  },
+  "compatibility": {
+    "minEchoVersion": "26.8.15"
+  },
+  "files": [
+    {
+      "path": "config-ui.js",
+      "size": 410,
+      "sha256": "91c0e188c7fdf75b83fa7653025001e7ae205d05741b3afe871bd2cd7b4ba8ec"
+    },
+    {
+      "path": "config.json",
+      "size": 67,
+      "sha256": "e8d1f802625968f5cce9b81c2063ee1658da33f9a3983d1b3e0b1a9f47505507"
+    },
+    {
+      "path": "config.schema.json",
+      "size": 426,
+      "sha256": "c26737b51c514c866fe020cf8ab700847a2353d453a1657475cca96f7a62fd18"
+    },
+    {
+      "path": "host/README.md",
+      "size": 349,
+      "sha256": "05a4519c3bb463418a8bf2f2295d0186aa55bc054f77582ceb685f9fd0c683dd"
+    },
+    {
+      "path": "native-shell.json",
+      "size": 751,
+      "sha256": "8edccca108e7b667d8b4cc10576e7c802bca52c2470778fedfa9ce9e5e4f907d"
+    },
+    {
+      "path": "renderer.js",
+      "size": 234,
+      "sha256": "8dad37aab6917202d13fa181516608f1d8ad9c14c6c0d8c68b305bda50d813ac"
+    }
+  ],
+  "license": {
+    "id": "All-Rights-Reserved",
+    "holder": "ECHO SDK"
+  }
+}

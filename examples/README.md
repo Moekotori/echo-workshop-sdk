@@ -21,6 +21,7 @@ Complete Workshop projects (run `node ../../bin/echo-workshop-sdk.mjs test .`):
 - `visualizer-radial`: a radial spectrum using only host styles `bars`, `wave` and `radial`.
 - `dsp-vocal`: a conservative 31-band vocal EQ. Audio Core still owns playback DSP.
 - `locale-wenyan`: a literary Chinese (`lzh`) language pack. Extra languages live only in Workshop JSON; missing keys fall back to Simplified Chinese.
+- `native-shell-taskbar`: a Windows system-shell item using native-shell protocol v1. The host exe is optional while authoring. Official Steam Workshop will not spawn subscriber-supplied executables.
 
 For a parameterized custom-function project, run `init ./my-functions --kind plugin-package --preset complete`. Its `save-library-note` command demonstrates a host-rendered form, confirmation, `echo.commands.execute()` composition and sandbox-only storage without a custom HTML panel for the form.
 

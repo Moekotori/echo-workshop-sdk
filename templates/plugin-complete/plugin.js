@@ -17,7 +17,7 @@ echo.commands.register('save-library-note', { title: 'Save a custom library note
     trackCount: summary.trackCount || 0,
     albumCount: input.includeAlbums === true ? summary.albumCount || 0 : null,
   };
-  await echo.storage.set(`note:${note.name}`, note);
+  await echo.storage.set('library-note', note);
   await echo.ui.notify(`Saved ${note.name}.`);
   return note;
 });

@@ -7,6 +7,7 @@ One page, both languages. All commands are local-only and never upload to Steam.
 | Command | What it does | 作用 |
 | --- | --- | --- |
 | `init ./dir --kind theme` | New project; folder name becomes id/title | 新建项目，目录名即 id/标题 |
+| `init ./dir --kind native-shell` | Windows taskbar/shell host (exe + named pipe) | Windows 系统壳（exe + named pipe） |
 | `init ./dir --recipe css-theme` | Start from an outcome (`recipes` lists them) | 按效果起步（`recipes` 列表） |
 | `example list` / `example hello-plugin ./dir` | Copy a complete official example | 拷贝完整官方示例 |
 | `kinds` / `recipes` / `guide` | Catalogs and the Chinese cookbook | 类型/配方目录与中文说明书 |
