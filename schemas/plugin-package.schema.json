@@ -63,7 +63,7 @@
             "panels": { "type": "array", "items": { "$ref": "#/$defs/panel" } },
             "agents": { "type": "array", "maxItems": 8, "items": { "$ref": "#/$defs/agent" } },
             "sourceProviders": { "type": "array", "maxItems": 8, "items": { "$ref": "#/$defs/provider" } },
-            "lyricsProviders": { "type": "array", "maxItems": 8, "items": { "$ref": "#/$defs/provider" } },
+            "lyricsProviders": { "type": "array", "maxItems": 8, "items": { "$ref": "#/$defs/lyricsProvider" } },
             "metadataProviders": { "type": "array", "maxItems": 8, "items": { "$ref": "#/$defs/provider" } },
             "coverProviders": { "type": "array", "maxItems": 8, "items": { "$ref": "#/$defs/provider" } },
             "themePresets": { "type": "array", "maxItems": 12, "items": { "$ref": "#/$defs/themePreset" } },
@@ -92,6 +92,17 @@
     "contributionId": { "type": "string", "minLength": 3, "maxLength": 80, "pattern": "^[a-z0-9](?:[a-z0-9._-]{1,78}[a-z0-9])?$" },
     "title": { "type": "string", "minLength": 1, "maxLength": 80 },
     "description": { "type": "string", "maxLength": 180 },
+    "lyricsProvider": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title"],
+      "properties": {
+        "id": { "$ref": "#/$defs/contributionId" },
+        "title": { "$ref": "#/$defs/title" },
+        "description": { "$ref": "#/$defs/description" },
+        "automaticPriority": { "const": "highest" }
+      }
+    },
     "provider": {
       "type": "object",
       "additionalProperties": false,

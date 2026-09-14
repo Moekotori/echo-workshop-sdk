@@ -3,7 +3,7 @@
   "schemaVersion": 1,
   "id": "echo.locale.lzh",
   "title": "文言文",
-  "version": "1.2.0",
+  "version": "1.4.0",
   "content": {
     "kind": "locale-pack",
     "entry": "locale.json"
@@ -14,8 +14,8 @@
   "files": [
     {
       "path": "locale.json",
-      "size": 441303,
-      "sha256": "e6c803dd8a108ad57dcad79a092ca982faba572918647e06cd4b8a9d843c7ba3"
+      "size": 517924,
+      "sha256": "e157361c85b510fea670ca1e27da3790ad1a4f3663719a0b81132ed8f09463d9"
     }
   ],
   "license": {

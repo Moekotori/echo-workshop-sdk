@@ -65,7 +65,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for example in hello-plugin minimal-theme stylesheet-theme retro-modern-ui-runtime lyrics-cinema-scene visualizer-radial dsp-vocal locale-wenyan native-shell-taskbar; do
+          for example in hello-plugin minimal-theme stylesheet-theme retro-modern-ui-runtime lyrics-view-runtime lyrics-cinema-scene visualizer-radial dsp-vocal locale-wenyan native-shell-taskbar; do
             cp -R "examples/$example" "$RUNNER_TEMP/example-$example"
             node bin/echo-workshop-sdk.mjs validate "$RUNNER_TEMP/example-$example"
             node bin/echo-workshop-sdk.mjs test "$RUNNER_TEMP/example-$example"

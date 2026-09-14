@@ -28,6 +28,10 @@
     "./schemas/plugin-package": "./schemas/plugin-package.schema.json",
     "./schemas/theme": "./schemas/theme.schema.json",
     "./schemas/lyrics-style": "./schemas/lyrics-style.schema.json",
+    "./schemas/animation-library": "./schemas/animation-library.schema.json",
+    "./animation-library": {
+      "types": "./echo-workshop-animation-library.d.ts"
+    },
     "./schemas/visualizer": "./schemas/visualizer.schema.json",
     "./schemas/dsp": "./schemas/dsp.schema.json",
     "./schemas/audio-plugin-profile": "./schemas/audio-plugin-profile.schema.json",
@@ -60,9 +64,11 @@
     "LICENSE",
     "README.md",
     "README.zh-CN.md",
+    "lyrics-authoring.md",
     "echo-workshop-plugin.d.ts",
     "echo-workshop-ui-runtime.d.ts",
     "echo-workshop-native-shell.d.ts",
+    "echo-workshop-animation-library.d.ts",
     "echo-workshop-sdk.json"
   ],
   "engines": {

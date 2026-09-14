@@ -27,6 +27,8 @@ Keep iterating with `check . --warn-only` (reports everything, exits 0); publica
 | `Preview must be JPG, PNG or GIF under 1 MB` | Run `fix .` to generate a compliant 256×256 `preview.png`, or supply your own square image. |
 | `Workshop networkHosts are invalid` | Hosts must be plain public domain names or public IPv4 — no protocol, port, wildcard, duplicate, private or loopback address. |
 | `Inner and outer plug-in apiVersion must match` | `community.echo` `manifest.apiVersion` must equal the outer manifest's `compatibility.pluginApiVersion`. |
+| `system:full and manifest.trustedEntry must be declared together` | For a new capability run `add . --permission system:full`. If an older SDK already left a half-configured project, run `fix .`; it pairs and creates the missing `trusted.mjs` starter. |
+| `system:full requires minEchoVersion 26.8.29 or newer` | Run `add . --permission system:full` again from a project that does not already declare it, or update the outer minimum version to `26.8.29`. |
 | `Plug-in package exceeds the host byte limit` | Contract: at most 32 files, 512 KiB per file, 2 MiB serialized. Split or trim assets. |
 | `Project tags are invalid` | 1–8 unique non-empty tags. Quality additionally warns when a tag is not configured on the ECHO AppID (run `kinds` for the configured tag per content kind). |
 | `native-shell.json has an invalid package header` | Use `type: echo-workshop-native-shell`, `schemaVersion: 1`, `protocolVersion: 1`. |
@@ -54,6 +56,7 @@ Local `test`/`dev` is author evidence only; it is not the production sandbox and
 ## Environment
 
 - Node.js **20+** is required (`node --version`). No other dependency is needed; the SDK is zero-dependency by design.
+- Full-trust projects may use other dependencies, but authors install, build and package them in their own environment. ECHO Authoring Studio does not install Node, compilers or packages.
 - On Windows, quote paths with spaces and prefer `.\folder` relative paths, as in the README examples.
 - For machine-readable output in scripts and editors, add `--json` to `check`, `quality`, `test`, `validate`, `next`, `version`, `doctor`, `snippet` and `api`.
 
@@ -93,6 +96,8 @@ Local `test`/`dev` is author evidence only; it is not the production sandbox and
 | `Preview must be ...` | `fix .` 会生成合规 256×256 `preview.png`。 |
 | `Workshop networkHosts are invalid` | 只能写纯公网域名或公网 IPv4；不能带协议、端口、通配符、私网、本机地址，也不能重复。 |
 | `Inner and outer plug-in apiVersion must match` | 内层 `community.echo` 的 `apiVersion` 必须等于外层清单 `compatibility.pluginApiVersion`。 |
+| `system:full and manifest.trustedEntry must be declared together` | 新增能力用 `add . --permission system:full`；若旧 SDK 已留下半配置项目，跑 `fix .` 自动配对并补 `trusted.mjs`。 |
+| `system:full requires minEchoVersion 26.8.29 or newer` | 把外层清单最低版本提升到 `26.8.29`；新项目和 CLI `add` 会自动处理。 |
 | `Plug-in package exceeds the host byte limit` | 限额：32 个文件、单文件 512 KiB、整包 2 MiB。 |
 | `Project tags are invalid` | 1–8 个不重复标签；quality 还会提示未在 ECHO AppID 配置的标签（`kinds` 可查每类默认标签）。 |
 
@@ -118,6 +123,7 @@ Local `test`/`dev` is author evidence only; it is not the production sandbox and
 ## 环境
 
 - 需要 Node.js **20+**；SDK 零依赖，无需 npm install。
+- 完整系统插件可用其它依赖，但作者必须在自己的环境里安装、构建和打包；ECHO 创作台不安装 Node、编译器或依赖。
 - Windows 下带空格的路径要加引号，示例统一用 `.\folder` 相对路径。
 - 脚本 / 编辑器集成给 `check`、`quality`、`test`、`validate`、`next`、`version`、`doctor`、`snippet`、`api` 加 `--json`。
 

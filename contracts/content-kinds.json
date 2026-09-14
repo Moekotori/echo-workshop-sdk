@@ -13,6 +13,7 @@
   "kinds": {
     "theme": { "entry": "theme.json", "tag": "Theme" },
     "lyrics-style": { "entry": "lyrics-scene.json", "tag": "Lyrics Scene" },
+    "animation-library": { "entry": "animation-library.json", "tag": "Lyrics Scene" },
     "visualizer-preset": { "entry": "visualizer.json", "tag": "Visualizer Preset" },
     "dsp-preset": { "entry": "dsp-preset.json", "tag": "DSP / EQ Preset" },
     "audio-plugin-profile": { "entry": "audio-plugin-profile.json", "tag": "DSP / EQ Preset" },

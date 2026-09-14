@@ -7,9 +7,13 @@
 <body>
   <main>
     <h1>Workshop Plugin</h1>
+    <small id="host-context">Reading host UI context…</small>
     <p id="summary">Reading library summary…</p>
     <input id="agent-input" placeholder="Ask the author Agent">
-    <button id="agent-run" type="button">Run Agent</button>
+    <div class="actions">
+      <button id="agent-run" type="button">Run Agent</button>
+      <button id="panel-close" type="button">Close</button>
+    </div>
     <pre id="agent-result"></pre>
   </main>
   <script src="__bridge__.js"></script>

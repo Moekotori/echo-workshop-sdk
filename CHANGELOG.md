@@ -1,7 +1,26 @@
 # ECHO Workshop SDK changelog
 
+## Unreleased — lyrics authoring
+
+- Scoped lyric part styles, vertical text, scroll anchor/duration, timed single-line slots, and public back-button/control accent styling.
+- Lyrics-only `lyrics-view` runtime with host recovery, revisioned current lyrics and shared clock packets.
+- Recursive lyrics schema, author validation, typed lyric/clock events and the Lyric Ink example.
+- Existing scenes and full-shell runtimes keep their defaults. No SDK or Steam publication is implied.
+
+## Unreleased
+
+- Added optional theme `runtime.presentation: "lyrics-background"`: an independent read-only sandbox backdrop that retains host lyrics and controls. The schema limits it to `playback:read` and `audio:spectrum`; host state includes a motion budget and heartbeat. See `docs/ECHO_WORKSHOP_LYRICS_BACKGROUND.md` and `workshop/spectrum-tide` in the ECHO source tree.
+
+- Added data-only `animation-library` packages. Dependent lyrics scenes can reference versioned Workshop exports made from bounded opacity, 2D/3D transform, fixed-origin, host-owned clip-reveal and named-easing keyframes; deterministic stagger choreography coordinates explicitly indexed sibling nodes without selectors or author code. The ECHO host resolves enabled dependencies and owns execution. The portable `dev` host includes an interactive kinetic-score gallery for filtering and replaying single- and multi-voice exports at different intensity levels.
+- Added responsive, host-themed sandbox panel context through `echo.ui.getContext()` and `echo.ui.onContextChanged()`, including locale, direction, viewport, reduced motion, light/dark state and bounded semantic appearance tokens.
+- Added host-owned panel presentation controls for bounded title, badge, dirty state, attention and four panel sizes, plus a safe panel-close request. Background runtimes cannot mutate panel chrome, and the host close control remains permanent.
+
 ## 1.15.0 — 2026-08-29
 
+- Added the one-command `full-trust-plugin` recipe / `full-trust` preset and a copyable official example. They provide a typed sandbox bridge plus `trusted.mjs`, declare `system:full`, and select the first compatible ECHO version.
+- `add . --permission system:full` now safely upgrades an existing plug-in by pairing `trustedEntry`, creating a missing starter module without overwriting author code, and raising the outer minimum version.
+- The portable gate now rejects unpaired or unpackaged trusted entries. Documentation makes the ownership boundary explicit: authors install and build their own Node toolchain and dependencies; Authoring Studio does not provision an environment.
+- Release guidance no longer links a source-tree version to a GitHub asset that has not been published, and the 1.15 Steam starter metadata is prepared separately from any upload.
 - Added content kind `native-shell`: a Windows system-shell channel that speaks JSON Lines over a named pipe. This is not the sandboxed plug-in VM.
 - Promoted the AudioBand host protocol to official native-shell protocol v1 (`config` / `status` / `quit` inbound, `ready` / `log` / `command` outbound).
 - Added per-kind limits in `contracts/native-shell-limits.json` (512 files, 256 MiB/file, 512 MiB package, `.exe` / `.dll` allowed in the portable authoring gate) so a self-contained WinUI host can be packaged.

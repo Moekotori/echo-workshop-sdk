@@ -184,9 +184,11 @@
     "runtime": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["entry", "capabilities"],
+        "required": ["entry", "capabilities"],
+        "allOf": [{"if":{"properties":{"presentation":{"const":"lyrics-view"}},"required":["presentation"]},"then":{"properties":{"capabilities":{"items":{"enum":["playback:read","playback:control","lyrics:read","audio:spectrum","storage"]}}}}}, { "if": { "properties": { "presentation": { "const": "lyrics-background" } }, "required": ["presentation"] }, "then": { "properties": { "capabilities": { "items": { "enum": ["playback:read", "audio:spectrum"] } } } } }],
       "properties": {
-        "entry": { "$ref": "#/$defs/htmlPath" },
+          "entry": { "$ref": "#/$defs/htmlPath" },
+          "presentation": { "enum": ["shell", "lyrics-background", "lyrics-view"], "description": "Omit for the full UI shell. lyrics-background preserves the host lyrics and controls; only playback:read and audio:spectrum are allowed." },
         "capabilities": {
           "type": "array",
           "uniqueItems": true,

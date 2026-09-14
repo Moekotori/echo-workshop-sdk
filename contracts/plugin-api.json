@@ -1,6 +1,26 @@
 {
   "apiVersion": 2,
   "actions": {
+    "host:getCapabilities": {
+      "method": "echo.host.getCapabilities",
+      "permission": null
+    },
+    "host:getFeatureAvailability": {
+      "method": "echo.host.getFeatureAvailability",
+      "permission": null
+    },
+    "ui:getContext": {
+      "method": "echo.ui.getContext",
+      "permission": null
+    },
+    "ui:setPanelPresentation": {
+      "method": "echo.ui.setPanelPresentation",
+      "permission": null
+    },
+    "ui:closePanel": {
+      "method": "echo.ui.closePanel",
+      "permission": null
+    },
     "navigation:open": {
       "method": "echo.navigation.open",
       "permission": "navigation"
@@ -329,6 +349,10 @@
     "settings:changed": "fs:plugin"
   },
   "commonErrors": {
+    "panel-context-required": {
+      "retry": false,
+      "recovery": "Call panel presentation or close methods only from the currently visible sandbox panel; background runtimes cannot mutate host chrome."
+    },
     "capability-denied": {
       "retry": false,
       "recovery": "Declare the listed permission, rerun check, and let the subscriber review the changed capability."
@@ -340,6 +364,14 @@
     "invalid-payload": {
       "retry": false,
       "recovery": "Validate and bound the arguments before calling the method."
+    },
+    "message-too-large": {
+      "retry": false,
+      "recovery": "Reduce the serialized request below the documented bridge message limit."
+    },
+    "response-too-large": {
+      "retry": false,
+      "recovery": "Request a bounded page or smaller result; the host will not forward an oversized response."
     },
     "rate-limited": {
       "retry": true,
@@ -356,6 +388,26 @@
     "plugin-request-timeout": {
       "retry": true,
       "recovery": "Handle the failure; retry only idempotent reads with backoff."
+    },
+    "trusted-runtime-concurrency-limited": {
+      "retry": true,
+      "recovery": "Await outstanding full-trust invokes and keep at most 32 pending for one plug-in."
+    },
+    "trusted-runtime-input-invalid": {
+      "retry": false,
+      "recovery": "Pass a JSON-serializable input below the trusted runtime input limit."
+    },
+    "trusted-runtime-result-invalid": {
+      "retry": false,
+      "recovery": "Return a JSON-serializable bounded result from trustedEntry."
+    },
+    "trusted-runtime-heartbeat-timeout": {
+      "retry": false,
+      "recovery": "The utility process stopped responding and was terminated; inspect the plug-in before manually retrying."
+    },
+    "trusted-runtime-quarantined": {
+      "retry": false,
+      "recovery": "The plug-in crashed three times in ten minutes; review it and explicitly re-enable it to retry."
     },
     "command-unavailable": {
       "retry": false,

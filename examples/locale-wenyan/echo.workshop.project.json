@@ -6,7 +6,7 @@
   "previewFile": "preview.png",
   "visibility": "public",
   "description": "A curated literary Chinese language pack for ECHO. It covers the current interface and Workshop authoring copy; missing keys fall back to built-in Simplified Chinese. Data-only JSON, no scripts, network access or binaries.",
-  "changeNote": "Version 1.2.0: broader literary-Chinese grammar pass across common interface, community and settings copy.",
+  "changeNote": "Version 1.4.0: added complete coverage for split Simplified Chinese locale modules, rewrote common Workshop and community copy, and removed blunt single-character substitutions that caused broken pseudo-classical Chinese.",
   "tags": [
     "Language Pack"
   ]

@@ -10,7 +10,8 @@ export type EchoNativeShellCommand =
   | 'next'
   | 'previous'
   | 'seekRatio'
-  | 'openLyrics';
+  | 'openLyrics'
+  | 'setOffset';
 
 export interface EchoNativeShellMessage<T = unknown> {
   v: 1;
@@ -29,6 +30,7 @@ export interface EchoNativeShellStatus {
   durationSeconds: number;
   trackKey: string;
   officialEnabled: boolean;
+  suppressed: boolean;
   lyricsCurrent: string;
   lyricsNext: string;
   lyricsHas: boolean;
@@ -38,6 +40,8 @@ export interface EchoNativeShellStatus {
 export interface EchoNativeShellCommandPayload {
   action: EchoNativeShellCommand;
   ratio?: number;
+  offsetX?: number;
+  offsetY?: number;
 }
 
 export interface EchoNativeShellLogPayload {

@@ -1,0 +1,34 @@
+{
+  "type": "echo-plugin-package",
+  "version": 1,
+  "exportedAt": "2026-09-03T00:00:00.000Z",
+  "manifest": {
+    "id": "echo.example-full-trust",
+    "name": "Full Trust Plugin",
+    "version": "1.0.0",
+    "apiVersion": 2,
+    "entry": "plugin.js",
+    "trustedEntry": "trusted.mjs",
+    "permissions": [
+      "system:full"
+    ],
+    "contributes": {
+      "commands": [
+        {
+          "id": "runtime-info",
+          "title": "Show trusted runtime info"
+        }
+      ]
+    }
+  },
+  "files": [
+    {
+      "path": "plugin.js",
+      "content": "/// <reference path=\"../../../echo-workshop-plugin.d.ts\" />\n\necho.commands.register('runtime-info', { title: 'Show trusted runtime info' }, async () => {\n  try {\n    /** @type {{ node?: string, platform?: string, arch?: string }} */\n    const info = await echo.trusted.invoke('runtime-info');\n    await echo.ui.notify(`Node ${info.node ?? '?'} · ${info.platform ?? '?'} · ${info.arch ?? '?'}`);\n    return info;\n  } catch (error) {\n    const message = error instanceof Error ? error.message : String(error);\n    if (message.includes('mock host does not execute full-trust code')) {\n      await echo.ui.notify('Manifest and bridge verified. Run this command inside ECHO to execute trusted.mjs.');\n      return { mockOnly: true };\n    }\n    throw error;\n  }\n});\n"
+    },
+    {
+      "path": "trusted.mjs",
+      "content": "/**\n * This file is built in the author's own Node.js environment and runs only\n * after the subscriber approves desktop-application-equivalent access.\n *\n * @param {{ method: string, input?: unknown }} request\n * @param {{ pluginId: string, revision: string, contentRoot: string }} context\n */\nexport async function handle(request, context) {\n  if (request.method === 'runtime-info') {\n    return {\n      pluginId: context.pluginId,\n      revision: context.revision,\n      node: process.versions.node,\n      platform: process.platform,\n      arch: process.arch,\n    };\n  }\n  throw new Error(`Unknown trusted method: ${request.method}`);\n}\n"
+    }
+  ]
+}

@@ -19,7 +19,8 @@
     "next",
     "previous",
     "seekRatio",
-    "openLyrics"
+    "openLyrics",
+    "setOffset"
   ],
   "statusFields": [
     "state",
@@ -32,6 +33,7 @@
     "durationSeconds",
     "trackKey",
     "officialEnabled",
+    "suppressed",
     "lyricsCurrent",
     "lyricsNext",
     "lyricsHas",

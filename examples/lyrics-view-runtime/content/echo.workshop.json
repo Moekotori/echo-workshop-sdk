@@ -1,0 +1,40 @@
+{
+  "type": "echo-workshop-item",
+  "schemaVersion": 1,
+  "id": "echo.lyric-ink",
+  "title": "Lyric Ink",
+  "version": "1.0.0",
+  "content": {
+    "kind": "theme",
+    "entry": "theme.json"
+  },
+  "compatibility": {
+    "minEchoVersion": "26.9.13"
+  },
+  "files": [
+    {
+      "path": "theme.json",
+      "size": 407,
+      "sha256": "18bc723b589605952dabbf8502aba468a0d82383caffef43bde2598afebd8daa"
+    },
+    {
+      "path": "ui/app.css",
+      "size": 1222,
+      "sha256": "36d56557387cf26965d0cb9fb757cb0b7e7fd682f127e2495521aaaece9bd6d4"
+    },
+    {
+      "path": "ui/app.js",
+      "size": 4248,
+      "sha256": "7c441061769b4a2f3b1c5654c196727cf5f38f141a055772272425296ed213d6"
+    },
+    {
+      "path": "ui/index.html",
+      "size": 475,
+      "sha256": "3860935cdc4d152e11f13758860d4bd906354c300e4836ca6c61ae2133303690"
+    }
+  ],
+  "license": {
+    "id": "MIT",
+    "holder": "ECHO SDK"
+  }
+}

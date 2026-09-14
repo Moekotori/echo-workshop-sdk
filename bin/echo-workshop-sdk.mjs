@@ -45,6 +45,7 @@ import { createDebouncedRunner, isGeneratedWorkshopChange } from '../lib/watch-u
 import { validateWorkshopNetworkDeclaration } from '../lib/network-policy.mjs';
 import { validateNativeShellEntry } from '../lib/native-shell.mjs';
 import { createListingPreviewPng } from '../lib/preview-png.mjs';
+import { animationLibraryMinEchoVersion } from '../lib/animation-preview.mjs';
 import { lyricsPageStyles, visualizerStyles } from '../lib/kind-presets.mjs';
 import {
   createKindExtraFiles,
@@ -61,10 +62,18 @@ import {
   dspPresets,
   isEchoVersionAtLeast,
   lyricsStylePresets,
+  pluginPresets,
   stylesheetMinEchoVersion,
   themePresets,
   visualizerPresets,
 } from '../lib/theme-assets.mjs';
+import {
+  createFullTrustPluginSourceFiles,
+  fullTrustMinimumEchoVersion,
+  fullTrustPluginPreset,
+  trustedEntryFileName,
+  trustedRuntimeStarterSource,
+} from '../lib/trusted-plugin.mjs';
 
 const sdkRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const manifestFileName = 'echo.workshop.json';
@@ -225,6 +234,17 @@ const validatePackage = (value, expectedId, expectedApiVersion) => {
     paths.add(key);
   }
   if (!paths.has(manifest.entry.toLowerCase())) fail('Plug-in entry is not packaged');
+  const permissions = Array.isArray(manifest.permissions) ? manifest.permissions : [];
+  const trustedEntry = typeof manifest.trustedEntry === 'string' ? manifest.trustedEntry.trim() : '';
+  if (permissions.includes('system:full') !== Boolean(trustedEntry)) {
+    fail('system:full and manifest.trustedEntry must be declared together');
+  }
+  if (trustedEntry) {
+    if (!isSafeRelativePath(trustedEntry) || extname(trustedEntry).toLowerCase() !== '.mjs') {
+      fail('manifest.trustedEntry must be a safe .mjs path');
+    }
+    if (!paths.has(trustedEntry.toLowerCase())) fail('Plug-in trustedEntry is not packaged');
+  }
   const serialized = `${JSON.stringify(value, null, 2)}\n`;
   if (Buffer.byteLength(serialized, 'utf8') > maximumPluginPackageBytes) fail('Plug-in package exceeds the host byte limit');
 };
@@ -264,7 +284,13 @@ const validateProject = async (rootInput) => {
   }
   const entry = JSON.parse(packageText);
   if (!entry || typeof entry !== 'object' || Array.isArray(entry)) fail('Workshop entry must be a JSON object');
-  if (manifest.content.kind === 'plugin-package') validatePackage(entry, manifest.id, manifest.compatibility.pluginApiVersion);
+  if (manifest.content.kind === 'plugin-package') {
+    validatePackage(entry, manifest.id, manifest.compatibility.pluginApiVersion);
+    if (entry.manifest.permissions?.includes('system:full')
+      && !isEchoVersionAtLeast(manifest.compatibility.minEchoVersion, fullTrustMinimumEchoVersion)) {
+      fail(`system:full requires minEchoVersion ${fullTrustMinimumEchoVersion} or newer`);
+    }
+  }
   if (manifest.content.kind === 'native-shell') validateNativeShellEntry(entry, manifest.id);
   validateWorkshopNetworkDeclaration(manifest, entry);
   const previewPath = projectPath(root, project.previewFile, 'previewFile');
@@ -297,7 +323,9 @@ const createProjectReadme = (title, kind, preset, entryPath) => `# ${title}
 
 Template: \`${kind}\`${preset ? ` / preset \`${preset}\`` : ''}.
 
-Edit \`${kind === 'plugin-package' ? 'src/plugin.js' : `content/${entryPath}`}\`, then run \`npm run next\` to see what the host still allows. \`add\`, \`set\` and \`scaffold\` keep customizing without rewriting the whole file.
+Edit \`${kind === 'plugin-package' ? (preset === fullTrustPluginPreset ? 'src/plugin.js and src/trusted.mjs' : 'src/plugin.js') : `content/${entryPath}`}\`, then run \`npm run next\` to see what the host still allows. \`add\`, \`set\` and \`scaffold\` keep customizing without rewriting the whole file.
+
+Use your own Node 20+ environment and install or build any third-party dependencies yourself. ECHO Workshop Authoring Studio checks, previews and publishes the verified package; it does not provision or manage an author development environment.
 
 Packaged CSS must be scoped to \`html[data-workshop-theme-pack="<id>"]\`. A stylesheet or runtime theme should declare \`minEchoVersion\` ${stylesheetMinEchoVersion} or newer.
 
@@ -316,6 +344,7 @@ const copyPortableSdk = async (echoSdkRoot) => {
   await cp(resolve(sdkRoot, 'echo-workshop-plugin.d.ts'), resolve(echoSdkRoot, 'echo-workshop-plugin.d.ts'));
   await cp(resolve(sdkRoot, 'echo-workshop-ui-runtime.d.ts'), resolve(echoSdkRoot, 'echo-workshop-ui-runtime.d.ts'));
   await cp(resolve(sdkRoot, 'echo-workshop-native-shell.d.ts'), resolve(echoSdkRoot, 'echo-workshop-native-shell.d.ts'));
+  await cp(resolve(sdkRoot, 'echo-workshop-animation-library.d.ts'), resolve(echoSdkRoot, 'echo-workshop-animation-library.d.ts'));
   await cp(resolve(sdkRoot, 'bin', 'echo-workshop-sdk.mjs'), resolve(echoSdkRoot, 'bin', 'echo-workshop-sdk.mjs'));
   await cp(resolve(sdkRoot, 'bin', 'echo-workshop-sdk.cmd'), resolve(echoSdkRoot, 'bin', 'echo-workshop-sdk.cmd'));
   await cp(resolve(sdkRoot, 'lib'), resolve(echoSdkRoot, 'lib'), { recursive: true });
@@ -345,7 +374,13 @@ const initProject = async (rootInput, options) => {
   const kind = recipe?.kind ?? String(options.get('kind') ?? 'plugin-package');
   if (!workshopTemplateKinds.includes(kind)) fail(`Unsupported template kind: ${kind}`);
   const preset = resolveTemplatePreset(kind, options.get('preset') ?? recipe?.preset);
-  const minVersion = normalizeText(options.get('min-version') ?? defaultMinEchoVersionForPreset(preset), '--min-version', 48);
+  const minVersion = normalizeText(
+    options.get('min-version') ?? (kind === 'animation-library'
+      ? animationLibraryMinEchoVersion
+      : defaultMinEchoVersionForPreset(preset)),
+    '--min-version',
+    48,
+  );
   if (!versionPattern.test(minVersion)) fail('Minimum ECHO version is invalid');
   await mkdir(resolve(root, 'content'), { recursive: true });
   await mkdir(resolve(root, '.github', 'workflows'), { recursive: true });
@@ -358,6 +393,8 @@ const initProject = async (rootInput, options) => {
       await cp(resolve(sdkRoot, 'templates', 'plugin-catalog'), resolve(root, 'src'), { recursive: true });
     } else if (preset === 'lyrics') {
       await cp(resolve(sdkRoot, 'templates', 'plugin-lyrics'), resolve(root, 'src'), { recursive: true });
+    } else if (preset === fullTrustPluginPreset) {
+      await writeRelativeFiles(resolve(root, 'src'), createFullTrustPluginSourceFiles());
     } else {
       await cp(resolve(sdkRoot, 'templates', 'plugin-basic', 'plugin.js'), resolve(root, 'src', 'plugin.js'));
     }
@@ -399,7 +436,7 @@ const initProject = async (rootInput, options) => {
   });
   await writeJson(resolve(root, 'tsconfig.json'), {
     compilerOptions: { allowJs: true, checkJs: true, noEmit: true, strict: true, target: 'ES2022', lib: ['ES2022', 'DOM'] },
-    include: ['src/**/*.js', 'content/ui/**/*.js', '.echo-sdk/**/*.d.ts'],
+    include: ['src/**/*.js', 'src/**/*.mjs', 'content/ui/**/*.js', '.echo-sdk/**/*.d.ts'],
   });
   await writeJson(resolve(root, '.vscode', 'settings.json'), {
     'json.schemas': [
@@ -408,6 +445,7 @@ const initProject = async (rootInput, options) => {
       { fileMatch: ['/content/theme.json'], url: './.echo-sdk/schemas/theme.schema.json' },
       { fileMatch: ['/content/community.echo'], url: './.echo-sdk/schemas/plugin-package.schema.json' },
       { fileMatch: [`/content/${templateEntryForKind('lyrics-style')}`], url: './.echo-sdk/schemas/lyrics-style.schema.json' },
+      { fileMatch: [`/content/${templateEntryForKind('animation-library')}`], url: './.echo-sdk/schemas/animation-library.schema.json' },
       { fileMatch: [`/content/${templateEntryForKind('visualizer-preset')}`], url: './.echo-sdk/schemas/visualizer.schema.json' },
       { fileMatch: [`/content/${templateEntryForKind('dsp-preset')}`], url: './.echo-sdk/schemas/dsp.schema.json' },
       { fileMatch: [`/content/${templateEntryForKind('audio-plugin-profile')}`], url: './.echo-sdk/schemas/audio-plugin-profile.schema.json' },
@@ -505,6 +543,25 @@ const addToProject = async (rootInput, options, positional) => {
     fail('add needs --slot, --capability, --color or --permission');
   }
   await writeJson(projectPath(current.contentRoot, current.manifest.content.entry, 'content.entry'), nextEntry);
+  if (permission === 'system:full') {
+    const trustedEntry = nextEntry.manifest?.trustedEntry ?? trustedEntryFileName;
+    const trustedPath = projectPath(resolve(current.root, 'src'), trustedEntry, 'manifest.trustedEntry');
+    try {
+      await access(trustedPath, fsConstants.F_OK);
+    } catch {
+      await mkdir(dirname(trustedPath), { recursive: true });
+      await writeFile(trustedPath, trustedRuntimeStarterSource, 'utf8');
+    }
+    if (!isEchoVersionAtLeast(current.manifest.compatibility?.minEchoVersion, fullTrustMinimumEchoVersion)) {
+      await writeJson(resolve(current.contentRoot, manifestFileName), {
+        ...current.manifest,
+        compatibility: {
+          ...current.manifest.compatibility,
+          minEchoVersion: fullTrustMinimumEchoVersion,
+        },
+      });
+    }
+  }
   return { ...await syncProject(current.root), change };
 };
 
@@ -649,8 +706,9 @@ const fixProject = async (rootInput) => {
       : 'Created a 256x256 listing preview PNG.');
   }
   const manifestPath = resolve(contentRoot, manifestFileName);
-  const manifest = await readJson(manifestPath);
-  const entry = await readJson(projectPath(contentRoot, manifest.content.entry, 'content.entry'));
+  let manifest = await readJson(manifestPath);
+  const entryPath = projectPath(contentRoot, manifest.content.entry, 'content.entry');
+  let entry = await readJson(entryPath);
   if (manifest.content.kind === 'theme' && (entry.stylesheet || entry.runtime)
     && !isEchoVersionAtLeast(manifest.compatibility?.minEchoVersion, stylesheetMinEchoVersion)) {
     await writeJson(manifestPath, {
@@ -658,6 +716,43 @@ const fixProject = async (rootInput) => {
       compatibility: { ...manifest.compatibility, minEchoVersion: stylesheetMinEchoVersion },
     });
     changes.push(`Bumped minEchoVersion to ${stylesheetMinEchoVersion}.`);
+  }
+  if (manifest.content.kind === 'animation-library'
+    && !isEchoVersionAtLeast(manifest.compatibility?.minEchoVersion, animationLibraryMinEchoVersion)) {
+    await writeJson(manifestPath, {
+      ...manifest,
+      compatibility: { ...manifest.compatibility, minEchoVersion: animationLibraryMinEchoVersion },
+    });
+    changes.push(`Bumped minEchoVersion to ${animationLibraryMinEchoVersion}.`);
+  }
+  if (manifest.content.kind === 'plugin-package'
+    && entry.manifest?.permissions?.includes('system:full')) {
+    const trustedEntry = typeof entry.manifest.trustedEntry === 'string' && entry.manifest.trustedEntry.trim()
+      ? entry.manifest.trustedEntry.trim()
+      : trustedEntryFileName;
+    if (!entry.manifest.trustedEntry) {
+      entry = {
+        ...entry,
+        manifest: { ...entry.manifest, trustedEntry },
+      };
+      await writeJson(entryPath, entry);
+      changes.push(`Paired system:full with ${trustedEntry}.`);
+    }
+    const trustedPath = projectPath(resolve(root, 'src'), trustedEntry, 'manifest.trustedEntry');
+    const trustedMissing = await access(trustedPath, fsConstants.R_OK).then(() => false, () => true);
+    if (trustedMissing) {
+      await mkdir(dirname(trustedPath), { recursive: true });
+      await writeFile(trustedPath, trustedRuntimeStarterSource, 'utf8');
+      changes.push(`Created ${toSlash(relative(root, trustedPath))}.`);
+    }
+    if (!isEchoVersionAtLeast(manifest.compatibility?.minEchoVersion, fullTrustMinimumEchoVersion)) {
+      manifest = {
+        ...manifest,
+        compatibility: { ...manifest.compatibility, minEchoVersion: fullTrustMinimumEchoVersion },
+      };
+      await writeJson(manifestPath, manifest);
+      changes.push(`Bumped minEchoVersion to ${fullTrustMinimumEchoVersion}.`);
+    }
   }
   const kind = manifest.content.kind;
   const preset = inferKindPreset(kind, entry);
@@ -685,11 +780,13 @@ const doctor = async () => {
     'echo-workshop-plugin.d.ts',
     'echo-workshop-ui-runtime.d.ts',
     'echo-workshop-native-shell.d.ts',
+    'echo-workshop-animation-library.d.ts',
     'schemas/echo.workshop.schema.json',
     'schemas/project.schema.json',
     'schemas/plugin-package.schema.json',
     'schemas/theme.schema.json',
     'schemas/lyrics-style.schema.json',
+    'schemas/animation-library.schema.json',
     'schemas/visualizer.schema.json',
     'schemas/dsp.schema.json',
     'schemas/locale-pack.schema.json',
@@ -720,6 +817,7 @@ const doctor = async () => {
     'lib/watch-utils.mjs',
     'lib/network-policy.mjs',
     'lib/native-shell.mjs',
+    'lib/trusted-plugin.mjs',
     'bin/echo-workshop-sdk.cmd',
     'README.zh-CN.md',
     'TROUBLESHOOTING.md',
@@ -754,6 +852,7 @@ const versionSurface = async () => {
     currentPluginApiVersion: descriptor.plugin.currentApiVersion,
     uiRuntimeProtocolVersion: descriptor.theme.uiRuntimeProtocolVersion,
     stylesheetMinEchoVersion: descriptor.theme.stylesheetMinEchoVersion,
+    animationLibrary: descriptor.animationLibrary,
     pluginPackageLimits: {
       maximumFiles: maximumPluginFiles,
       maximumFileBytes: maximumPluginFileBytes,
@@ -787,6 +886,7 @@ const formatVersionSurface = (surface) => [
   `ECHO Workshop SDK ${surface.packageVersion} (sdkVersion ${surface.sdkVersion})`,
   `Manifest schema: ${surface.manifestSchemaVersions.join(', ')} · plugin API: ${surface.pluginApiVersions.join(', ')} (current ${surface.currentPluginApiVersion})`,
   `UI runtime protocol: ${surface.uiRuntimeProtocolVersion} · stylesheet/runtime min ECHO: ${surface.stylesheetMinEchoVersion}`,
+  `Animation library schema: ${surface.animationLibrary.schemaVersion} · min ECHO: ${surface.animationLibrary.minimumEchoVersion} · ${surface.animationLibrary.properties.length} bounded properties · ${surface.animationLibrary.clipDirections.length} reveals · ${surface.animationLibrary.staggerOrigins.length} stagger orders`,
   `Content kinds: ${surface.contentKinds.join(', ')}`,
   `Plug-in limits: ${surface.pluginPackageLimits.maximumFiles} files · ${surface.pluginPackageLimits.maximumFileBytes} B/file · ${surface.pluginPackageLimits.maximumPackageBytes} B/package`,
   `Native-shell limits: ${surface.nativeShellLimits.maximumFiles} files · ${surface.nativeShellLimits.maximumFileBytes} B/file · ${surface.nativeShellLimits.maximumPackageBytes} B/package`,
@@ -806,7 +906,7 @@ const kindsCatalog = () => ({
     'lyrics-style': lyricsStylePresets,
     'visualizer-preset': visualizerPresets,
     'dsp-preset': dspPresets,
-    'plugin-package': ['basic', 'complete', 'catalog', 'lyrics'],
+    'plugin-package': pluginPresets,
   },
 });
 

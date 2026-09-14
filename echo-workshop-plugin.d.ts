@@ -392,6 +392,10 @@ interface EchoWorkshopSourceProviderHandlers {
 }
 
 interface EchoWorkshopLyricsCandidate {
+  ttml?: string;
+  artist?: string;
+  album?: string;
+  durationSeconds?: number;
   title?: string;
   language?: string;
   source?: string;
@@ -445,6 +449,8 @@ interface EchoWorkshopNetworkRequest {
 }
 
 interface EchoWorkshopNetworkResponse {
+  /** Present for bounded byte-range responses; decode with a streaming TextDecoder. */
+  bodyBase64?: string;
   url: string;
   status: number;
   statusText: string;
@@ -507,9 +513,76 @@ interface EchoWorkshopRegisteredCommand {
   title: string;
 }
 
+type EchoWorkshopHostUnavailableReason =
+  | 'unsupported-platform'
+  | 'not-entitled'
+  | 'capability-not-approved'
+  | 'audio-core-unavailable'
+  | 'library-unavailable'
+  | 'queue-unavailable'
+  | 'decoder-unavailable'
+  | 'current-mode-incompatible'
+  | 'local-track-required'
+  | 'feature-disabled';
+
+interface EchoWorkshopHostFeatureAvailability {
+  supported: boolean;
+  granted: boolean;
+  available: boolean;
+  reason: EchoWorkshopHostUnavailableReason | null;
+}
+
+interface EchoWorkshopHostCapabilities {
+  apiVersion: 2;
+  features: Record<string, EchoWorkshopHostFeatureAvailability>;
+}
+
+type EchoWorkshopPanelSize = 'compact' | 'comfortable' | 'wide' | 'full';
+type EchoWorkshopPanelAttention = 'none' | 'info' | 'warning';
+
+interface EchoWorkshopPanelPresentation {
+  title: string;
+  badge: string | null;
+  dirty: boolean;
+  attention: EchoWorkshopPanelAttention;
+  size: EchoWorkshopPanelSize;
+}
+
+interface EchoWorkshopUiAppearance {
+  accent: string;
+  accentText: string;
+  panel: string;
+  text: string;
+  heading: string;
+  muted: string;
+  appBg: string;
+  border: string;
+  player: string;
+}
+
+interface EchoWorkshopUiContext {
+  surface: 'runtime' | 'panel';
+  panel: { id: string; placement: 'main' | 'utility' | 'sidebar' | 'home' | 'lyrics' | 'queue' | 'track-detail' | 'player' } | null;
+  visible: boolean;
+  locale: string;
+  direction: 'ltr' | 'rtl';
+  colorScheme: 'light' | 'dark';
+  reducedMotion: boolean;
+  viewport: { width: number; height: number };
+  /** A bounded snapshot of ECHO semantic theme tokens. */
+  appearance: EchoWorkshopUiAppearance;
+  presentation: EchoWorkshopPanelPresentation | null;
+}
+
 type EchoWorkshopCommandInput = Record<string, string | number | boolean | null>;
 
 interface EchoWorkshopApi {
+  host: {
+    /** Returns sanitized API 2 feature states; it never includes account, device, path, or license data. */
+    getCapabilities(): Promise<EchoWorkshopHostCapabilities>;
+    /** Accepts an API action id (for example audio:getSpectrum) or a declared capability id. */
+    getFeatureAvailability(featureId: string): Promise<EchoWorkshopHostFeatureAvailability>;
+  };
   commands: {
     /** A trackContextMenus command receives one sanitized EchoWorkshopTrack as its first argument. */
     /** A parameterized command receives one host-validated EchoWorkshopCommandInput as its first argument. */
@@ -613,7 +686,7 @@ interface EchoWorkshopApi {
     post(url: string, body: string, options?: Omit<EchoWorkshopNetworkRequest, 'url' | 'method' | 'body'>): Promise<EchoWorkshopNetworkResponse>;
   };
   lyrics: {
-    registerProvider(id: string, metadata: { title: string }, handler: (request: EchoWorkshopLyricsRequest) => { candidates: EchoWorkshopLyricsCandidate[] } | Promise<{ candidates: EchoWorkshopLyricsCandidate[] }>): void;
+    registerProvider(id: string, metadata: { title: string }, handler: (request: EchoWorkshopLyricsRequest, context: { providerId: string; signal: AbortSignal }) => { candidates: EchoWorkshopLyricsCandidate[] } | Promise<{ candidates: EchoWorkshopLyricsCandidate[] }>): void;
     get(trackId?: string): Promise<EchoWorkshopSandboxLyrics | null>;
   };
   metadata: {
@@ -646,6 +719,14 @@ interface EchoWorkshopApi {
   };
   ui: {
     notify(message: string): Promise<null>;
+    /** Returns a sanitized responsive/theme context for this runtime or visible panel. */
+    getContext(): Promise<EchoWorkshopUiContext>;
+    /** Updates only the host-owned shell around the current panel. Background runtimes are rejected. */
+    setPanelPresentation(presentation: Partial<EchoWorkshopPanelPresentation>): Promise<EchoWorkshopPanelPresentation>;
+    /** Closes the current visible panel. Background runtimes are rejected. */
+    closePanel(): Promise<null>;
+    /** Fires when theme, locale, visibility, viewport, or host-owned presentation changes. */
+    onContextChanged(handler: (context: EchoWorkshopUiContext) => unknown): EchoWorkshopUnsubscribe;
   };
 }
 

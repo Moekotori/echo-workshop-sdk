@@ -4,54 +4,1111 @@
   "title": "ECHO Workshop lyrics style",
   "type": "object",
   "additionalProperties": false,
-  "required": ["type", "schemaVersion", "id", "title"],
+  "required": [
+    "type",
+    "schemaVersion",
+    "id",
+    "title"
+  ],
   "properties": {
-    "type": { "const": "echo-workshop-lyrics-style" },
-    "schemaVersion": { "const": 1 },
-    "id": { "type": "string", "minLength": 3, "maxLength": 80 },
-    "title": { "type": "string", "minLength": 1, "maxLength": 120 },
-    "description": { "type": "string" },
+    "type": {
+      "const": "echo-workshop-lyrics-style"
+    },
+    "schemaVersion": {
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 80
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "description": {
+      "type": "string"
+    },
     "settings": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
         "lyricsPageStyle": {
-          "enum": ["default", "editorial", "folded", "roseVinyl", "cinemaStage", "kineticPoster", "coverStage", "cutBoard"]
+          "enum": [
+            "default",
+            "luminous",
+            "editorial",
+            "folded",
+            "roseVinyl",
+            "cinemaStage",
+            "kineticPoster",
+            "coverStage",
+            "cutBoard"
+          ]
         },
-        "lyricsFontSizePx": { "type": "number", "minimum": 16, "maximum": 96 },
-        "lyricsSecondaryFontSizePx": { "type": "number", "minimum": 10, "maximum": 64 },
-        "lyricsLineSpacingPercent": { "type": "number", "minimum": 80, "maximum": 240 },
-        "lyricsContextOpacityPercent": { "type": "number", "minimum": 0, "maximum": 100 },
-        "lyricsCoverOpacityPercent": { "type": "number", "minimum": 0, "maximum": 100 },
-        "lyricsCoverBlurPx": { "type": "number", "minimum": 0, "maximum": 80 },
-        "lyricsCoverBrightnessPercent": { "type": "number", "minimum": 20, "maximum": 150 },
-        "lyricsBackgroundScalePercent": { "type": "number", "minimum": 100, "maximum": 160 },
-        "lyricsSmartReadableColorsEnabled": { "type": "boolean" },
-        "lyricsWordHighlightEnabled": { "type": "boolean" },
-        "lyricsImmersiveCoverStyleEnabled": { "type": "boolean" },
-        "lyricsImmersiveCoverGlassEnabled": { "type": "boolean" },
-        "lyricsMusicReactiveVisualsEnabled": { "type": "boolean" },
-        "lyricsColor": { "type": "string", "pattern": "^#[0-9A-Fa-f]{6}$" },
-        "lyricsBackgroundMode": { "enum": ["theme", "cover", "coverColor"] }
+        "lyricsFontSizePx": {
+          "type": "number",
+          "minimum": 16,
+          "maximum": 96
+        },
+        "lyricsSecondaryFontSizePx": {
+          "type": "number",
+          "minimum": 10,
+          "maximum": 64
+        },
+        "lyricsLineSpacingPercent": {
+          "type": "number",
+          "minimum": 80,
+          "maximum": 240
+        },
+        "lyricsContextOpacityPercent": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "lyricsCoverOpacityPercent": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "lyricsCoverBlurPx": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 80
+        },
+        "lyricsCoverBrightnessPercent": {
+          "type": "number",
+          "minimum": 20,
+          "maximum": 150
+        },
+        "lyricsBackgroundScalePercent": {
+          "type": "number",
+          "minimum": 100,
+          "maximum": 160
+        },
+        "lyricsSmartReadableColorsEnabled": {
+          "type": "boolean"
+        },
+        "lyricsWordHighlightEnabled": {
+          "type": "boolean"
+        },
+        "lyricsImmersiveCoverStyleEnabled": {
+          "type": "boolean"
+        },
+        "lyricsImmersiveCoverGlassEnabled": {
+          "type": "boolean"
+        },
+        "lyricsMusicReactiveVisualsEnabled": {
+          "type": "boolean"
+        },
+        "lyricsColor": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "lyricsBackgroundMode": {
+          "enum": [
+            "theme",
+            "cover",
+            "coverColor"
+          ]
+        }
       }
     },
     "scene": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["schemaVersion", "root"],
+      "required": [
+        "schemaVersion",
+        "background",
+        "root"
+      ],
       "properties": {
-        "schemaVersion": { "const": 1 },
-        "background": { "enum": ["theme", "cover", "cover-blur", "cover-color", "transparent", "asset"] },
-        "backgroundAsset": { "type": "string" },
+        "schemaVersion": {
+          "const": 1
+        },
+        "background": {
+          "enum": [
+            "theme",
+            "cover",
+            "cover-blur",
+            "cover-color",
+            "transparent",
+            "asset"
+          ]
+        },
+        "backgroundAsset": {
+          "type": "string"
+        },
         "hostChrome": {
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "miniPlayer": { "enum": ["visible", "hidden"] }
+            "miniPlayer": {
+              "enum": [
+                "visible",
+                "hidden"
+              ]
+            },
+            "backButton": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "sizePx": {
+                  "type": "number",
+                  "minimum": 32,
+                  "maximum": 80
+                },
+                "borderRadiusPx": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 40
+                },
+                "color": {
+                  "type": "string",
+                  "maxLength": 240
+                },
+                "backgroundColor": {
+                  "type": "string",
+                  "maxLength": 240
+                },
+                "borderColor": {
+                  "type": "string",
+                  "maxLength": 240
+                }
+              }
+            }
           }
         },
-        "root": { "type": "object" }
+        "root": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/node"
+            },
+            {
+              "properties": {
+                "type": {
+                  "const": "group"
+                }
+              }
+            }
+          ]
+        }
       }
+    }
+  },
+  "$defs": {
+    "style": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "position": {
+          "enum": [
+            "relative",
+            "absolute"
+          ]
+        },
+        "inset": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "top": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "right": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "bottom": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "left": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "zIndex": {
+          "type": "number",
+          "minimum": -100,
+          "maximum": 100
+        },
+        "boxSizing": {
+          "enum": [
+            "content-box",
+            "border-box"
+          ]
+        },
+        "display": {
+          "enum": [
+            "block",
+            "flex",
+            "grid",
+            "none"
+          ]
+        },
+        "flexDirection": {
+          "enum": [
+            "row",
+            "row-reverse",
+            "column",
+            "column-reverse"
+          ]
+        },
+        "flexWrap": {
+          "enum": [
+            "nowrap",
+            "wrap",
+            "wrap-reverse"
+          ]
+        },
+        "alignItems": {
+          "enum": [
+            "stretch",
+            "flex-start",
+            "center",
+            "flex-end",
+            "baseline"
+          ]
+        },
+        "alignContent": {
+          "enum": [
+            "stretch",
+            "flex-start",
+            "center",
+            "flex-end",
+            "space-between",
+            "space-around",
+            "space-evenly"
+          ]
+        },
+        "alignSelf": {
+          "enum": [
+            "auto",
+            "stretch",
+            "flex-start",
+            "center",
+            "flex-end",
+            "baseline"
+          ]
+        },
+        "justifyContent": {
+          "enum": [
+            "flex-start",
+            "center",
+            "flex-end",
+            "space-between",
+            "space-around",
+            "space-evenly"
+          ]
+        },
+        "justifyItems": {
+          "enum": [
+            "stretch",
+            "start",
+            "center",
+            "end"
+          ]
+        },
+        "justifySelf": {
+          "enum": [
+            "auto",
+            "stretch",
+            "start",
+            "center",
+            "end"
+          ]
+        },
+        "placeContent": {
+          "enum": [
+            "stretch",
+            "start",
+            "center",
+            "end",
+            "space-between",
+            "space-around",
+            "space-evenly"
+          ]
+        },
+        "placeItems": {
+          "enum": [
+            "stretch",
+            "start",
+            "center",
+            "end"
+          ]
+        },
+        "placeSelf": {
+          "enum": [
+            "auto",
+            "stretch",
+            "start",
+            "center",
+            "end"
+          ]
+        },
+        "flex": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "flexGrow": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 20
+        },
+        "flexShrink": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 20
+        },
+        "flexBasis": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "order": {
+          "type": "number",
+          "minimum": -64,
+          "maximum": 64
+        },
+        "gridTemplateColumns": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "gridTemplateRows": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "gridTemplateAreas": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "gridAutoColumns": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "gridAutoRows": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "gridAutoFlow": {
+          "enum": [
+            "row",
+            "column",
+            "dense",
+            "row dense",
+            "column dense"
+          ]
+        },
+        "gridColumn": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "gridColumnStart": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "gridColumnEnd": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "gridRow": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "gridRowStart": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "gridRowEnd": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "gap": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "rowGap": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "columnGap": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "width": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "height": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "minWidth": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "maxWidth": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "minHeight": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "maxHeight": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "margin": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "marginTop": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "marginRight": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "marginBottom": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "marginLeft": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "padding": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "paddingTop": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "paddingRight": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "paddingBottom": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "paddingLeft": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "overflow": {
+          "enum": [
+            "visible",
+            "hidden",
+            "auto",
+            "scroll"
+          ]
+        },
+        "overflowX": {
+          "enum": [
+            "visible",
+            "hidden",
+            "auto",
+            "scroll"
+          ]
+        },
+        "overflowY": {
+          "enum": [
+            "visible",
+            "hidden",
+            "auto",
+            "scroll"
+          ]
+        },
+        "visibility": {
+          "enum": [
+            "visible",
+            "hidden"
+          ]
+        },
+        "color": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "background": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "backgroundColor": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "backgroundImage": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "backgroundPosition": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "backgroundSize": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "backgroundRepeat": {
+          "enum": [
+            "repeat",
+            "repeat-x",
+            "repeat-y",
+            "no-repeat",
+            "space",
+            "round"
+          ]
+        },
+        "backgroundBlendMode": {
+          "enum": [
+            "normal",
+            "multiply",
+            "screen",
+            "overlay",
+            "darken",
+            "lighten",
+            "color-dodge",
+            "color-burn",
+            "hard-light",
+            "soft-light",
+            "difference",
+            "exclusion",
+            "hue",
+            "saturation",
+            "color",
+            "luminosity"
+          ]
+        },
+        "border": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "borderColor": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "borderWidth": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "borderStyle": {
+          "enum": [
+            "none",
+            "solid",
+            "dashed",
+            "dotted",
+            "double"
+          ]
+        },
+        "borderRadius": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "outline": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "boxShadow": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "backdropFilter": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "filter": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "mixBlendMode": {
+          "enum": [
+            "normal",
+            "multiply",
+            "screen",
+            "overlay",
+            "darken",
+            "lighten",
+            "color-dodge",
+            "color-burn",
+            "hard-light",
+            "soft-light",
+            "difference",
+            "exclusion",
+            "hue",
+            "saturation",
+            "color",
+            "luminosity"
+          ]
+        },
+        "opacity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "clipPath": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "transform": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "transformOrigin": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "fontFamily": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "fontSize": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "fontWeight": {
+          "type": "number",
+          "minimum": 100,
+          "maximum": 900
+        },
+        "fontStyle": {
+          "enum": [
+            "normal",
+            "italic",
+            "oblique"
+          ]
+        },
+        "lineHeight": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "letterSpacing": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "textAlign": {
+          "enum": [
+            "left",
+            "center",
+            "right",
+            "start",
+            "end"
+          ]
+        },
+        "textTransform": {
+          "enum": [
+            "none",
+            "uppercase",
+            "lowercase",
+            "capitalize"
+          ]
+        },
+        "textDecoration": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "textOverflow": {
+          "enum": [
+            "clip",
+            "ellipsis"
+          ]
+        },
+        "textShadow": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "whiteSpace": {
+          "enum": [
+            "normal",
+            "nowrap",
+            "pre-line",
+            "break-spaces"
+          ]
+        },
+        "wordBreak": {
+          "enum": [
+            "normal",
+            "break-all",
+            "break-word",
+            "keep-all"
+          ]
+        },
+        "writingMode": {
+          "enum": [
+            "horizontal-tb",
+            "vertical-rl",
+            "vertical-lr"
+          ]
+        },
+        "objectFit": {
+          "enum": [
+            "contain",
+            "cover",
+            "fill",
+            "none",
+            "scale-down"
+          ]
+        },
+        "objectPosition": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "aspectRatio": {
+          "$ref": "#/$defs/styleValue"
+        },
+        "cursor": {
+          "enum": [
+            "auto",
+            "default",
+            "pointer",
+            "text"
+          ]
+        },
+        "pointerEvents": {
+          "enum": [
+            "none",
+            "auto"
+          ]
+        },
+        "userSelect": {
+          "enum": [
+            "auto",
+            "none",
+            "text"
+          ]
+        }
+      },
+      "maxProperties": 48
+    },
+    "options": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "showTranslation": {
+          "type": "boolean"
+        },
+        "showRomanization": {
+          "type": "boolean"
+        },
+        "showTimestamps": {
+          "type": "boolean"
+        },
+        "wordHighlightEnabled": {
+          "type": "boolean"
+        },
+        "parts": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "line": {
+              "$ref": "#/$defs/style"
+            },
+            "activeLine": {
+              "$ref": "#/$defs/style"
+            },
+            "pastLine": {
+              "$ref": "#/$defs/style"
+            },
+            "futureLine": {
+              "$ref": "#/$defs/style"
+            },
+            "primary": {
+              "$ref": "#/$defs/style"
+            },
+            "translation": {
+              "$ref": "#/$defs/style"
+            },
+            "romanization": {
+              "$ref": "#/$defs/style"
+            },
+            "word": {
+              "$ref": "#/$defs/style"
+            },
+            "currentWord": {
+              "$ref": "#/$defs/style"
+            },
+            "passedWord": {
+              "$ref": "#/$defs/style"
+            },
+            "futureWord": {
+              "$ref": "#/$defs/style"
+            }
+          }
+        },
+        "textDirection": {
+          "enum": [
+            "horizontal",
+            "vertical"
+          ]
+        },
+        "lineTransition": {
+          "enum": [
+            "default",
+            "none",
+            "fade",
+            "slide",
+            "scale"
+          ]
+        },
+        "emptyText": {
+          "type": "string",
+          "maxLength": 120
+        },
+        "spectrumScale": {
+          "enum": [
+            "linear",
+            "perceptual"
+          ]
+        },
+        "scrollAnchor": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 0.9
+        },
+        "scrollDurationMs": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 2000
+        },
+        "lineTransitionMs": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 2000
+        },
+        "spectrumBars": {
+          "type": "integer",
+          "minimum": 4,
+          "maximum": 128
+        },
+        "spectrumGain": {
+          "type": "number",
+          "minimum": 0.25,
+          "maximum": 4
+        },
+        "spectrumAttackMs": {
+          "type": "number",
+          "minimum": 8,
+          "maximum": 600
+        },
+        "spectrumReleaseMs": {
+          "type": "number",
+          "minimum": 8,
+          "maximum": 1200
+        },
+        "controlAccent": {
+          "type": "string",
+          "maxLength": 240
+        }
+      }
+    },
+    "motion": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "preset": {
+          "enum": [
+            "none",
+            "fade",
+            "slide-up",
+            "slide-left",
+            "scale",
+            "float",
+            "pulse"
+          ]
+        },
+        "library": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "itemId": {
+              "type": "string"
+            },
+            "animationId": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "itemId",
+            "animationId"
+          ]
+        },
+        "durationMs": {
+          "type": "number",
+          "minimum": 80,
+          "maximum": 30000
+        },
+        "delayMs": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 30000
+        },
+        "intensity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 2
+        },
+        "loop": {
+          "type": "boolean"
+        },
+        "sequence": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "index": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 63
+            },
+            "count": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 64
+            }
+          },
+          "required": [
+            "index",
+            "count"
+          ]
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "preset"
+          ]
+        },
+        {
+          "required": [
+            "library"
+          ]
+        }
+      ]
+    },
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_-]{0,47}$"
+        },
+        "type": {
+          "enum": [
+            "group",
+            "slot",
+            "text",
+            "decoration",
+            "image"
+          ]
+        },
+        "style": {
+          "$ref": "#/$defs/style"
+        },
+        "responsive": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "compact": {
+              "$ref": "#/$defs/style"
+            },
+            "wide": {
+              "$ref": "#/$defs/style"
+            }
+          }
+        },
+        "motion": {
+          "$ref": "#/$defs/motion"
+        },
+        "when": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "hasCover": {
+              "type": "boolean"
+            },
+            "hasLyrics": {
+              "type": "boolean"
+            },
+            "isPlaying": {
+              "type": "boolean"
+            },
+            "hasAlbum": {
+              "type": "boolean"
+            },
+            "isShuffle": {
+              "type": "boolean"
+            },
+            "isRepeat": {
+              "type": "boolean"
+            },
+            "isLiked": {
+              "type": "boolean"
+            }
+          }
+        },
+        "children": {
+          "type": "array",
+          "maxItems": 24,
+          "items": {
+            "$ref": "#/$defs/node"
+          }
+        },
+        "slot": {
+          "enum": [
+            "cover",
+            "title",
+            "artist",
+            "album",
+            "lyrics",
+            "current-line",
+            "previous-line",
+            "next-line",
+            "translation",
+            "progress",
+            "seek-bar",
+            "time-current",
+            "time-duration",
+            "spectrum",
+            "status",
+            "track-tech",
+            "play-toggle",
+            "previous-track",
+            "next-track",
+            "volume-slider",
+            "shuffle-toggle",
+            "repeat-cycle",
+            "like-toggle"
+          ]
+        },
+        "options": {
+          "$ref": "#/$defs/options"
+        },
+        "text": {
+          "type": "string",
+          "maxLength": 240
+        },
+        "asset": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "group"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "children"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "slot"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "slot"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "text"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "text"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "image"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "asset"
+            ]
+          }
+        }
+      ]
+    },
+    "styleValue": {
+      "anyOf": [
+        {
+          "type": "number",
+          "minimum": -4096,
+          "maximum": 4096
+        },
+        {
+          "type": "string",
+          "maxLength": 240,
+          "pattern": "^[^;{}<>\\\\]*$"
+        }
+      ]
     }
   }
 }

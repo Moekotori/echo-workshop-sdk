@@ -17,7 +17,7 @@
       "additionalProperties": false,
       "required": ["kind", "entry"],
       "properties": {
-        "kind": { "enum": ["theme", "lyrics-style", "visualizer-preset", "dsp-preset", "audio-plugin-profile", "locale-pack", "plugin-package", "native-shell"] },
+        "kind": { "enum": ["theme", "lyrics-style", "animation-library", "visualizer-preset", "dsp-preset", "audio-plugin-profile", "locale-pack", "plugin-package", "native-shell"] },
         "entry": { "$ref": "#/$defs/path" }
       }
     },

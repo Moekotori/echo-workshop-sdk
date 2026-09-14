@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "appId": "5105090",
+  "publishedFileId": "0",
+  "contentDirectory": "content",
+  "previewFile": "preview.png",
+  "visibility": "private",
+  "description": "A lyrics-only sandbox runtime with host-owned clock anchors, revisioned word-timed lyrics, theme-aware typography, seek and play/pause. The application shell remains native.",
+  "changeNote": "Introduce the lyrics-view runtime example.",
+  "tags": [
+    "Theme"
+  ]
+}

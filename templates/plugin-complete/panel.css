@@ -1,6 +1,10 @@
-:root { color-scheme: dark; }
-body { margin: 0; padding: 28px; font: 15px system-ui; background: #101522; color: #eef5ff; }
+:root { color-scheme: light dark; }
+body { margin: 0; padding: 28px; font: 15px system-ui; background: var(--echo-host-appBg, Canvas); color: var(--echo-host-text, CanvasText); }
 main { display: grid; gap: 12px; max-width: 720px; margin: auto; }
-h1 { color: #8bdcff; }
-input, button, pre { padding: 10px; border-radius: 8px; }
+h1 { color: var(--echo-host-heading, CanvasText); }
+small { color: var(--echo-host-muted, GrayText); }
+input, button, pre { padding: 10px; border: 1px solid var(--echo-host-border, ButtonBorder); border-radius: 8px; }
+input, pre { color: inherit; background: var(--echo-host-panel, Canvas); }
+button { color: var(--echo-host-accentText, ButtonText); background: var(--echo-host-accent, ButtonFace); }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; }
 pre { white-space: pre-wrap; }

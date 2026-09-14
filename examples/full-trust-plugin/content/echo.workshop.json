@@ -1,0 +1,26 @@
+{
+  "type": "echo-workshop-item",
+  "schemaVersion": 1,
+  "id": "echo.example-full-trust",
+  "title": "Full Trust Plugin",
+  "version": "1.0.0",
+  "content": {
+    "kind": "plugin-package",
+    "entry": "community.echo"
+  },
+  "compatibility": {
+    "minEchoVersion": "26.8.29",
+    "pluginApiVersion": 2
+  },
+  "files": [
+    {
+      "path": "community.echo",
+      "size": 2074,
+      "sha256": "4534a2b8825dbb828e42715d973e1fec59a5ee1b37ed92571b590649ddfea122"
+    }
+  ],
+  "license": {
+    "id": "MIT",
+    "holder": "Workshop Author"
+  }
+}

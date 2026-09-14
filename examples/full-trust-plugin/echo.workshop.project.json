@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "appId": "5105090",
+  "publishedFileId": "0",
+  "contentDirectory": "content",
+  "previewFile": "preview.png",
+  "visibility": "private",
+  "description": "A minimal full-trust ECHO Workshop plug-in with a sandbox command and a subscriber-approved Node.js utility-process handler.",
+  "changeNote": "SDK 1.15.0 example: full-trust plug-in with an author-managed development environment.",
+  "tags": [
+    "Sandboxed Plugin"
+  ]
+}

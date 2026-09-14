@@ -7,6 +7,7 @@
     "contentKinds": [
       "theme",
       "lyrics-style",
+      "animation-library",
       "visualizer-preset",
       "dsp-preset",
       "audio-plugin-profile",
@@ -24,6 +25,7 @@
       "permission": "system:full",
       "entryField": "manifest.trustedEntry",
       "entryExtension": ".mjs",
+      "minimumEchoVersion": "26.8.29",
       "execution": "isolated-utility-process",
       "moduleExports": ["activate", "handle", "dispose"]
     },
@@ -46,6 +48,19 @@
   },
   "lyricsStyle": {
     "presets": ["editorial", "compact", "cinema", "cover"]
+  },
+  "animationLibrary": {
+    "schemaVersion": 1,
+    "minimumEchoVersion": "26.9.1",
+    "declarationFile": "echo-workshop-animation-library.d.ts",
+    "maximumAnimations": 64,
+    "maximumKeyframesPerAnimation": 8,
+    "properties": ["opacity", "translateX", "translateY", "translateZ", "scale", "rotateXDeg", "rotateYDeg", "rotateDeg", "skewXDeg", "skewYDeg", "clipProgress"],
+    "triggers": ["scene-enter", "track-change", "line-change", "ambient"],
+    "origins": ["center", "top", "right", "bottom", "left", "top-left", "top-right", "bottom-right", "bottom-left"],
+    "clipDirections": ["left-to-right", "right-to-left", "top-to-bottom", "bottom-to-top", "center-out-x", "center-out-y"],
+    "staggerOrigins": ["first", "center", "last", "edges"],
+    "easings": ["linear", "ease", "ease-in", "ease-out", "ease-in-out", "echo-spring", "echo-snappy", "echo-gentle", "echo-elastic"]
   },
   "visualizer": {
     "presets": ["bars", "wave", "radial"]
@@ -82,6 +97,7 @@
     "bass-eq",
     "8bit-audio",
     "plugin-complete",
+    "full-trust-plugin",
     "source-catalog",
     "lyrics-source",
     "wenyan-locale",

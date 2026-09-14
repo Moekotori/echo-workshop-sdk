@@ -99,6 +99,7 @@ interface EchoWorkshopUiLyricsPeek {
 
 interface EchoWorkshopUiReadyMessage {
   type: 'echo:workshop-ui:ready';
+  protocolVersion?: 1;
 }
 
 interface EchoWorkshopUiCommandMessage {
@@ -113,12 +114,16 @@ interface EchoWorkshopUiInitMessage {
   protocolVersion: 1;
   theme: { id: string; version: string };
   capabilities: EchoWorkshopUiCapability[];
+  presentation?: 'shell' | 'lyrics-background' | 'lyrics-view';
   appearance?: EchoWorkshopUiAppearance;
+  features?: Array<'lyrics-events' | 'clock'>;
 }
 
 interface EchoWorkshopUiStateMessage {
   type: 'echo:workshop-ui:state';
   protocolVersion: 1;
+  /** Background runtimes stop RAF when null, and respect the host frame budget. */
+  motion?: { frameIntervalMs: number | null };
   playback?: {
     state: string;
     currentTrackId: string | null;
@@ -149,20 +154,62 @@ interface EchoWorkshopUiStateMessage {
   };
 }
 
-interface EchoWorkshopUiResultMessage {
+interface EchoWorkshopUiResultMessage<T = unknown> {
   type: 'echo:workshop-ui:result';
   protocolVersion: 1;
   requestId: string;
   ok: boolean;
-  value?: unknown;
+  value?: T;
   error?: string;
 }
 
 type EchoWorkshopUiHostMessage =
   | EchoWorkshopUiInitMessage
   | EchoWorkshopUiStateMessage
-  | EchoWorkshopUiResultMessage;
+  | EchoWorkshopUiResultMessage
+  | EchoWorkshopUiLyricsMessage
+  | EchoWorkshopUiClockMessage
+  | EchoWorkshopUiPingMessage;
 
 type EchoWorkshopUiFrameMessage =
   | EchoWorkshopUiReadyMessage
-  | EchoWorkshopUiCommandMessage;
+  | EchoWorkshopUiCommandMessage
+  | EchoWorkshopUiPongMessage
+  | EchoWorkshopUiErrorMessage;
+
+/** Sanitized, bounded document returned by lyrics:get and pushed when its revision changes. */
+interface EchoWorkshopUiLyricWord { text: string; startMs: number; endMs: number | null; }
+interface EchoWorkshopUiLyricLine {
+  timeMs: number;
+  text: string;
+  translation: string | null;
+  romanization: string | null;
+  kana: string | null;
+  words: EchoWorkshopUiLyricWord[];
+}
+interface EchoWorkshopUiLyrics {
+  kind: 'empty' | 'plain' | 'synced' | 'instrumental';
+  title: string; artist: string; album: string | null;
+  durationSeconds: number | null; offsetMs: number;
+  provider: 'none' | 'local' | 'manual' | 'cached' | 'remote';
+  lines: EchoWorkshopUiLyricLine[];
+  plainText: string | null; syncedText: string | null;
+}
+interface EchoWorkshopUiLyricsMessage {
+  type: 'echo:workshop-ui:lyrics'; protocolVersion: 1;
+  trackId: string | null; revision: number; lyrics: EchoWorkshopUiLyrics | null;
+}
+interface EchoWorkshopUiClockMessage {
+  type: 'echo:workshop-ui:clock'; protocolVersion: 1;
+  clock: {
+    currentTrackId: string | null; state: string;
+    positionSeconds: number; durationSeconds: number; playbackRate: number;
+    /** Host browser performance.timeOrigin + performance.now(), milliseconds. */
+    sampledAtMs: number; generation: number | null;
+  };
+  motion: { frameIntervalMs: number | null };
+}
+interface EchoWorkshopUiPingMessage { type: 'echo:workshop-ui:ping'; protocolVersion: 1; }
+interface EchoWorkshopUiPongMessage { type: 'echo:workshop-ui:pong'; protocolVersion: 1; }
+interface EchoWorkshopUiErrorMessage { type: 'echo:workshop-ui:error'; protocolVersion: 1; }
+type EchoWorkshopUiLyricsResult = EchoWorkshopUiResultMessage<EchoWorkshopUiLyrics | null>;

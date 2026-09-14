@@ -9,6 +9,7 @@ One page, both languages. All commands are local-only and never upload to Steam.
 | `init ./dir --kind theme` | New project; folder name becomes id/title | 新建项目，目录名即 id/标题 |
 | `init ./dir --kind native-shell` | Windows taskbar/shell host (exe + named pipe) | Windows 系统壳（exe + named pipe） |
 | `init ./dir --recipe css-theme` | Start from an outcome (`recipes` lists them) | 按效果起步（`recipes` 列表） |
+| `init ./dir --recipe full-trust-plugin` | Subscriber-approved Node.js process; author owns the toolchain | 完整系统插件；作者自管环境 |
 | `example list` / `example hello-plugin ./dir` | Copy a complete official example | 拷贝完整官方示例 |
 | `kinds` / `recipes` / `guide` | Catalogs and the Chinese cookbook | 类型/配方目录与中文说明书 |
 
@@ -46,6 +47,13 @@ Add `--json` to `check`, `quality`, `test`, `validate`, `next`, `version`, `doct
 - The handler receives one values object; compose another local command with `echo.commands.execute(id, input)`. / 处理函数收到一个参数对象；可用 `echo.commands.execute` 组合本插件命令。
 - Player-bar, track-context and automation actions stay one-click and must target a command without parameters or confirmation. / 播放器按钮、歌曲右键和自动化保持一键执行，只能绑定无需参数或确认的命令。
 - Generate the working example with `init ./dir --kind plugin-package --preset complete`. / 用 `complete` 预设直接生成可运行示例。
+
+## Full trust / 完整系统
+
+- `init ./dir --recipe full-trust-plugin` generates `src/plugin.js` plus `src/trusted.mjs`. / 一条命令生成沙箱入口和完整系统入口。
+- For an existing plug-in, `add . --permission system:full` adds the paired entry, starter file and minimum ECHO version. / 旧项目用一条 `add` 命令补齐配对声明、文件和最低版本。
+- Authors install and maintain Node, compilers and dependencies in their own environment. Authoring Studio does not provision them. / 作者自装自管环境；创作台不代装。
+- Local mock tests validate the bridge but do not execute `trusted.mjs`; real execution requires subscriber approval inside ECHO. / mock 只验桥接，真执行需在 ECHO 内由订阅者确认。
 
 ## VS Code tips / 编辑器技巧
 
