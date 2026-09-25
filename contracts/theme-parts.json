@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "attribute": "data-echo-part",
+  "statesAttribute": "data-echo-state",
+  "parts": ["titlebar", "sidebar", "navigation", "player", "player-button", "track-row", "album-card", "menu", "menu-item", "lyrics-line", "lyrics-word"],
+  "states": ["active", "selected", "playing", "disabled"],
+  "tokens": {
+    "--echo-surface": "--theme-panel-bg",
+    "--echo-background": "--theme-app-bg",
+    "--echo-text": "--theme-text",
+    "--echo-muted": "--theme-muted-text",
+    "--echo-accent": "--theme-accent",
+    "--echo-border": "--theme-panel-border"
+  },
+  "compatibility": "Names are additive within version 1. Host markup and internal class names are not public API."
+}

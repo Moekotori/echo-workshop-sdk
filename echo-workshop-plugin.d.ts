@@ -236,6 +236,8 @@ interface EchoWorkshopTrack {
   bitrate: number | null;
   coverUrl: string | null;
   unavailable: boolean;
+  /** Present only when `library:path` is approved, and only for a local file. */
+  path?: string;
 }
 
 interface EchoWorkshopAlbum {
@@ -459,34 +461,6 @@ interface EchoWorkshopNetworkResponse {
   body: string;
 }
 
-interface EchoWorkshopPlaybackShareTrack {
-  id: string | null;
-  title: string;
-  artist: string;
-  album: string;
-  durationSeconds: number;
-  codec: string | null;
-  sizeBytes: number;
-}
-
-interface EchoWorkshopPlaybackShareInfo {
-  available: boolean;
-  reason: 'no-current-track' | 'not-local-file' | 'file-unavailable' | null;
-  track: EchoWorkshopPlaybackShareTrack | null;
-  allowedHosts: string[];
-}
-
-interface EchoWorkshopPlaybackShareTask {
-  id: string;
-  state: 'queued' | 'uploading' | 'ready' | 'error';
-  bytesSent: number;
-  totalBytes: number;
-  progress: number;
-  playbackUrl: string | null;
-  expiresAt: string | null;
-  error: string | null;
-  track: EchoWorkshopPlaybackShareTrack;
-}
 
 interface EchoWorkshopSandboxLyrics {
   kind: 'empty' | 'plain' | 'synced' | 'instrumental';
@@ -537,7 +511,14 @@ interface EchoWorkshopHostCapabilities {
   features: Record<string, EchoWorkshopHostFeatureAvailability>;
 }
 
-type EchoWorkshopPanelSize = 'compact' | 'comfortable' | 'wide' | 'full';
+/**
+ * Host-owned panel sizes. `immersive` fills the whole ECHO window content area (including over the
+ * player bar) with no host chrome at all, so the panel must offer its own way out via
+ * `echo.ui.closePanel()` (the host's `Ctrl+Shift+Esc` emergency exit always remains). Hosts older
+ * than the version that introduced it reject the value with `invalid-payload`, so fall back to `full`
+ * when the request fails.
+ */
+type EchoWorkshopPanelSize = 'compact' | 'comfortable' | 'wide' | 'full' | 'immersive';
 type EchoWorkshopPanelAttention = 'none' | 'info' | 'warning';
 
 interface EchoWorkshopPanelPresentation {
@@ -560,9 +541,16 @@ interface EchoWorkshopUiAppearance {
   player: string;
 }
 
+interface EchoWorkshopParentPage {
+  routeId: string;
+  title: string | null;
+  pluginPage: { pluginId: string; panelId: string } | null;
+  selection: Array<{ trackId: string; path?: string }>;
+}
+
 interface EchoWorkshopUiContext {
   surface: 'runtime' | 'panel';
-  panel: { id: string; placement: 'main' | 'utility' | 'sidebar' | 'home' | 'lyrics' | 'queue' | 'track-detail' | 'player' } | null;
+  panel: { id: string; placement: 'main' | 'utility' | 'sidebar' | 'home' | 'lyrics' | 'queue' | 'track-detail' | 'player' | 'page' } | null;
   visible: boolean;
   locale: string;
   direction: 'ltr' | 'rtl';
@@ -584,7 +572,12 @@ interface EchoWorkshopApi {
     getFeatureAvailability(featureId: string): Promise<EchoWorkshopHostFeatureAvailability>;
   };
   commands: {
-    /** A trackContextMenus command receives one sanitized EchoWorkshopTrack as its first argument. */
+    /**
+     * A single-track context command receives one sanitized EchoWorkshopTrack.
+     * A `selection: "multiple"` command receives EchoWorkshopTrack[] (at most 100).
+     * A playlist column command receives EchoWorkshopTrack[] for the visible rows and
+     * returns `{ trackId, value }[]`, with each value at most 24 characters.
+     */
     /** A parameterized command receives one host-validated EchoWorkshopCommandInput as its first argument. */
     register<TInput = unknown, TResult = unknown>(id: string, metadata: { title: string }, handler: (input: TInput, ...args: unknown[]) => TResult | Promise<TResult>): void;
     /** Compose declared commands inside the same sandbox without adding a host permission. */
@@ -596,6 +589,13 @@ interface EchoWorkshopApi {
     on(eventName: 'playback:status' | 'audio:spectrum' | 'queue:changed' | 'library:changed' | 'library:liked-changed' | 'settings:changed', handler: (payload: unknown) => unknown): EchoWorkshopUnsubscribe;
   };
   navigation: {
+    /**
+     * Opens a built-in route, or a native sidebar page.
+     * Page route ids are `plugin:<pluginId>:<panelId>`.
+     * Opening this plug-in's own page does not require `navigation`; every other route does.
+     * Unknown ids reject with `invalid-payload`; a well-formed page id that is
+     * not currently registered is ignored by the host.
+     */
     open(routeId: string): Promise<null>;
   };
   playback: {
@@ -610,9 +610,6 @@ interface EchoWorkshopApi {
     toggleShuffle(): Promise<null>;
     setRepeat(mode: 'off' | 'one' | 'all'): Promise<null>;
     cycleRepeat(): Promise<null>;
-    getShareInfo(): Promise<EchoWorkshopPlaybackShareInfo>;
-    shareCurrentTrack(options: { uploadUrl: string; roomId?: string; headers?: Record<string, string> }): Promise<EchoWorkshopPlaybackShareTask>;
-    getShareTask(taskId: string): Promise<EchoWorkshopPlaybackShareTask>;
     playUrl(url: string, metadata?: Omit<EchoWorkshopDirectSource, 'url'>): Promise<EchoWorkshopTrackActionResult>;
   };
   audio: {
@@ -721,8 +718,22 @@ interface EchoWorkshopApi {
     notify(message: string): Promise<null>;
     /** Returns a sanitized responsive/theme context for this runtime or visible panel. */
     getContext(): Promise<EchoWorkshopUiContext>;
+    /**
+     * Returns the host page the plug-in is attached to: route, title and the current
+     * library selection. This is not the live parent document. Track ids require
+     * `library:read` or `library:path`; file paths require `library:path`.
+     */
+    getParentPage(): Promise<EchoWorkshopParentPage>;
     /** Updates only the host-owned shell around the current panel. Background runtimes are rejected. */
     setPanelPresentation(presentation: Partial<EchoWorkshopPanelPresentation>): Promise<EchoWorkshopPanelPresentation>;
+    /**
+     * Opens one of this plug-in's declared panels. Background runtimes may call this so
+     * `playerBarActions` and dock commands can show a panel. Pass a panel id to open it
+     * immediately. Omit the id to let the host choose: one visible panel opens directly,
+     * several panels show a host-owned chooser. Returns the opened panel, or `null` if the
+     * user dismissed the chooser. Unknown ids reject with `panel-undeclared`.
+     */
+    openPanel(panelId?: string): Promise<{ id: string; title: string } | null>;
     /** Closes the current visible panel. Background runtimes are rejected. */
     closePanel(): Promise<null>;
     /** Fires when theme, locale, visibility, viewport, or host-owned presentation changes. */

@@ -22,7 +22,7 @@
     "nativeLabel": { "type": "string", "minLength": 1, "maxLength": 80 },
     "fallback": {
       "type": "string",
-      "enum": ["zh-CN", "zh-TW", "en-US", "ja-JP", "ko-KR"],
+      "enum": ["zh-CN", "zh-TW", "en-US", "ja-JP", "ko-KR", "de-DE", "fr-FR", "ru-RU", "es-ES"],
       "default": "zh-CN"
     },
     "strings": {

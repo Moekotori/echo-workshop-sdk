@@ -1,18 +1,22 @@
 # ECHO Workshop SDK
 
-歌词样式与歌词自绘的新增源码候选能力见 [Lyrics authoring / 歌词创作](./lyrics-authoring.md)。
-
 [![ECHO Workshop SDK CI](https://github.com/Moekotori/echo-workshop-sdk/actions/workflows/ci.yml/badge.svg)](https://github.com/Moekotori/echo-workshop-sdk/actions/workflows/ci.yml)
 
 [Public repository](https://github.com/Moekotori/echo-workshop-sdk) · [Latest release](https://github.com/Moekotori/echo-workshop-sdk/releases/latest) · [Report a vulnerability](https://github.com/Moekotori/echo-workshop-sdk/security/advisories/new) · [中文说明](./README.zh-CN.md)
 
-This folder is the portable developer kit for ECHO Steam Workshop. SDK version `1` targets Workshop manifest schema `1` and plug-in API `2`. Package version `1.15.0` adds `native-shell`, a Windows system-shell channel (named pipe + packaged `.exe`) that is not the sandboxed plug-in VM. `1.14.0` still makes the sandbox a default rather than a ceiling: a plug-in may request `system:full`, declare a packaged `.mjs` `trustedEntry`, and—after explicit subscriber approval—run normal Node.js code in a dedicated ECHO utility process. The five built-in app languages stay in ECHO. ECHO does not ship a third-party streaming platform.
+This repository contains the portable developer kit for ECHO Steam Workshop. The current source package is `1.17.0`. SDK version `1` targets Workshop manifest schema `1` and plug-in API `2`. The SDK is MIT-licensed, requires Node.js 20+ for local authoring, and is not published to npm. Check the [latest GitHub release](https://github.com/Moekotori/echo-workshop-sdk/releases/latest) for an actual downloadable `.tgz`; the main branch can be newer than the latest release.
+
+| Feature | Minimum ECHO version |
+| --- | --- |
+| Native sidebar pages (`placement: "page"`), page navigation and the 1.17 command surfaces | `26.9.25` |
+| Independent theme/lyrics/background composition, animation libraries and panel presentation from 1.16 | `26.9.16` |
+| Full-trust plug-ins (`system:full` and `trustedEntry`) | `26.8.29`; explicit subscriber approval required |
+
+The SDK includes `native-shell` authoring contracts for a Windows named-pipe channel, but the official ECHO Steam build does not launch subscriber-supplied `.exe` or `.dll` files. Sandboxed plug-ins remain the default. The five built-in app languages stay in ECHO. ECHO does not ship a third-party streaming platform.
 
 The unreleased API surface also exposes a bounded `workshopAudioEffect.vocalCut` state for realtime center-vocal suppression. Audio Core owns execution and smoothing; plug-ins can set strength and an 80–300 Hz bass-preservation crossover, but still cannot run code on the realtime thread.
 
-The public Steam Workshop starter is
-[`3784997717`](https://steamcommunity.com/sharedfiles/filedetails/?id=3784997717)
-at published package version `1.12.0`. This source tree is the `1.15.0` release candidate; the GitHub Releases page and the Steam item are authoritative for what users can actually download. GitHub and Steam releases advance independently. Later Steam updates must keep that PublishedFileID.
+The public [Steam Workshop starter item](https://steamcommunity.com/sharedfiles/filedetails/?id=3784997717) provides a runnable sample and a separately published copy of the SDK. GitHub Releases and the Steam item can have different versions; check each download directly. Updates to the Steam item keep PublishedFileID `3784997717`.
 
 It contains:
 
@@ -31,12 +35,13 @@ one-page command reference lives in [CHEATSHEET.md](./CHEATSHEET.md), and
 [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) maps every common local failure —
 check errors, mock permission denials, dev port conflicts, tag warnings — to
 its fix (`guide troubleshoot` prints the short Chinese table).
+[Theme parts and host preview](./theme-parts.md) and [lyrics authoring](./lyrics-authoring.md) document the newer visual surfaces.
 
 The JSON Schemas improve editor feedback. ECHO's production parser remains authoritative and may enforce cross-file, hash, size and runtime-policy checks that JSON Schema cannot express.
 
 Plug-in API 2 is the stable compatibility baseline. Before showing a feature, use `echo.host.getFeatureAvailability(actionOrCapability)` or inspect `echo.host.getCapabilities()`, then degrade using the returned reason instead of probing undocumented methods or guessing from thrown errors. Experimental APIs must be explicitly marked experimental and are not part of the API 2 compatibility promise.
 
-Sandbox panels can also behave like responsive ECHO-native tools without gaining parent DOM access. Use `echo.ui.getContext()` and `echo.ui.onContextChanged()` for the host locale, direction, viewport, reduced-motion setting, light/dark state and bounded semantic appearance tokens. A visible panel may call `echo.ui.setPanelPresentation()` to change its host-owned title, badge, dirty marker, attention state and `compact` / `comfortable` / `wide` / `full` size, or `echo.ui.closePanel()` after completing a workflow. Background runtimes cannot mutate panel chrome, and the host close control remains permanent.
+Sandbox panels can also behave like responsive ECHO-native tools without gaining parent DOM access. Use `echo.ui.getContext()` and `echo.ui.onContextChanged()` for the host locale, direction, viewport, reduced-motion setting, light/dark state and bounded semantic appearance tokens. A visible panel may call `echo.ui.setPanelPresentation()` to change its host-owned title, badge, dirty marker, attention state and `compact` / `comfortable` / `wide` / `full` / `immersive` size, or `echo.ui.closePanel()` after completing a workflow. Background runtimes may call `echo.ui.openPanel(panelId?)` so a `playerBarActions` command can open a declared panel, or omit the id to let the host choose among this plug-in's visible panels. `immersive` fills the whole ECHO window content area, including over the player bar, with no host chrome at all, so the panel must offer its own exit via `echo.ui.closePanel()` (the host's `Ctrl+Shift+Esc` emergency exit always remains); hosts older than the version that introduced it reject the value with `invalid-payload`, so fall back to `full`. Background runtimes cannot mutate panel chrome, and in every other size the host close control remains permanent.
 
 ## Quick start from the packed SDK
 
@@ -178,7 +183,7 @@ A declared command may include up to 12 `parameters` (`string`, `number`, `boole
 
 Commands can reuse other commands in the same sandbox with `await echo.commands.execute('command-id', input)`, and `echo.commands.list()` returns the runtime's registered command titles. These local composition helpers add no permission and cannot cross into another plug-in. Handlers should still normalize business-level values defensively. The `complete` plug-in preset demonstrates a host-generated form, confirmation, command composition and bounded sandbox storage.
 
-`validate` rejects private, local, wildcard, duplicate and malformed `networkHosts`, plus host declarations without `network:request` or `playback:share`. The mock rejects undeclared destinations and custom ports before a fixture can pass. Production network requests and playback-sharing uploads resolve a public address and connect to that validated address while preserving the declared Host/TLS identity. HTTP(S) remains accepted for compatibility, but authors should use HTTPS for requests and uploads.
+`validate` rejects private, local, wildcard, duplicate and malformed `networkHosts`, and host declarations without `network:request`. Requests resolve and connect to validated public addresses while preserving Host/TLS identity. Prefer HTTPS.
 
 ## Standalone GitHub mirror
 
@@ -222,3 +227,5 @@ never publishes to Steam or npm.
 ## License
 
 The SDK files in this package, including its types, schemas, CLI, templates and examples, are licensed under the [MIT License](./LICENSE). An independent extension that only uses the documented Workshop API or these MIT-licensed materials is not covered by the ECHO application's source-available license. Your original Workshop content remains yours and may use a license you choose; submission to ECHO's Steam Workshop must still follow the Workshop content policy, Steam terms, third-party rights and applicable law. The MIT license does not grant rights to the ECHO name, logo, proprietary application code or assets outside this SDK package.
+
+Local-track uploads are no longer supported. Packages requesting `playback:share` are rejected. The playback upload methods have been removed from the host and SDK; existing local files are not deleted. Authorized direct-stream playback remains available through `sources:direct`.

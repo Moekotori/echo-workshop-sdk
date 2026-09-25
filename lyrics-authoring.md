@@ -13,7 +13,7 @@
 | 只画背景，保留原歌词和控件 | `theme.runtime.presentation: "lyrics-background"` |
 | 重写整个应用界面 | `theme.runtime.presentation: "shell"` |
 
-`lyrics-view` 与背景 runtime 共用当前启用的主题 runtime 选择，一次运行一个。
+包含视觉组合更新的宿主将主题、`lyrics-view` 和背景 runtime 分别保存，可以混搭；旧构建仍只有一个选择。混搭时，自绘歌词页面应使用透明背景。见 [主题部件与预览](theme-parts.md)。
 应用歌词 runtime 不改全局配色。当前只接管主播放队列的普通歌词页，电台、一起听和 AirPlay 接收页保持原显示。它在普通歌词页可见时挂载；离开页面、禁用或退出会释放 iframe、状态订阅和计时器。
 若另选了声明式歌词场景，该场景优先；切回内置歌词布局可使用 runtime。
 声明式场景暂不提供自带字体文件；自带字体走 runtime 的已验证 `.woff/.woff2` 资源通道。
@@ -71,7 +71,7 @@
 
 支持能力：`playback:read / playback:control / lyrics:read / audio:spectrum / storage`。
 不提供全曲库、全局导航、窗口管理。当前曲 `lyrics:get` 可读，指定其它曲会被拒绝。
-宿主始终提供返回、退出以及原播放器；出错或 10 秒未 ready/pong 会恢复宿主歌词。
+宿主始终提供位于现有标题栏内、不占歌词布局空间的返回箭头以及原播放器；返回沿用歌词页导航，回到进入歌词前的页面，不取消已应用的歌词主题。歌词模式不显示额外的“退出自定义 UI”按钮，仍保留主进程 `Ctrl+Shift+Esc` 紧急退出；出错或 10 秒未 ready/pong 会恢复宿主歌词。完整应用 shell 主题继续显示宿主退出按钮。
 
 新增协议 1 消息（shell 也支持歌词变化和时钟）：
 
@@ -87,3 +87,22 @@
 
 `echo-workshop-ui-runtime.d.ts` 提供完整歌词、逐字时间、clock 和事件类型，以及 `EchoWorkshopUiLyricsResult`。
 运行示例见 [Lyric Ink](examples/lyrics-view-runtime/README.md)。素材只用同包相对路径；自带字体需记录来源、许可和分发权，不需要开放网络或系统权限。
+
+## 只读音频信息事件（源码候选）
+
+包含本次音频事件更新的宿主在 `init.features` 声明 `audio-events`，通过
+`echo:workshop-ui:audio` 推送当前曲 `trackId` 和有权限读取的字段。
+`playback:read` 允许 `audio`（codec、文件 sampleRate、bitDepth、实际 deviceSampleRate、
+outputDevice 显示名称、outputBackend、outputMode、replayGainDb/replayGainActive）；
+`audio:spectrum` 允许 `levels`（peakDb/rmsDb/source）与 `spectrum`。未获能力的字段不发送。
+这是可选的协议 1 扩展；旧客户端不提供音频信息时作者应显示不可用，不能从模拟数据补齐。
+
+电平单位为 dBFS：`native_post_dsp` 表示宿主原生 DSP 后测量，
+`pre_native_estimated_post_dsp` 在本事件中只提供其 **输入 Peak/RMS**，不提供估算输出。
+不是独立 L/R 声道电平。ReplayGain 为宿主实际应用的 ReplayGain，不是总 DSP 增益或音量。
+源采样率与设备实际采样率分别显示，不以请求值代替设备事实。
+
+事件复用现有 Audio Core 状态订阅，最高 10 Hz 并遵守可见性/帧预算，无额外 IPC 轮询。
+隐藏时停止推送，卸载时移除订阅和定时器；暂停/停止清空电平与频谱，切歌按 trackId 隔离。
+频谱仍为现有的最多 128 个归一化 band；真实有效状态为 `pcm`，`priming`/`fallback` 不应显示为稳定 PCM 数据。
+本事件不提供 PCM、文件路径、设备 ID、设备枚举或访问能力，不增加外联。

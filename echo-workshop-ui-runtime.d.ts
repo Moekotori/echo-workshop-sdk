@@ -1,5 +1,14 @@
 /** ECHO Workshop theme UI runtime bridge. Protocol version 1. See echo-workshop-sdk.json. */
 
+/** Optional `lyrics-interaction` init feature. Only accepted from the active lyrics-view frame.
+ * Pointer coordinates are viewport-normalized [0, 1]; coalesce to at most 20 Hz.
+ * Back requests the host's lyrics return action; it grants no arbitrary navigation.
+ */
+type EchoWorkshopLyricsInteraction = {
+  type: 'echo:workshop-ui:interaction';
+  protocolVersion: 1;
+} & ({ action: 'back' } | { action: 'pointer'; x: number; y: number });
+
 type EchoWorkshopUiCapability =
   | 'navigation'
   | 'playback:read'
@@ -78,6 +87,8 @@ interface EchoWorkshopUiTrack {
 }
 
 interface EchoWorkshopUiAppearance {
+  /** Lyrics-only explicit override; absent means follow host palette. */
+  tone?: 'light' | 'dark';
   accent: string;
   accentText: string;
   panel: string;
@@ -116,7 +127,7 @@ interface EchoWorkshopUiInitMessage {
   capabilities: EchoWorkshopUiCapability[];
   presentation?: 'shell' | 'lyrics-background' | 'lyrics-view';
   appearance?: EchoWorkshopUiAppearance;
-  features?: Array<'lyrics-events' | 'clock'>;
+  features?: Array<'lyrics-events' | 'clock' | 'audio-events' | 'lyrics-interaction'>;
 }
 
 interface EchoWorkshopUiStateMessage {
@@ -164,14 +175,17 @@ interface EchoWorkshopUiResultMessage<T = unknown> {
 }
 
 type EchoWorkshopUiHostMessage =
+  | { type: 'echo:workshop-ui:appearance'; protocolVersion: 1; appearance: EchoWorkshopUiAppearance }
   | EchoWorkshopUiInitMessage
   | EchoWorkshopUiStateMessage
   | EchoWorkshopUiResultMessage
   | EchoWorkshopUiLyricsMessage
   | EchoWorkshopUiClockMessage
-  | EchoWorkshopUiPingMessage;
+  | EchoWorkshopUiPingMessage
+  | EchoWorkshopUiAudioMessage;
 
 type EchoWorkshopUiFrameMessage =
+  | EchoWorkshopLyricsInteraction
   | EchoWorkshopUiReadyMessage
   | EchoWorkshopUiCommandMessage
   | EchoWorkshopUiPongMessage
@@ -210,6 +224,24 @@ interface EchoWorkshopUiClockMessage {
   motion: { frameIntervalMs: number | null };
 }
 interface EchoWorkshopUiPingMessage { type: 'echo:workshop-ui:ping'; protocolVersion: 1; }
+/** Existing capabilities: audio metadata needs playback:read, meters/spectrum need audio:spectrum.
+ * At most 10 Hz from existing Audio Core status. No PCM, device IDs or local paths.
+ */
+interface EchoWorkshopUiAudioMessage {
+  type: 'echo:workshop-ui:audio'; protocolVersion: 1; trackId: string | null;
+  audio?: {
+    codec: string | null; sampleRate: number | null; bitDepth: number | null;
+    deviceSampleRate: number | null; outputDevice: string | null;
+    outputBackend: string | null; outputMode: string | null; replayGainDb: number | null;
+    replayGainActive: boolean | null;
+  } | null;
+  levels?: {
+    /** dBFS; input before native DSP unless source is native_post_dsp. Never independent L/R. */
+    peakDb: number | null; rmsDb: number | null;
+    source: 'native_post_dsp' | 'pre_native_estimated_post_dsp' | null;
+  };
+  spectrum?: EchoWorkshopUiStateMessage['spectrum'];
+}
 interface EchoWorkshopUiPongMessage { type: 'echo:workshop-ui:pong'; protocolVersion: 1; }
 interface EchoWorkshopUiErrorMessage { type: 'echo:workshop-ui:error'; protocolVersion: 1; }
 type EchoWorkshopUiLyricsResult = EchoWorkshopUiResultMessage<EchoWorkshopUiLyrics | null>;

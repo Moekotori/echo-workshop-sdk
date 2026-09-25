@@ -1,20 +1,28 @@
 # ECHO 创意工坊 SDK
 
-歌词样式与歌词自绘的新增源码候选能力见 [Lyrics authoring / 歌词创作](./lyrics-authoring.md)。
-
 [![ECHO Workshop SDK CI](https://github.com/Moekotori/echo-workshop-sdk/actions/workflows/ci.yml/badge.svg)](https://github.com/Moekotori/echo-workshop-sdk/actions/workflows/ci.yml)
 
 [公开仓库](https://github.com/Moekotori/echo-workshop-sdk) · [最新版本](https://github.com/Moekotori/echo-workshop-sdk/releases/latest) · [私密报告安全问题](https://github.com/Moekotori/echo-workshop-sdk/security/advisories/new) · [English](./README.md)
 
-这是给作者用的便携工具箱。当前源码包版本 `1.15.0`，清单 schema `1`，插件 API `2`。`1.15.0` 增加 `native-shell`：Windows 系统壳通道，走 named pipe 协议 v1，不是沙箱插件。`1.14.0` 起沙箱只是默认而不是上限：插件可申请 `system:full` 和 `.mjs` trustedEntry。额外语言仍只活在工坊 JSON 里。
+这是给作者用的便携工具箱。当前源码包版本 `1.17.0`，清单 schema `1`，插件 API `2`。本 SDK 采用 MIT 许可，本地创作需要 Node.js 20+，不发布到 npm。可下载的 `.tgz` 以 [GitHub Releases](https://github.com/Moekotori/echo-workshop-sdk/releases/latest) 实际列出的资产为准；main 分支可能比最新 Release 新。
+
+| 能力 | 最低 ECHO 版本 |
+| --- | --- |
+| 原生侧边栏页面 `placement: "page"`、页面导航及 1.17 的命令入口 | `26.9.25` |
+| 1.16 的独立主题/歌词/背景组合、动画库和面板外观控制 | `26.9.16` |
+| `system:full` 与 `trustedEntry` 完整系统权限插件 | `26.8.29`，且须订阅者明确批准 |
+
+SDK 包含 `native-shell` Windows named-pipe 作者契约，但官方 ECHO Steam 版不会启动订阅者提供的 `.exe` 或 `.dll`；沙箱插件仍为默认方式。额外语言只活在工坊 JSON 里。[Steam 创意工坊 SDK 条目](https://steamcommunity.com/sharedfiles/filedetails/?id=3784997717)附带可运行示例与独立发布的 SDK，可能与 GitHub Release 版本不同，请分别核对下载内容。
 
 尚未发布的 API 还为固定 `workshopAudioEffect` 槽加入受限 `vocalCut` 状态：插件可设置实时中置人声抑制强度和 80–300 Hz 低频保护分频点，实际处理与平滑仍由 Audio Core 持有，插件不会进入实时线程。
+
+新视觉接口另见[稳定主题部件、独立视觉组合与宿主预览](./theme-parts.md)和[歌词创作](./lyrics-authoring.md)。
 
 这些命令**永远不会上传**到 Steam。发布只能在 ECHO 创作台或仓库作者 CLI 里单独确认。
 
 插件 API 2 是稳定兼容基线。展示功能前先调用 `echo.host.getFeatureAvailability(actionOrCapability)`，或读取 `echo.host.getCapabilities()`；根据 `unsupported-platform`、`not-entitled`、`capability-not-approved`、`audio-core-unavailable`、`current-mode-incompatible` 等原因渐进降级，不要靠调用未声明 API 或反复捕获异常来猜。实验接口必须明确标为 experimental，不属于 API 2 的跨版本保证。
 
-沙箱面板现在也可以做成响应式、跟随 ECHO 主题的应用级工具，而不需要获得父页面 DOM。用 `echo.ui.getContext()` 和 `echo.ui.onContextChanged()` 读取宿主语言、文字方向、面板尺寸、减少动效偏好、明暗模式和有界语义主题 token。可见面板可以通过 `echo.ui.setPanelPresentation()` 动态设置宿主外壳的标题、徽标、未保存标记、注意状态，以及 `compact` / `comfortable` / `wide` / `full` 四档尺寸；工作完成后可调用 `echo.ui.closePanel()`。后台 runtime 不能修改面板外壳，宿主关闭按钮也始终保留。
+沙箱面板现在也可以做成响应式、跟随 ECHO 主题的应用级工具，而不需要获得父页面 DOM。用 `echo.ui.getContext()` 和 `echo.ui.onContextChanged()` 读取宿主语言、文字方向、面板尺寸、减少动效偏好、明暗模式和有界语义主题 token。可见面板可以通过 `echo.ui.setPanelPresentation()` 动态设置宿主外壳的标题、徽标、未保存标记、注意状态，以及 `compact` / `comfortable` / `wide` / `full` / `immersive` 五档尺寸；工作完成后可调用 `echo.ui.closePanel()`。后台 runtime 可以调用 `echo.ui.openPanel(panelId?)`，让 `playerBarActions` 或插件坞命令打开已声明的面板；不传 id 时由宿主在多个可见面板之间选择。`immersive` 会铺满整个 ECHO 窗口内容区（覆盖播放栏），并且不渲染任何宿主外壳，因此面板必须自行通过 `echo.ui.closePanel()` 提供退出方式（宿主的 `Ctrl+Shift+Esc` 紧急退出始终可用）；比引入该尺寸更旧的宿主会以 `invalid-payload` 拒绝，插件应回退到 `full`。后台 runtime 不能修改面板外壳，其余尺寸下宿主关闭按钮也始终保留。
 
 ## 最快上手
 
@@ -109,13 +117,13 @@ node .\bin\echo-workshop-sdk.mjs fix .\my-theme
 
 同一沙箱内可以用 `await echo.commands.execute('command-id', input)` 复用其他命令，`echo.commands.list()` 可列出运行时已经注册的命令。这两个组合接口不增加权限，也不能跨插件调用。业务值仍应在处理函数中做防御性归一化。`complete` 插件模板已经演示宿主表单、确认、命令组合和受限沙箱存储。
 
-`validate` 会拒绝私网、本机、通配、重复和畸形 `networkHosts`，也会拒绝没有 `network:request` / `playback:share` 能力依据的域名声明。mock 会在 fixture 阶段拒绝未声明域名和自定义端口；生产网络请求与一起听上传会先解析公网地址，再固定连接到已校验地址，同时保留原域名的 Host/TLS 身份。为兼容性仍接受 HTTP(S)，作者应优先使用 HTTPS。
+`validate` 会拒绝私网、本机、通配、重复及畸形 `networkHosts`，域名声明必须具备 `network:request` 权限。请求只连接已验证的公网地址并保留 Host/TLS 身份；优先使用 HTTPS。
 
 便携 CLI 与 ECHO 宿主共用 `contracts/plugin-package-limits.json`。内层可执行/文本 `.echo` 包仍最多 32 个文件、单个 UTF-8 文件最多 512 KiB、序列化整包最多 2 MiB，扩展名限 `.css`、`.html`、`.js`、`.mjs`、`.json`。外层 `plugin-package` 工坊项可以在 `assets/` 下额外携带清单哈希覆盖的 `.wasm`、`.onnx`、`.bin`、`.data`，单文件最多 128 MiB、合计最多 256 MiB；插件用 `new URL('./assets/model.onnx', location.href)` 这类相对 URL 读取，不能访问包外文件。`native-shell` 走单独的 `contracts/native-shell-limits.json`（512 文件、单文件 256 MiB、整包 512 MiB）。官方 Steam 校验仍拒绝订阅者 `.exe` / `.dll`。共享契约都可通过包导出被外部工具直接 import。沙箱入口仍须为 `.js`；完整系统 `trustedEntry` 是单独声明的 `.mjs`，其它 `.mjs` 也可作为模块素材。内层插件 `apiVersion` 必须与外层 Workshop 清单的 `compatibility.pluginApiVersion` 完全一致。
 
 整包 CSS 必须写在 `html[data-workshop-theme-pack="<id>"]` 下面。不能用 `FINAL`、`nyanCat`、`darkSideMoon` 当 `basePreset`。
 
-公开工坊 SDK 起步包 [3784997717](https://steamcommunity.com/sharedfiles/filedetails/?id=3784997717) 当前已发布版本是 `1.12.0`；本源码树是 `1.15.0` 待发布候选。GitHub Releases 页面和 Steam 条目才是用户实际可下载内容的事实源，两条发布线分别推进。以后更新 Steam 公开项必须继续用这一项，不要新建。
+公开工坊 SDK 起步包 [3784997717](https://steamcommunity.com/sharedfiles/filedetails/?id=3784997717) 通过独立发布流程分发此 SDK。GitHub Releases 页面和 Steam 条目才是用户实际可下载内容的事实源，两条发布线分别推进。以后更新 Steam 公开项必须继续用这一项，不要新建。
 
 ## 独立 GitHub 镜像仓库
 
@@ -137,3 +145,5 @@ TypeScript 声明编译）。
 ## 许可
 
 本 SDK 包内的类型、Schema、CLI、模板和示例采用 [MIT License](./LICENSE)。仅调用公开 Workshop API 或使用这些 MIT 材料的独立扩展，不受 ECHO 应用源码可见许可证约束。作者保留原创 Workshop 内容的所有权，并可自行选择许可；提交到 ECHO Steam 创意工坊时仍须遵守创意工坊内容政策、Steam 条款、第三方权利和适用法律。MIT License 不授予使用 ECHO 名称、Logo、SDK 包以外专有应用源码或素材的权利。
+
+宿主不再提供本地歌曲上传能力。声明 `playback:share` 的旧插件会被拒绝；上传 API 已从宿主和 SDK 移除，不删除已有本地文件。合法外部直链播放继续使用 `sources:direct`。

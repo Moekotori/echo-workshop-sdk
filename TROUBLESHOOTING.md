@@ -43,7 +43,6 @@ The local mock enforces the same declarations as production, so these failures a
 | `capability-denied:<permission>` | The code calls an `echo.*` API without the permission. Run `add . --permission <permission>` (plug-ins) or `add . --capability <cap>` (UI runtimes). |
 | `network-host-denied` | The code requests a host missing from the outer manifest's `networkHosts`. Declare it there, then `sync .`. |
 | `network-port-denied` | Custom ports are rejected locally and in production. Use default 443/80. |
-| `share-destination-denied` | `playback:share` uploads only to declared `networkHosts`. |
 
 Local `test`/`dev` is author evidence only; it is not the production sandbox and not proof of Steam-client behavior.
 
@@ -110,7 +109,6 @@ Local `test`/`dev` is author evidence only; it is not the production sandbox and
 | `capability-denied:<权限>` | 代码用了未声明的权限：插件 `add . --permission <权限>`，UI runtime `add . --capability <能力>`。 |
 | `network-host-denied` | 请求了外层清单 `networkHosts` 没有的域名，先声明再 `sync .`。 |
 | `network-port-denied` | 本地与生产都拒绝自定义端口，用默认 443/80。 |
-| `share-destination-denied` | `playback:share` 只能上传到已声明域名。 |
 
 本地 `test` / `dev` 只是作者证据，不是生产沙箱，也不能当 Steam 客户端验证。
 
@@ -131,3 +129,5 @@ Local `test`/`dev` is author evidence only; it is not the production sandbox and
 
 - `guide troubleshoot` 是一屏速查表；`help <命令>` 看单条命令用法。
 - 去公开镜像仓库提 issue（README「独立 GitHub 镜像仓库」一节）。不要附带 Steam 凭据、token 或本机绝对路径。
+
+Local-track uploads are no longer supported. Packages requesting `playback:share` are rejected. The playback upload methods have been removed from the host and SDK; existing local files are not deleted. Authorized direct-stream playback remains available through `sources:direct`.

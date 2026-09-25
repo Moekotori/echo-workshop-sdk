@@ -32,12 +32,12 @@
               "navigation",
               "playback:read",
               "playback:control",
-              "playback:share",
               "audio:spectrum",
               "audio:dsp-read",
               "audio:dsp-write",
               "audio:offline-read",
               "library:read",
+              "library:path",
               "library:control",
               "queue:read",
               "queue:control",
@@ -59,6 +59,8 @@
           "properties": {
             "commands": { "type": "array", "items": { "$ref": "#/$defs/command" } },
             "trackContextMenus": { "type": "array", "maxItems": 16, "items": { "$ref": "#/$defs/trackContextMenu" } },
+            "mainMenus": { "type": "array", "maxItems": 16, "items": { "$ref": "#/$defs/mainMenu" } },
+            "columns": { "type": "array", "maxItems": 4, "items": { "$ref": "#/$defs/column" } },
             "playerBarActions": { "type": "array", "maxItems": 8, "items": { "$ref": "#/$defs/playerBarAction" } },
             "panels": { "type": "array", "items": { "$ref": "#/$defs/panel" } },
             "agents": { "type": "array", "maxItems": 8, "items": { "$ref": "#/$defs/agent" } },
@@ -92,6 +94,13 @@
     "contributionId": { "type": "string", "minLength": 3, "maxLength": 80, "pattern": "^[a-z0-9](?:[a-z0-9._-]{1,78}[a-z0-9])?$" },
     "title": { "type": "string", "minLength": 1, "maxLength": 80 },
     "description": { "type": "string", "maxLength": 180 },
+    "contributionIcon": {
+      "enum": [
+        "blocks", "sparkles", "bot", "radio", "list-music", "heart", "bookmark", "zap",
+        "library", "music", "disc", "mic", "globe", "folder", "clock", "headphones",
+        "star", "users", "compass", "hash", "image", "activity"
+      ]
+    },
     "lyricsProvider": {
       "type": "object",
       "additionalProperties": false,
@@ -161,7 +170,31 @@
         "title": { "$ref": "#/$defs/title" },
         "commandId": { "$ref": "#/$defs/contributionId" },
         "description": { "$ref": "#/$defs/description" },
-        "localOnly": { "type": "boolean" }
+        "localOnly": { "type": "boolean" },
+        "selection": { "enum": ["single", "multiple"] }
+      }
+    },
+    "mainMenu": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "commandId"],
+      "properties": {
+        "id": { "$ref": "#/$defs/contributionId" },
+        "title": { "$ref": "#/$defs/title" },
+        "commandId": { "$ref": "#/$defs/contributionId" },
+        "description": { "$ref": "#/$defs/description" },
+        "shortcut": { "type": "string", "minLength": 3, "maxLength": 40 }
+      }
+    },
+    "column": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "commandId"],
+      "properties": {
+        "id": { "$ref": "#/$defs/contributionId" },
+        "title": { "$ref": "#/$defs/title" },
+        "commandId": { "$ref": "#/$defs/contributionId" },
+        "description": { "$ref": "#/$defs/description" }
       }
     },
     "playerBarAction": {
@@ -173,7 +206,7 @@
         "title": { "$ref": "#/$defs/title" },
         "commandId": { "$ref": "#/$defs/contributionId" },
         "description": { "$ref": "#/$defs/description" },
-        "icon": { "enum": ["blocks", "sparkles", "bot", "radio", "list-music", "heart", "bookmark", "zap"] }
+        "icon": { "$ref": "#/$defs/contributionIcon" }
       }
     },
     "panel": {
@@ -184,7 +217,10 @@
         "id": { "$ref": "#/$defs/contributionId" },
         "title": { "$ref": "#/$defs/title" },
         "path": { "allOf": [{ "$ref": "#/$defs/path" }, { "pattern": "\\.html$" }] },
-        "placement": { "enum": ["main", "utility", "sidebar", "home", "lyrics", "queue", "track-detail", "player"] }
+        "description": { "$ref": "#/$defs/description" },
+        "placement": { "enum": ["main", "utility", "sidebar", "home", "lyrics", "queue", "track-detail", "player", "page"] },
+        "group": { "enum": ["library", "sources", "playback", "plugins"] },
+        "icon": { "$ref": "#/$defs/contributionIcon" }
       }
     },
     "agent": {

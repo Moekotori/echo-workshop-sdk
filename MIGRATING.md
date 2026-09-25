@@ -1,5 +1,7 @@
 # SDK migration policy
 
+SDK `1.17.0` is additive. Existing panels keep their placements. `placement: "page"` is optional and registers a native sidebar page on ECHO 26.9.25 or newer; older hosts show that panel as `main`. A page may also set `group`, `description` and a host icon, and may open itself without the `navigation` capability. `mainMenus`, selection context menus and `columns` are optional foobar-style command surfaces. Run `upgrade` to refresh `.echo-sdk` types and schema without rewriting content.
+
 SDK `1.15.0` is additive. Existing theme / lyrics / visualizer / DSP / locale / plug-in projects keep working. New recipe `full-trust-plugin` creates the paired sandbox and subscriber-approved Node.js entries; an existing plug-in can run `add . --permission system:full` to add the missing `trustedEntry`, starter module and minimum ECHO version. Authors install and build their own Node toolchain and dependencies; ECHO Authoring Studio does not provision them. New kind `native-shell` is a system-shell channel (Windows exe + named pipe protocol v1). Do not convert a sandboxed plug-in to `native-shell` unless you actually ship a host process. Official Steam Workshop validation still rejects packaged `.exe` / `.dll`.
 
 There is no required migration for existing `1.0.0` through `1.5.0` projects.

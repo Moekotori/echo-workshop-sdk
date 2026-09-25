@@ -1,19 +1,44 @@
 # ECHO Workshop SDK changelog
 
-## Unreleased — lyrics authoring
+## 1.17.0 — 2026-09-25
+
+Requires ECHO 26.9.25 for native sidebar pages. Older hosts keep `placement: "page"` as a normal `main` panel.
+
+- Added panel placement `page`. A declared HTML panel becomes a host-rendered sidebar item and fills the main page with the same opaque sandbox. It does not cover the sidebar, title bar or player bar, and it does not add a capability.
+- A package may declare at most eight `page` panels. Optional `group` selects `library`, `sources`, `playback` or `plugins`. The sidebar shows at most twenty-four visible pages; further pages stay reachable from the plug-in dock.
+- Optional panel `description` and a larger host icon set (`library`, `music`, `disc`, `mic`, `globe`, `folder`, `clock`, `headphones`, `star`, `users`, `compass`, `hash`, `image`, `activity`, plus the original eight). `echo.ui.setPanelPresentation()` badge and attention show on the sidebar item.
+- `echo.navigation.open("plugin:<pluginId>:<panelId>")` opens one of the caller's own pages without the `navigation` capability. Other routes still require it. `echo.ui.closePanel()` returns to the previous built-in route. On a page, `immersive` hides only the host caption.
+- Added foobar-style command surfaces: `mainMenus` with an optional `Ctrl`/`Alt`/`Command` shortcut, `trackContextMenus` `"selection": "multiple"` for the current selection (at most 100 tracks), and `columns` whose command labels the visible playlist rows (at most 40 tracks per call, 24-character values, two chips on the row).
+- Added `library:path`. Approved plug-ins receive the local file path on track payloads and on `echo.ui.getParentPage()`. The call returns the host route, title and current selection. The iframe still cannot access the parent document or the application bridge.
+
+## 1.16.0 — 2026-09-16
+
+Requires ECHO 26.9.16 for the complete host feature set. Workshop publication is verified separately against the existing Steam item.
+
+- Added optional lyrics interaction messages for bounded pointer updates and host-owned back navigation from the active lyrics-view frame.
+
+### Visual composition and host preview
+
+- Independent theme, lyrics-view and background selections, with per-layer runtime demand.
+- Stable theme parts v1 and semantic aliases, backed by a public JSON contract.
+- Authoring Studio preview with production lyric rendering, theme styles, scoped runtime resources and simulated playback; saved-file refresh.
+
+### Lyrics authoring
 
 - Scoped lyric part styles, vertical text, scroll anchor/duration, timed single-line slots, and public back-button/control accent styling.
 - Lyrics-only `lyrics-view` runtime with host recovery, revisioned current lyrics and shared clock packets.
 - Recursive lyrics schema, author validation, typed lyric/clock events and the Lyric Ink example.
-- Existing scenes and full-shell runtimes keep their defaults. No SDK or Steam publication is implied.
+- Existing scenes and full-shell runtimes keep their defaults.
 
-## Unreleased
+### Animation libraries and panels
 
 - Added optional theme `runtime.presentation: "lyrics-background"`: an independent read-only sandbox backdrop that retains host lyrics and controls. The schema limits it to `playback:read` and `audio:spectrum`; host state includes a motion budget and heartbeat. See `docs/ECHO_WORKSHOP_LYRICS_BACKGROUND.md` and `workshop/spectrum-tide` in the ECHO source tree.
 
 - Added data-only `animation-library` packages. Dependent lyrics scenes can reference versioned Workshop exports made from bounded opacity, 2D/3D transform, fixed-origin, host-owned clip-reveal and named-easing keyframes; deterministic stagger choreography coordinates explicitly indexed sibling nodes without selectors or author code. The ECHO host resolves enabled dependencies and owns execution. The portable `dev` host includes an interactive kinetic-score gallery for filtering and replaying single- and multi-voice exports at different intensity levels.
 - Added responsive, host-themed sandbox panel context through `echo.ui.getContext()` and `echo.ui.onContextChanged()`, including locale, direction, viewport, reduced motion, light/dark state and bounded semantic appearance tokens.
 - Added host-owned panel presentation controls for bounded title, badge, dirty state, attention and four panel sizes, plus a safe panel-close request. Background runtimes cannot mutate panel chrome, and the host close control remains permanent.
+- Added the fifth panel size `immersive`: the panel fills the whole ECHO window content area, including over the player bar, and the host renders no chrome at all (no header, no close button). An immersive panel therefore has to offer its own exit through `echo.ui.closePanel()` (for example on `Esc`); the host's `Ctrl+Shift+Esc` emergency exit always remains. Hosts older than the version that introduced it reject the value with `invalid-payload`, so plug-ins should fall back to `full`. The mock host accepts the new size.
+- Added `echo.ui.openPanel(panelId?)` so a background runtime can open a declared panel. This is the supported way for `playerBarActions` and dock commands to show a panel. An explicit id opens that panel; omitting it opens the only visible panel or shows a host-owned chooser when several are visible. Unknown ids reject with `panel-undeclared`. The mock host accepts the new method.
 
 ## 1.15.0 — 2026-08-29
 

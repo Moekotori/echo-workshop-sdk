@@ -1,6 +1,6 @@
 {
   "name": "@echo/workshop-sdk",
-  "version": "1.15.0",
+  "version": "1.17.0",
   "description": "Types, schemas and zero-dependency tooling for ECHO Steam Workshop extensions.",
   "type": "module",
   "private": true,
@@ -41,6 +41,7 @@
     "./contracts/plugin-package-limits": "./contracts/plugin-package-limits.json",
     "./contracts/native-shell": "./contracts/native-shell.json",
     "./contracts/native-shell-limits": "./contracts/native-shell-limits.json",
+    "./contracts/theme-parts": "./contracts/theme-parts.json",
     "./contracts/content-kinds": "./contracts/content-kinds.json",
     "./ui-runtime": {
       "types": "./echo-workshop-ui-runtime.d.ts"
@@ -65,6 +66,7 @@
     "README.md",
     "README.zh-CN.md",
     "lyrics-authoring.md",
+    "theme-parts.md",
     "echo-workshop-plugin.d.ts",
     "echo-workshop-ui-runtime.d.ts",
     "echo-workshop-native-shell.d.ts",

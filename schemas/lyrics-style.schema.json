@@ -38,6 +38,7 @@
           "enum": [
             "default",
             "luminous",
+            "afterglowCover",
             "editorial",
             "folded",
             "roseVinyl",

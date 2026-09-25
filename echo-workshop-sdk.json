@@ -1,6 +1,6 @@
 {
   "sdkVersion": 1,
-  "packageVersion": "1.15.0",
+  "packageVersion": "1.17.0",
   "manifest": {
     "type": "echo-workshop-item",
     "schemaVersions": [1],
@@ -43,6 +43,8 @@
   "theme": {
     "presets": ["colors", "skin", "stylesheet", "runtime"],
     "stylesheetMinEchoVersion": "26.8.20",
+    "partsContract": "contracts/theme-parts.json",
+    "partsApiVersion": 1,
     "uiRuntimeProtocolVersion": 1,
     "declarationFile": "echo-workshop-ui-runtime.d.ts"
   },

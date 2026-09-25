@@ -346,7 +346,12 @@ const copyPortableSdk = async (echoSdkRoot) => {
   await cp(resolve(sdkRoot, 'echo-workshop-native-shell.d.ts'), resolve(echoSdkRoot, 'echo-workshop-native-shell.d.ts'));
   await cp(resolve(sdkRoot, 'echo-workshop-animation-library.d.ts'), resolve(echoSdkRoot, 'echo-workshop-animation-library.d.ts'));
   await cp(resolve(sdkRoot, 'bin', 'echo-workshop-sdk.mjs'), resolve(echoSdkRoot, 'bin', 'echo-workshop-sdk.mjs'));
-  await cp(resolve(sdkRoot, 'bin', 'echo-workshop-sdk.cmd'), resolve(echoSdkRoot, 'bin', 'echo-workshop-sdk.cmd'));
+  // Steam's unpacked SDK omits shell launchers; Node and npm use the .mjs entry.
+  try {
+    await cp(resolve(sdkRoot, 'bin', 'echo-workshop-sdk.cmd'), resolve(echoSdkRoot, 'bin', 'echo-workshop-sdk.cmd'));
+  } catch (error) {
+    if (error.code !== 'ENOENT') throw error;
+  }
   await cp(resolve(sdkRoot, 'lib'), resolve(echoSdkRoot, 'lib'), { recursive: true });
   await cp(resolve(sdkRoot, 'contracts'), resolve(echoSdkRoot, 'contracts'), { recursive: true });
   await cp(resolve(sdkRoot, 'schemas'), resolve(echoSdkRoot, 'schemas'), { recursive: true });
@@ -818,7 +823,6 @@ const doctor = async () => {
     'lib/network-policy.mjs',
     'lib/native-shell.mjs',
     'lib/trusted-plugin.mjs',
-    'bin/echo-workshop-sdk.cmd',
     'README.zh-CN.md',
     'TROUBLESHOOTING.md',
     'CHEATSHEET.md',
