@@ -1,6 +1,6 @@
 {
   "sdkVersion": 1,
-  "packageVersion": "1.17.0",
+  "packageVersion": "1.19.0",
   "manifest": {
     "type": "echo-workshop-item",
     "schemaVersions": [1],
@@ -36,8 +36,8 @@
       "channels": [1, 2],
       "externalAssetDirectory": "assets/",
       "externalAssetExtensions": [".wasm", ".onnx", ".bin", ".data"],
-      "maximumExternalAssetFileBytes": 134217728,
-      "maximumExternalAssetBytes": 268435456
+      "maximumExternalAssetFileBytes": null,
+      "maximumExternalAssetBytes": null
     }
   },
   "theme": {
@@ -49,7 +49,14 @@
     "declarationFile": "echo-workshop-ui-runtime.d.ts"
   },
   "lyricsStyle": {
-    "presets": ["editorial", "compact", "cinema", "cover"]
+    "presets": ["editorial", "compact", "cinema", "cover", "afterglow"],
+    "afterglow": {
+      "schemaVersion": 1,
+      "minimumEchoVersion": "26.9.29",
+      "declarationFile": "echo-workshop-afterglow.d.ts",
+      "contractFile": "contracts/afterglow-scenes.json",
+      "guide": "afterglow-scenes.md"
+    }
   },
   "animationLibrary": {
     "schemaVersion": 1,

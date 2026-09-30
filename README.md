@@ -1,16 +1,33 @@
 # ECHO Workshop SDK
 
+Afterglow scene packs: [format and import guide](./afterglow-scenes.md). Create a `lyrics-style` project with `--preset afterglow`, then import its content ZIP locally or distribute it through Workshop.
+
 [![ECHO Workshop SDK CI](https://github.com/Moekotori/echo-workshop-sdk/actions/workflows/ci.yml/badge.svg)](https://github.com/Moekotori/echo-workshop-sdk/actions/workflows/ci.yml)
 
 [Public repository](https://github.com/Moekotori/echo-workshop-sdk) · [Latest release](https://github.com/Moekotori/echo-workshop-sdk/releases/latest) · [Report a vulnerability](https://github.com/Moekotori/echo-workshop-sdk/security/advisories/new) · [中文说明](./README.zh-CN.md)
 
-This repository contains the portable developer kit for ECHO Steam Workshop. The current source package is `1.17.0`. SDK version `1` targets Workshop manifest schema `1` and plug-in API `2`. The SDK is MIT-licensed, requires Node.js 20+ for local authoring, and is not published to npm. Check the [latest GitHub release](https://github.com/Moekotori/echo-workshop-sdk/releases/latest) for an actual downloadable `.tgz`; the main branch can be newer than the latest release.
+This repository contains the portable developer kit for ECHO Steam Workshop. The SDK version is `1.19.0`; GitHub release assets and the Steam starter are published through separate channels. SDK version `1` targets Workshop manifest schema `1` and plug-in API `2`. The SDK is MIT-licensed, requires Node.js 20+ for local authoring, and is not published to npm. Check the [latest GitHub release](https://github.com/Moekotori/echo-workshop-sdk/releases/latest) for an actual downloadable `.tgz`; source changes do not create a release asset.
 
 | Feature | Minimum ECHO version |
 | --- | --- |
+| Data-only Afterglow scene packs | `26.9.29` with Afterglow support |
 | Native sidebar pages (`placement: "page"`), page navigation and the 1.17 command surfaces | `26.9.25` |
 | Independent theme/lyrics/background composition, animation libraries and panel presentation from 1.16 | `26.9.16` |
 | Full-trust plug-ins (`system:full` and `trustedEntry`) | `26.8.29`; explicit subscriber approval required |
+| Local manual-playlist edit and item removal (included in 1.19) | An ECHO host build containing these actions; check feature availability at runtime |
+
+SDK 1.19 includes the 1.18 additions: a smaller in-app plug-in starter and exposes `echo.library.updatePlaylist(playlistId, { name?, description? })` and `echo.library.removePlaylistItems(playlistId, itemIds)` under `library:control`. The host accepts only local manual playlists; removal checks that every selected item belongs to that playlist and keeps recovery history. Check `echo.host.getFeatureAvailability('library:updatePlaylist')` before showing the edit control on older ECHO builds.
+
+In ECHO's Workshop **Create** tab, choose a starting path before filling in the project ID and rights holder:
+
+| Goal | Starting point | Scope |
+| --- | --- | --- |
+| Small ECHO tool | Plug-in → Basic tool | One library command and a panel; `library:read` |
+| Theme or lyrics scene | Theme → Skin / Lyrics → Editorial | Data-driven appearance; no plug-in permission |
+| Larger plug-in example | Plug-in → Complete example | Multiple host surfaces and declared permissions to trim to your project |
+| Local system integration | Plug-in → Full-trust tool | `system:full`; subscriber approval is required before Node code runs |
+
+Edit the project with the guided fields, save it to update hashes, prepare and inspect the package, then review rights and visibility before publishing. Raw JSON is under **Advanced**. The starter is intentionally small; add capabilities only when your code needs them.
 
 The SDK includes `native-shell` authoring contracts for a Windows named-pipe channel, but the official ECHO Steam build does not launch subscriber-supplied `.exe` or `.dll` files. Sandboxed plug-ins remain the default. The five built-in app languages stay in ECHO. ECHO does not ship a third-party streaming platform.
 
@@ -97,7 +114,7 @@ node .\bin\echo-workshop-sdk.mjs scaffold .\my-theme --preset runtime
 
 `npm run check` is the complete local gate: it synchronizes packaged content, validates hashes and schemas, runs the quality report, and executes deterministic fixtures. Use `npm run check -- --json` for one machine-readable result, or `--warn-only` to keep iterating with a passing exit code while failures are still reported; publication still requires a clean check. `doctor`, `validate` and `example list` also accept `--json`. The mock host enforces declared plug-in permissions, so undeclared capability use fails locally. `npm run dev` opens a live author console with gate status, permissions, fixtures, the latest changed file, copyable recovery commands and raw diagnostics; stylesheet, runtime, lyrics, visualizer and DSP projects also get a separate fixture preview. `npm run watch` and the dev console debounce editor save bursts, watch nested files and ignore the generated manifest update. This author-controlled local tool is not the production sandbox and must not be used as proof of Steam-client behavior.
 
-The portable CLI and ECHO host share the plug-in package contract in `contracts/plugin-package-limits.json`. The inner executable/text `.echo` package remains capped at 32 files, 512 KiB per UTF-8 file and 2 MiB serialized, with `.css`, `.html`, `.js`, `.mjs` and `.json` assets. A `plugin-package` Workshop item may additionally carry hash-listed `.wasm`, `.onnx`, `.bin` and `.data` files under `assets/`, capped at 128 MiB each and 256 MiB total. These assets are package-local: load them with a relative URL such as `new URL('./assets/model.onnx', location.href)`. Native-shell items use the separate `contracts/native-shell-limits.json` surface (512 files, 256 MiB/file, 512 MiB package). All shared contracts are importable package exports for external tooling. The sandbox entry remains `.js`; a full-trust `trustedEntry` is a separately declared `.mjs` module. Other `.mjs` files may be imported module assets. The inner plug-in `apiVersion` must exactly match the outer Workshop manifest's `compatibility.pluginApiVersion`.
+The portable CLI and ECHO host share the plug-in package contract in `contracts/plugin-package-limits.json`. The inner executable/text `.echo` package remains capped at 32 files, 512 KiB per UTF-8 file and 2 MiB serialized, with `.css`, `.html`, `.js`, `.mjs` and `.json` assets. A `plugin-package` Workshop item may additionally carry hash-listed `.wasm`, `.onnx`, `.bin` and `.data` files under `assets/`, without outer file or total byte quotas. These assets are package-local: load them with a relative URL such as `new URL('./assets/model.onnx', location.href)`. Native-shell items use the separate `contracts/native-shell-limits.json` surface (512 files, no outer file or total byte quotas). All shared contracts are importable package exports for external tooling. The sandbox entry remains `.js`; a full-trust `trustedEntry` is a separately declared `.mjs` module. Other `.mjs` files may be imported module assets. The inner plug-in `apiVersion` must exactly match the outer Workshop manifest's `compatibility.pluginApiVersion`.
 
 Generated projects include VS Code JSON Schema mappings and tasks. Run the default build task for `ECHO Workshop: Check`, or start `ECHO Workshop: Dev console` without remembering CLI paths.
 
@@ -211,6 +228,10 @@ never publishes to Steam or npm.
 
 ## Theme customization rules
 
+Shell runtimes with `navigation` may send `ui:close` to dismiss locally while keeping the underlying route. Lattice's Use action starts a separate Windows desktop window and waits for native attachment, instead of selecting an application shell theme or maximizing ECHO. It repairs that pack's obsolete shell binding when upgrading. Lattice keeps the original bounded album-play loader; its preferences are inherited from the retired built-in wall only when no explicit Workshop value exists. The theme client coalesces preference writes and flushes on ordinary close. Original-module parity and the verification boundary are recorded in `workshop/lattice-wall/PARITY.md`.
+
+The Lattice theme (`echo.lattice-wall`) can run on the Windows desktop after a verified local import is enabled, or after Steam subscription, installation and verified activation. Either source adds the 「音乐拼贴墙」 switch to the player's 「迷你」 panel, without changing the selected application theme. Local imports do not depend on the Steam catalog. The app has no built-in wall entry or experimental fallback. Disabling or removing all available sources closes its desktop window. External Steam subscription changes are checked by the existing 5-second desktop maintenance loop. Its sandbox may request `window:getDesktopWall` / `window:setDesktopWall` with `window:control`; the host checks the enabled revision and source availability and waits for native attachment. `getPlaybackRate` (`playback:read`) and `setPlaybackRate` (`playback:control`, `{rate:0.5..2}`) use host-confirmed speed. Desktop frames retain `allow-scripts` only and receive bounded local metadata, never native handles or arbitrary IPC. See the repository's `workshop/lattice-wall/README.md` for the self-contained source-bearing package.
+
 - `basePreset` must be a public host preset such as `classic`. `FINAL`, `nyanCat` and `darkSideMoon` are rejected.
 - Packaged CSS must target `html[data-workshop-theme-pack="<id>"]`. The host sanitizes it and does not unlock a built-in pack.
 - A stylesheet wins over a declarative skin. A runtime replaces the visible chrome and still requires an emergency-exit host chrome.
@@ -226,6 +247,6 @@ never publishes to Steam or npm.
 
 ## License
 
-The SDK files in this package, including its types, schemas, CLI, templates and examples, are licensed under the [MIT License](./LICENSE). An independent extension that only uses the documented Workshop API or these MIT-licensed materials is not covered by the ECHO application's source-available license. Your original Workshop content remains yours and may use a license you choose; submission to ECHO's Steam Workshop must still follow the Workshop content policy, Steam terms, third-party rights and applicable law. The MIT license does not grant rights to the ECHO name, logo, proprietary application code or assets outside this SDK package.
+The SDK files in this package, including its types, schemas, CLI, templates and examples, are licensed under the [MIT License](./LICENSE). ECHO application code is separately licensed under AGPL-3.0-only. This SDK's MIT license covers its types, schemas, CLI, templates and examples; it does not relicense application code or third-party materials. Your original Workshop content remains yours and may use a license you choose, subject to the licenses of any code or assets it incorporates, Steam terms, Workshop policy and applicable law. The SDK license does not grant trademark endorsement.
 
 Local-track uploads are no longer supported. Packages requesting `playback:share` are rejected. The playback upload methods have been removed from the host and SDK; existing local files are not deleted. Authorized direct-stream playback remains available through `sources:direct`.

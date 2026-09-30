@@ -1,5 +1,20 @@
 # ECHO Workshop SDK changelog
 
+## 1.19.0 — 2026-09-30
+
+- Added data-only Afterglow scene packs through the existing `lyrics-style` kind: seven drawing primitives, palette colours, simple motion, and mixed or pack-only rotation. The host retains lyrics, playback, transport and quality scheduling.
+- Added the `afterglow` preset, one-command `afterglow-scenes` recipe, author declarations, machine-readable limits, format guide and two-scene starter example.
+- Portable validation now checks scene IDs, per-pack paint/layer budgets, type-specific fields and the empty host root required by Afterglow. The production host remains the activation authority.
+- npm packages, portable SDK copies, in-app exports and the public mirror include the Afterglow surface and existing background/progress guides.
+- Includes the unreleased 1.18 playlist APIs below. Manifest schema 1 and plug-in API 2 remain unchanged. Requires an ECHO 26.9.29 or newer host build containing Afterglow support.
+
+## 1.18.0 — source candidate (not published)
+
+- The in-ECHO Authoring Studio now starts with a small plug-in, complete example, or subscriber-approved full-trust tool instead of giving every new plug-in the complete set of example permissions. Creation guides explain theme, lyrics, tool, and local-system paths; raw JSON remains available as an advanced editor.
+- Added `echo.library.updatePlaylist()` and `echo.library.removePlaylistItems()` to the `library:control` API. Both target local manual playlists only. Removal accepts at most 200 item IDs and uses the host's playlist-membership check and recovery history.
+- The production bridge, API contract, TypeScript declarations, theme UI command allowlist, and SDK mock host agree on the new methods. Older ECHO builds report them unavailable; authors should check `echo.host.getFeatureAvailability()` before showing controls.
+- This source candidate is not a GitHub Release or a Steam Workshop update. The new methods require an ECHO host build containing this change.
+
 ## 1.17.0 — 2026-09-25
 
 Requires ECHO 26.9.25 for native sidebar pages. Older hosts keep `placement: "page"` as a normal `main` panel.

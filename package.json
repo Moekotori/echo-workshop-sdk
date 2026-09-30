@@ -1,6 +1,6 @@
 {
   "name": "@echo/workshop-sdk",
-  "version": "1.17.0",
+  "version": "1.19.0",
   "description": "Types, schemas and zero-dependency tooling for ECHO Steam Workshop extensions.",
   "type": "module",
   "private": true,
@@ -28,6 +28,8 @@
     "./schemas/plugin-package": "./schemas/plugin-package.schema.json",
     "./schemas/theme": "./schemas/theme.schema.json",
     "./schemas/lyrics-style": "./schemas/lyrics-style.schema.json",
+    "./afterglow": { "types": "./echo-workshop-afterglow.d.ts" },
+    "./contracts/afterglow-scenes": "./contracts/afterglow-scenes.json",
     "./schemas/animation-library": "./schemas/animation-library.schema.json",
     "./animation-library": {
       "types": "./echo-workshop-animation-library.d.ts"
@@ -67,6 +69,10 @@
     "README.zh-CN.md",
     "lyrics-authoring.md",
     "theme-parts.md",
+    "afterglow-scenes.md",
+    "background-controls.md",
+    "progress-bar.md",
+    "echo-workshop-afterglow.d.ts",
     "echo-workshop-plugin.d.ts",
     "echo-workshop-ui-runtime.d.ts",
     "echo-workshop-native-shell.d.ts",

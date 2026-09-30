@@ -19,11 +19,14 @@ type EchoWorkshopUiCapability =
   | 'queue:control'
   | 'window:control'
   | 'lyrics:read'
+  | 'lyrics:match'
   | 'audio:spectrum'
   | 'storage';
 
 type EchoWorkshopUiCommand =
   | 'navigate'
+  /** navigation; close this runtime locally without changing the underlying route. */
+  | 'ui:close'
   | 'play'
   | 'pause'
   | 'playPause'
@@ -31,6 +34,12 @@ type EchoWorkshopUiCommand =
   | 'next'
   | 'seek'
   | 'setVolume'
+  /** { enabled: boolean }; explicit fixed 100% volume setting; DSD auto-lock cannot be bypassed. */
+  | 'setFixedVolume'
+  /** playback:read; returns the host-confirmed playback speed. */
+  | 'getPlaybackRate'
+  /** playback:control; { rate: number } in [0.5, 2], waits for host confirmation. */
+  | 'setPlaybackRate'
   | 'setShuffle'
   | 'toggleShuffle'
   | 'setRepeat'
@@ -54,7 +63,10 @@ type EchoWorkshopUiCommand =
   | 'library:toggleAlbumLiked'
   | 'library:createPlaylist'
   | 'library:addTracksToPlaylist'
+  | 'library:updatePlaylist'
+  | 'library:removePlaylistItems'
   | 'lyrics:get'
+  | 'lyrics:matchAmll'
   | 'audio:getSpectrum'
   | 'queue:get'
   | 'queue:playTrack'
@@ -74,6 +86,10 @@ type EchoWorkshopUiCommand =
   | 'window:minimize'
   | 'window:toggleMaximize'
   | 'window:toggleFullscreen'
+  /** window:control; Lattice desktop extension, returns { supported, enabled }. */
+  | 'window:getDesktopWall'
+  /** window:control; { enabled: boolean }, enabled verified echo.lattice-wall only. */
+  | 'window:setDesktopWall'
   | 'window:close';
 
 interface EchoWorkshopUiTrack {
@@ -87,7 +103,7 @@ interface EchoWorkshopUiTrack {
 }
 
 interface EchoWorkshopUiAppearance {
-  /** Lyrics-only explicit override; absent means follow host palette. */
+  /** Resolved light/dark palette; absent means follow the host palette. */
   tone?: 'light' | 'dark';
   accent: string;
   accentText: string;
@@ -128,6 +144,10 @@ interface EchoWorkshopUiInitMessage {
   presentation?: 'shell' | 'lyrics-background' | 'lyrics-view';
   appearance?: EchoWorkshopUiAppearance;
   features?: Array<'lyrics-events' | 'clock' | 'audio-events' | 'lyrics-interaction'>;
+  /** Lattice desktop extension only; the host owns Windows desktop attachment. */
+  desktop?: boolean;
+  bottomInset?: number;
+  uiContext?: { visible: boolean; locale: string; direction: 'ltr' | 'rtl'; reducedMotion: boolean };
 }
 
 interface EchoWorkshopUiStateMessage {
@@ -138,9 +158,16 @@ interface EchoWorkshopUiStateMessage {
   playback?: {
     state: string;
     currentTrackId: string | null;
+    /** Same monotonic Audio Core generation as clock packets; reject older state after a switch. */
+    generation?: number | null;
     positionSeconds: number;
     durationSeconds: number;
     volume: number | null;
+    fixedVolumeEnabled?: boolean;
+    volumeLocked?: boolean;
+    volumeLockReason?: 'fixed' | 'dsd' | null;
+    canGoPrevious?: boolean;
+    canGoNext?: boolean;
     shuffleEnabled?: boolean;
     repeatMode?: 'off' | 'one' | 'all';
   };
@@ -158,6 +185,7 @@ interface EchoWorkshopUiStateMessage {
   };
   lyrics?: EchoWorkshopUiLyricsPeek | null;
   spectrum?: {
+    /** Up to 128 native logarithmic frequency probes, or 32 on older/fallback hosts. */
     bands: number[];
     energy: number;
     transient: number;
@@ -195,10 +223,23 @@ type EchoWorkshopUiFrameMessage =
 interface EchoWorkshopUiLyricWord { text: string; startMs: number; endMs: number | null; }
 interface EchoWorkshopUiLyricLine {
   timeMs: number;
+  /** Optional rich TTML display fields; older hosts omit them. */
+  endMs?: number | null;
+  agentId?: string;
+  backgroundVocals?: EchoWorkshopUiBackgroundVocal[];
   text: string;
   translation: string | null;
   romanization: string | null;
   kana: string | null;
+  words: EchoWorkshopUiLyricWord[];
+}
+/** At most 8 vocals per line; words preserve authored whitespace. Total runtime lyrics stay <= 256 KiB. */
+interface EchoWorkshopUiBackgroundVocal {
+  timeMs: number;
+  endMs: number | null;
+  text: string;
+  agentId?: string;
+  translation: string | null;
   words: EchoWorkshopUiLyricWord[];
 }
 interface EchoWorkshopUiLyrics {
@@ -206,6 +247,8 @@ interface EchoWorkshopUiLyrics {
   title: string; artist: string; album: string | null;
   durationSeconds: number | null; offsetMs: number;
   provider: 'none' | 'local' | 'manual' | 'cached' | 'remote';
+  /** Set only when the currently applied document is actually from AMLL. */
+  attribution?: 'AMLL';
   lines: EchoWorkshopUiLyricLine[];
   plainText: string | null; syncedText: string | null;
 }
@@ -213,8 +256,18 @@ interface EchoWorkshopUiLyricsMessage {
   type: 'echo:workshop-ui:lyrics'; protocolVersion: 1;
   trackId: string | null; revision: number; lyrics: EchoWorkshopUiLyrics | null;
 }
+
+/** lyrics:match capability. Payload { trackId: string } must identify the current song.
+ * Host searches AMLL only, applies only auto-eligible candidates and keeps existing lyrics on miss.
+ * No provider IDs, URLs or search results are exposed. Respect existing network-lyrics settings.
+ * Uses a separate request from playback controls; allow up to 30 seconds for its acknowledgement.
+ */
+interface EchoWorkshopUiAmllMatchResult { trackId: string; matched: boolean; }
 interface EchoWorkshopUiClockMessage {
   type: 'echo:workshop-ui:clock'; protocolVersion: 1;
+  /** Included on song/metadata changes and ready handshake, omitted on ordinary clock ticks.
+   * Apply it together with the clock so switching identity cannot briefly erase artwork/title. */
+  currentTrack?: { id: string; title: string; artist: string; album: string; coverUrl: string | null; durationSeconds: number } | null;
   clock: {
     currentTrackId: string | null; state: string;
     positionSeconds: number; durationSeconds: number; playbackRate: number;

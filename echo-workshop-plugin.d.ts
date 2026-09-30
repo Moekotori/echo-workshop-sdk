@@ -648,6 +648,8 @@ interface EchoWorkshopApi {
     toggleAlbumLiked(albumId: string): Promise<EchoWorkshopLikedAlbumResult>;
     createPlaylist(input: { name: string; description?: string }): Promise<EchoWorkshopPlaylist>;
     addTracksToPlaylist(playlistId: string, trackIds: string[]): Promise<EchoWorkshopPlaylistItem[]>;
+    updatePlaylist(playlistId: string, patch: { name?: string; description?: string | null }): Promise<EchoWorkshopPlaylist>;
+    removePlaylistItems(playlistId: string, itemIds: string[]): Promise<{ affectedCount: number }>;
   };
   queue: {
     get(): Promise<EchoWorkshopQueueSnapshot>;

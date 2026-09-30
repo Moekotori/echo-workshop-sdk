@@ -4,8 +4,8 @@
   "maximumFiles": 32,
   "maximumFileBytes": 524288,
   "externalAssetPrefix": "assets/",
-  "maximumExternalAssetFileBytes": 134217728,
-  "maximumExternalAssetBytes": 268435456,
+  "maximumExternalAssetFileBytes": null,
+  "maximumExternalAssetBytes": null,
   "supportedAssetExtensions": [
     ".css",
     ".html",

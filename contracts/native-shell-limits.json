@@ -1,8 +1,8 @@
 {
   "contractVersion": 1,
-  "maximumPackageBytes": 536870912,
+  "maximumPackageBytes": null,
   "maximumFiles": 512,
-  "maximumFileBytes": 268435456,
+  "maximumFileBytes": null,
   "supportedAssetExtensions": [
     ".cjs",
     ".css",

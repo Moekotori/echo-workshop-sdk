@@ -49,7 +49,8 @@
               "lyrics:read",
               "fs:plugin",
               "fs:export",
-              "system:full"
+              "system:full",
+              "background:run"
             ]
           }
         },

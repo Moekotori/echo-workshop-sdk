@@ -1,0 +1,137 @@
+{
+  "type": "echo-workshop-lyrics-style",
+  "schemaVersion": 1,
+  "id": "echo.afterglow-starter",
+  "title": "Afterglow Scene Starter",
+  "description": "Palette-following Afterglow scenes. No JavaScript or external assets.",
+  "settings": {
+    "lyricsPageStyle": "jizura"
+  },
+  "scene": {
+    "schemaVersion": 1,
+    "background": "theme",
+    "root": {
+      "id": "root",
+      "type": "group",
+      "children": []
+    },
+    "afterglow": {
+      "schemaVersion": 1,
+      "mode": "mix",
+      "scenes": [
+        {
+          "id": "orbit",
+          "title": "Orbit garden",
+          "layers": [
+            {
+              "type": "ellipse",
+              "x": 0.78,
+              "y": 0.3,
+              "width": 0.5,
+              "height": 0.55,
+              "color": "transparent",
+              "stroke": "accent2",
+              "strokeWidth": 0.003,
+              "opacity": 0.65,
+              "motion": {
+                "spin": 0.04
+              }
+            },
+            {
+              "type": "ellipse",
+              "x": 0.78,
+              "y": 0.3,
+              "width": 0.43,
+              "height": 0.42,
+              "color": "transparent",
+              "stroke": "accent",
+              "strokeWidth": 0.0015,
+              "opacity": 0.4,
+              "rotation": 0.4
+            },
+            {
+              "type": "particles",
+              "x": 0.5,
+              "y": 0.5,
+              "width": 1.15,
+              "height": 1.15,
+              "radius": 0.002,
+              "color": "fg",
+              "opacity": 0.35,
+              "count": 50,
+              "motion": {
+                "floatY": 0.015,
+                "speed": 0.15
+              }
+            }
+          ]
+        },
+        {
+          "id": "paper",
+          "title": "Floating diamonds",
+          "layers": [
+            {
+              "type": "polygon",
+              "x": 0.15,
+              "y": 0.24,
+              "points": [
+                [
+                  0,
+                  -0.12
+                ],
+                [
+                  0.08,
+                  0
+                ],
+                [
+                  0,
+                  0.12
+                ],
+                [
+                  -0.08,
+                  0
+                ]
+              ],
+              "color": "accent",
+              "opacity": 0.22,
+              "motion": {
+                "spin": -0.03,
+                "floatY": 0.02
+              }
+            },
+            {
+              "type": "polygon",
+              "x": 0.84,
+              "y": 0.78,
+              "points": [
+                [
+                  0,
+                  -0.19
+                ],
+                [
+                  0.13,
+                  0
+                ],
+                [
+                  0,
+                  0.19
+                ],
+                [
+                  -0.13,
+                  0
+                ]
+              ],
+              "color": "accent2",
+              "opacity": 0.25,
+              "motion": {
+                "spin": 0.035,
+                "floatY": 0.025,
+                "phase": 2
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

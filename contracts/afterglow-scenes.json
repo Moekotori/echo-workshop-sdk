@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "contentKind": "lyrics-style",
+  "entryType": "echo-workshop-lyrics-style",
+  "field": "scene.afterglow",
+  "minimumEchoVersion": "26.9.29",
+  "modes": ["mix", "only"],
+  "layerTypes": ["circle", "ellipse", "rect", "line", "polygon", "text", "particles"],
+  "colors": ["transparent", "bg", "fg", "accent", "accent2", "ghostA", "ghostB"],
+  "limits": {
+    "maximumScenes": 12,
+    "maximumLayersPerScene": 64,
+    "maximumLayers": 256,
+    "maximumPaintElements": 512,
+    "maximumNormalizedBytes": 131072,
+    "maximumPolygonPoints": 32,
+    "maximumTextCharacters": 120,
+    "maximumParticlesPerLayer": 80,
+    "maximumParticleRadius": 0.02
+  },
+  "execution": "host-owned-data-only-canvas",
+  "externalAssets": false,
+  "authorCode": false
+}

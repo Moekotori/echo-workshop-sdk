@@ -1,0 +1,25 @@
+{
+  "type": "echo-workshop-item",
+  "schemaVersion": 1,
+  "id": "echo.afterglow-starter",
+  "title": "Afterglow Scene Starter",
+  "version": "1.0.0",
+  "content": {
+    "kind": "lyrics-style",
+    "entry": "lyrics-style.json"
+  },
+  "compatibility": {
+    "minEchoVersion": "26.9.29"
+  },
+  "files": [
+    {
+      "path": "lyrics-style.json",
+      "size": 3203,
+      "sha256": "eccf81952b5ccc3b0e65cdf441c8392bee97ddaa9ee0a5c5d44c56092f6a4168"
+    }
+  ],
+  "license": {
+    "id": "MIT",
+    "holder": "ECHO contributors"
+  }
+}

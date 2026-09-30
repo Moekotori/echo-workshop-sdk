@@ -41,7 +41,7 @@
         "required": ["path", "size", "sha256"],
         "properties": {
           "path": { "$ref": "#/$defs/path" },
-          "size": { "type": "integer", "minimum": 0, "maximum": 134217728 },
+          "size": { "type": "integer", "minimum": 0 },
           "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
         }
       }

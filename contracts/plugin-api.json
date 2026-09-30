@@ -189,6 +189,14 @@
       "method": "echo.library.addTracksToPlaylist",
       "permission": "library:control"
     },
+    "library:updatePlaylist": {
+      "method": "echo.library.updatePlaylist",
+      "permission": "library:control"
+    },
+    "library:removePlaylistItems": {
+      "method": "echo.library.removePlaylistItems",
+      "permission": "library:control"
+    },
     "queue:get": {
       "method": "echo.queue.get",
       "permission": "queue:read"

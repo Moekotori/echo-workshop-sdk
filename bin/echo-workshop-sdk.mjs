@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { createHash } from 'node:crypto';
-import { constants as fsConstants } from 'node:fs';
+import { constants as fsConstants, createReadStream } from 'node:fs';
 import { access, cp, lstat, mkdir, readFile, readdir, watch, writeFile } from 'node:fs/promises';
 import { basename, dirname, extname, isAbsolute, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -88,13 +88,13 @@ const maximumPluginFiles = Number(pluginPackageLimits.maximumFiles);
 const maximumPluginFileBytes = Number(pluginPackageLimits.maximumFileBytes);
 const allowedSourceExtensions = new Set(pluginPackageLimits.supportedAssetExtensions);
 const externalAssetPrefix = String(pluginPackageLimits.externalAssetPrefix);
-const maximumExternalAssetFileBytes = Number(pluginPackageLimits.maximumExternalAssetFileBytes);
-const maximumExternalAssetBytes = Number(pluginPackageLimits.maximumExternalAssetBytes);
+const maximumExternalAssetFileBytes = pluginPackageLimits.maximumExternalAssetFileBytes;
+const maximumExternalAssetBytes = pluginPackageLimits.maximumExternalAssetBytes;
 const allowedExternalAssetExtensions = new Set(pluginPackageLimits.supportedExternalAssetExtensions);
 const nativeShellLimits = JSON.parse(await readFile(resolve(sdkRoot, 'contracts', 'native-shell-limits.json'), 'utf8'));
-const maximumNativeShellPackageBytes = Number(nativeShellLimits.maximumPackageBytes);
+const maximumNativeShellPackageBytes = nativeShellLimits.maximumPackageBytes;
 const maximumNativeShellFiles = Number(nativeShellLimits.maximumFiles);
-const maximumNativeShellFileBytes = Number(nativeShellLimits.maximumFileBytes);
+const maximumNativeShellFileBytes = nativeShellLimits.maximumFileBytes;
 const allowedNativeShellExtensions = new Set(nativeShellLimits.supportedAssetExtensions);
 const previewPng = createListingPreviewPng();
 const booleanFlags = new Set(['json', 'warn-only', 'help']);
@@ -198,20 +198,18 @@ const collectContentInventory = async (root, current = root, kind = null) => {
     if (!entry.isFile()) fail(`Special content file is not allowed: ${entry.name}`);
     const relativePath = toSlash(relative(root, path));
     if (relativePath.toLowerCase() === manifestFileName) continue;
-    const content = await readFile(path);
+    const fileStat = await lstat(path);
     const normalizedPath = relativePath.toLowerCase();
     const isExternalPluginAsset = kind === 'plugin-package' && normalizedPath.startsWith(externalAssetPrefix);
-    const maximumBytes = kind === 'native-shell'
-      ? maximumNativeShellFileBytes
-      : isExternalPluginAsset ? maximumExternalAssetFileBytes : 16 * 1024 * 1024;
-    if (content.byteLength > maximumBytes) fail(`Content file exceeds ${maximumBytes} bytes: ${relativePath}`);
     if (isExternalPluginAsset && !allowedExternalAssetExtensions.has(extname(relativePath).toLowerCase())) {
       fail(`Unsupported external plug-in asset: ${relativePath}`);
     }
     if (kind === 'native-shell' && !allowedNativeShellExtensions.has(extname(relativePath).toLowerCase())) {
       fail(`Unsupported native-shell asset: ${relativePath}`);
     }
-    output.push({ path: relativePath, size: content.byteLength, sha256: hash(content) });
+    const digest = createHash('sha256');
+    for await (const chunk of createReadStream(path)) digest.update(chunk);
+    output.push({ path: relativePath, size: fileStat.size, sha256: digest.digest('hex') });
   }
   return output.sort((left, right) => left.path.localeCompare(right.path));
 };
@@ -264,12 +262,7 @@ const validateProject = async (rootInput) => {
   }
   const inventory = await collectContentInventory(contentRoot, contentRoot, manifest.content.kind);
   const totalBytes = inventory.reduce((total, file) => total + file.size, 0);
-  const maximumTotalBytes = manifest.content.kind === 'plugin-package'
-    ? maximumExternalAssetBytes
-    : manifest.content.kind === 'native-shell'
-      ? maximumNativeShellPackageBytes
-      : 64 * 1024 * 1024;
-  if (totalBytes > maximumTotalBytes) fail(`Workshop content exceeds ${maximumTotalBytes} bytes`);
+  if (!Number.isSafeInteger(totalBytes)) fail('Workshop content size is not a safe integer');
   const expected = new Map(inventory.map((file) => [file.path.toLowerCase(), file]));
   for (const file of manifest.files) {
     const actual = expected.get(String(file.path).toLowerCase());
@@ -345,6 +338,8 @@ const copyPortableSdk = async (echoSdkRoot) => {
   await cp(resolve(sdkRoot, 'echo-workshop-ui-runtime.d.ts'), resolve(echoSdkRoot, 'echo-workshop-ui-runtime.d.ts'));
   await cp(resolve(sdkRoot, 'echo-workshop-native-shell.d.ts'), resolve(echoSdkRoot, 'echo-workshop-native-shell.d.ts'));
   await cp(resolve(sdkRoot, 'echo-workshop-animation-library.d.ts'), resolve(echoSdkRoot, 'echo-workshop-animation-library.d.ts'));
+  await cp(resolve(sdkRoot, 'echo-workshop-afterglow.d.ts'), resolve(echoSdkRoot, 'echo-workshop-afterglow.d.ts'));
+  await cp(resolve(sdkRoot, 'afterglow-scenes.md'), resolve(echoSdkRoot, 'afterglow-scenes.md'));
   await cp(resolve(sdkRoot, 'bin', 'echo-workshop-sdk.mjs'), resolve(echoSdkRoot, 'bin', 'echo-workshop-sdk.mjs'));
   // Steam's unpacked SDK omits shell launchers; Node and npm use the .mjs entry.
   try {
@@ -893,7 +888,7 @@ const formatVersionSurface = (surface) => [
   `Animation library schema: ${surface.animationLibrary.schemaVersion} · min ECHO: ${surface.animationLibrary.minimumEchoVersion} · ${surface.animationLibrary.properties.length} bounded properties · ${surface.animationLibrary.clipDirections.length} reveals · ${surface.animationLibrary.staggerOrigins.length} stagger orders`,
   `Content kinds: ${surface.contentKinds.join(', ')}`,
   `Plug-in limits: ${surface.pluginPackageLimits.maximumFiles} files · ${surface.pluginPackageLimits.maximumFileBytes} B/file · ${surface.pluginPackageLimits.maximumPackageBytes} B/package`,
-  `Native-shell limits: ${surface.nativeShellLimits.maximumFiles} files · ${surface.nativeShellLimits.maximumFileBytes} B/file · ${surface.nativeShellLimits.maximumPackageBytes} B/package`,
+  `Native-shell limits: ${surface.nativeShellLimits.maximumFiles} files · no content byte quota`,
   `Recipes: ${surface.recipes.length} · guide topics: ${surface.guideTopics.length} · snippets: ${surface.snippets.length} (per-kind entries/tags via --json)`,
   `Machine-readable contracts: ${surface.contracts.join(', ')}`,
 ].join('\n');

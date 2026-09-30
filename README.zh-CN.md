@@ -4,19 +4,35 @@
 
 [公开仓库](https://github.com/Moekotori/echo-workshop-sdk) · [最新版本](https://github.com/Moekotori/echo-workshop-sdk/releases/latest) · [私密报告安全问题](https://github.com/Moekotori/echo-workshop-sdk/security/advisories/new) · [English](./README.md)
 
-这是给作者用的便携工具箱。当前源码包版本 `1.17.0`，清单 schema `1`，插件 API `2`。本 SDK 采用 MIT 许可，本地创作需要 Node.js 20+，不发布到 npm。可下载的 `.tgz` 以 [GitHub Releases](https://github.com/Moekotori/echo-workshop-sdk/releases/latest) 实际列出的资产为准；main 分支可能比最新 Release 新。
+这是给作者用的便携工具箱。SDK 版本为 `1.19.0`；GitHub 发布资产和 Steam 起步包通过各自渠道发布。清单 schema `1`，插件 API `2`。本 SDK 采用 MIT 许可，本地创作需要 Node.js 20+，不发布到 npm。可下载的 `.tgz` 以 [GitHub Releases](https://github.com/Moekotori/echo-workshop-sdk/releases/latest) 实际列出的资产为准；源码改动不会自动生成发布资产。
 
 | 能力 | 最低 ECHO 版本 |
 | --- | --- |
+| Afterglow 数据场景包 | 包含 Afterglow 支持的 `26.9.29` 或更新版本 |
 | 原生侧边栏页面 `placement: "page"`、页面导航及 1.17 的命令入口 | `26.9.25` |
 | 1.16 的独立主题/歌词/背景组合、动画库和面板外观控制 | `26.9.16` |
 | `system:full` 与 `trustedEntry` 完整系统权限插件 | `26.8.29`，且须订阅者明确批准 |
+| 编辑本地手动歌单、移除歌单条目（包含于 1.19） | 包含这两个操作的新版 ECHO 宿主；运行时先检查可用性 |
+
+1.19 包含原 1.18 的改动，让应用内创作台从更小的插件模板起步，并在 `library:control` 下增加 `echo.library.updatePlaylist(playlistId, { name?, description? })` 与 `echo.library.removePlaylistItems(playlistId, itemIds)`。宿主只接受本地手动歌单；移除前核对条目归属并保留恢复记录。旧版 ECHO 中显示编辑入口前，先调用 `echo.host.getFeatureAvailability('library:updatePlaylist')`。
+
+在 ECHO 创意工坊的**创作**页，先选目标，再填写内容 ID 和权利人：
+
+| 想做的事 | 起步方式 | 能力范围 |
+| --- | --- | --- |
+| 小型 ECHO 工具 | 插件 → 基础工具 | 一个曲库命令和面板；`library:read` |
+| 主题或歌词场景 | 主题 → 声明式外壳 / 歌词 → 封面加歌词 | 数据驱动的外观，不需要插件权限 |
+| 多能力插件示例 | 插件 → 完整能力示例 | 多种宿主入口与权限声明，按项目需要删减 |
+| 连接本机系统 | 插件 → 系统权限工具 | `system:full`；订阅者批准后才能运行 Node 代码 |
+
+通过引导字段编辑、保存以更新哈希、准备并核对包体，然后检查授权和可见性再发布。原始 JSON 在**高级**区域。基础模板刻意保持精简；代码真正需要时再增加能力。
 
 SDK 包含 `native-shell` Windows named-pipe 作者契约，但官方 ECHO Steam 版不会启动订阅者提供的 `.exe` 或 `.dll`；沙箱插件仍为默认方式。额外语言只活在工坊 JSON 里。[Steam 创意工坊 SDK 条目](https://steamcommunity.com/sharedfiles/filedetails/?id=3784997717)附带可运行示例与独立发布的 SDK，可能与 GitHub Release 版本不同，请分别核对下载内容。
 
 尚未发布的 API 还为固定 `workshopAudioEffect` 槽加入受限 `vocalCut` 状态：插件可设置实时中置人声抑制强度和 80–300 Hz 低频保护分频点，实际处理与平滑仍由 Audio Core 持有，插件不会进入实时线程。
 
 新视觉接口另见[稳定主题部件、独立视觉组合与宿主预览](./theme-parts.md)和[歌词创作](./lyrics-authoring.md)。
+Afterglow 用户场景包见[场景包格式与导入](./afterglow-scenes.md)，支持 `lyrics-style --preset afterglow` 模板、ZIP 本地导入及工坊分发。
 
 这些命令**永远不会上传**到 Steam。发布只能在 ECHO 创作台或仓库作者 CLI 里单独确认。
 
@@ -119,7 +135,7 @@ node .\bin\echo-workshop-sdk.mjs fix .\my-theme
 
 `validate` 会拒绝私网、本机、通配、重复及畸形 `networkHosts`，域名声明必须具备 `network:request` 权限。请求只连接已验证的公网地址并保留 Host/TLS 身份；优先使用 HTTPS。
 
-便携 CLI 与 ECHO 宿主共用 `contracts/plugin-package-limits.json`。内层可执行/文本 `.echo` 包仍最多 32 个文件、单个 UTF-8 文件最多 512 KiB、序列化整包最多 2 MiB，扩展名限 `.css`、`.html`、`.js`、`.mjs`、`.json`。外层 `plugin-package` 工坊项可以在 `assets/` 下额外携带清单哈希覆盖的 `.wasm`、`.onnx`、`.bin`、`.data`，单文件最多 128 MiB、合计最多 256 MiB；插件用 `new URL('./assets/model.onnx', location.href)` 这类相对 URL 读取，不能访问包外文件。`native-shell` 走单独的 `contracts/native-shell-limits.json`（512 文件、单文件 256 MiB、整包 512 MiB）。官方 Steam 校验仍拒绝订阅者 `.exe` / `.dll`。共享契约都可通过包导出被外部工具直接 import。沙箱入口仍须为 `.js`；完整系统 `trustedEntry` 是单独声明的 `.mjs`，其它 `.mjs` 也可作为模块素材。内层插件 `apiVersion` 必须与外层 Workshop 清单的 `compatibility.pluginApiVersion` 完全一致。
+便携 CLI 与 ECHO 宿主共用 `contracts/plugin-package-limits.json`。内层可执行/文本 `.echo` 包仍最多 32 个文件、单个 UTF-8 文件最多 512 KiB、序列化整包最多 2 MiB，扩展名限 `.css`、`.html`、`.js`、`.mjs`、`.json`。外层 `plugin-package` 工坊项可以在 `assets/` 下额外携带清单哈希覆盖的 `.wasm`、`.onnx`、`.bin`、`.data`，不设外层文件和整包字节配额；插件用 `new URL('./assets/model.onnx', location.href)` 这类相对 URL 读取，不能访问包外文件。`native-shell` 走单独的 `contracts/native-shell-limits.json`（512 文件、不设外层文件和整包字节配额）。官方 Steam 校验仍拒绝订阅者 `.exe` / `.dll`。共享契约都可通过包导出被外部工具直接 import。沙箱入口仍须为 `.js`；完整系统 `trustedEntry` 是单独声明的 `.mjs`，其它 `.mjs` 也可作为模块素材。内层插件 `apiVersion` 必须与外层 Workshop 清单的 `compatibility.pluginApiVersion` 完全一致。
 
 整包 CSS 必须写在 `html[data-workshop-theme-pack="<id>"]` 下面。不能用 `FINAL`、`nyanCat`、`darkSideMoon` 当 `basePreset`。
 

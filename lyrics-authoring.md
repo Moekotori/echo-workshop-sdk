@@ -85,6 +85,11 @@
 `motion.frameIntervalMs === null` 时停止 RAF，仅画静态帧。离开页面应释放引用和 GPU 资源。
 每个 runtime 仅缓存当前曲文档；沿用 800 行、每行 48 个 timing segment、整体 256 KiB 上限，不逐帧传整份歌词。
 
+新版宿主还提供可选的行 `endMs`、`agentId` 和 `backgroundVocals`（每行最多 8 组），可做对唱排版和和声逐词效果；词文本保留原始空格。旧宿主会省略这些字段。
+`lyrics-view` 也可声明 `library:read` / `library:control` 以读取/切换当前歌曲喜欢状态，及 `window:control` 以切换全屏。此 presentation 中仅接受当前曲的 `library:getLiked` / `library:toggleLiked` 与 `window:toggleFullscreen`；不开放曲库枚举、编辑、队列管理或其他窗口操作。
+音量状态可包含 `fixedVolumeEnabled`、`volumeLocked` 和 `volumeLockReason`（`fixed` / `dsd` / null）。声明 `playback:control` 的界面可显式发送 `setFixedVolume` `{enabled:boolean}`；它只改变固定音量设置，不绕过 DSD 自动锁定。锁定时 `setVolume` 返回明确错误，不能假报成功。
+上述限制属于运行时消息预算，与创意工坊内容包大小无关。工坊外层内容与 ZIP 导入不再设置总字节配额；校验仍检查路径、文件清单、哈希、文件类型及各运行时解析预算。
+
 `echo-workshop-ui-runtime.d.ts` 提供完整歌词、逐字时间、clock 和事件类型，以及 `EchoWorkshopUiLyricsResult`。
 运行示例见 [Lyric Ink](examples/lyrics-view-runtime/README.md)。素材只用同包相对路径；自带字体需记录来源、许可和分发权，不需要开放网络或系统权限。
 
@@ -104,5 +109,14 @@ outputDevice 显示名称、outputBackend、outputMode、replayGainDb/replayGain
 
 事件复用现有 Audio Core 状态订阅，最高 10 Hz 并遵守可见性/帧预算，无额外 IPC 轮询。
 隐藏时停止推送，卸载时移除订阅和定时器；暂停/停止清空电平与频谱，切歌按 trackId 隔离。
-频谱仍为现有的最多 128 个归一化 band；真实有效状态为 `pcm`，`priming`/`fallback` 不应显示为稳定 PCM 数据。
+原生宿主提供 128 个从低频到高频排列的对数频率探测值，归一化到 0–1；旧宿主或非原生回退仍可能只有 32 段，作者应以 `bands.length` 为准，不硬编码段数。真实有效状态为 `pcm`，`priming`/`fallback` 不应显示为稳定 PCM 数据。128 段提高探测密度，分析窗仍为 2048 个采样，不代表低频分辨能力提高四倍。
 本事件不提供 PCM、文件路径、设备 ID、设备枚举或访问能力，不增加外联。
+
+### 当前曲 AMLL 匹配
+
+`lyrics-view` / `shell` 可显式声明 `lyrics:match`，请求 `lyrics:matchAmll`，payload 为 `{ trackId }`。
+宿主只允许当前正在播放的歌曲，复用现有 AMLL 提供者和联网歌词设置，只应用自动接受条件满足的同步歌词。
+返回 `{ trackId, matched }`；无可靠结果保留原歌词，不清缓存。每个 runtime 最多一个在途请求及一个结果缓存。
+歌曲或主题改变后，异步结果不得再发起应用；网络请求仍由既有宿主超时回收。不要把这类请求放入播放控制的串行队列。
+该命令不授予网络、候选列表、平台 ID 或文件权限。实际 AMLL 文档的 `lyrics` 事件/`lyrics:get` 返回可选 `attribution: 'AMLL'`。
+来源标记应以当前曲文档为准，不能仅凭 match 返回成功、歌词标题或任意来源字符串推断。

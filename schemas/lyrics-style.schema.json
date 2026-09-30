@@ -45,7 +45,8 @@
             "cinemaStage",
             "kineticPoster",
             "coverStage",
-            "cutBoard"
+            "cutBoard",
+            "jizura"
           ]
         },
         "lyricsFontSizePx": {
@@ -194,6 +195,232 @@
               }
             }
           ]
+        },
+        "afterglow": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "schemaVersion",
+            "scenes"
+          ],
+          "properties": {
+            "schemaVersion": {
+              "const": 1
+            },
+            "mode": {
+              "enum": [
+                "mix",
+                "only"
+              ]
+            },
+            "scenes": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 12,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "title",
+                  "layers"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9_-]{0,31}$"
+                  },
+                  "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "layers": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 64,
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "type"
+                      ],
+                      "properties": {
+                        "type": {
+                          "enum": [
+                            "circle",
+                            "ellipse",
+                            "rect",
+                            "line",
+                            "polygon",
+                            "text",
+                            "particles"
+                          ]
+                        },
+                        "x": {
+                          "type": "number",
+                          "minimum": -1,
+                          "maximum": 2
+                        },
+                        "y": {
+                          "type": "number",
+                          "minimum": -1,
+                          "maximum": 2
+                        },
+                        "width": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 2
+                        },
+                        "height": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 2
+                        },
+                        "radius": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 2
+                        },
+                        "color": {
+                          "type": "string",
+                          "pattern": "^(transparent|bg|fg|accent|accent2|ghostA|ghostB|#[0-9a-fA-F]{6})$"
+                        },
+                        "stroke": {
+                          "type": "string",
+                          "pattern": "^(transparent|bg|fg|accent|accent2|ghostA|ghostB|#[0-9a-fA-F]{6})$"
+                        },
+                        "opacity": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1
+                        },
+                        "rotation": {
+                          "type": "number",
+                          "minimum": -6.283185307179586,
+                          "maximum": 6.283185307179586
+                        },
+                        "strokeWidth": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 0.05
+                        },
+                        "text": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 120
+                        },
+                        "fontSize": {
+                          "type": "number",
+                          "minimum": 0.005,
+                          "maximum": 0.2
+                        },
+                        "count": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 80
+                        },
+                        "points": {
+                          "type": "array",
+                          "minItems": 3,
+                          "maxItems": 32,
+                          "items": {
+                            "type": "array",
+                            "minItems": 2,
+                            "maxItems": 2,
+                            "items": {
+                              "type": "number",
+                              "minimum": -2,
+                              "maximum": 2
+                            }
+                          }
+                        },
+                        "motion": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "floatX": {
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 0.25
+                            },
+                            "floatY": {
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 0.25
+                            },
+                            "speed": {
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 3
+                            },
+                            "spin": {
+                              "type": "number",
+                              "minimum": -0.5,
+                              "maximum": 0.5
+                            },
+                            "phase": {
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 6.283185307179586
+                            }
+                          }
+                        }
+                      },
+                      "allOf": [
+                        {
+                          "if": {
+                            "properties": {
+                              "type": {
+                                "const": "text"
+                              }
+                            }
+                          },
+                          "then": {
+                            "required": [
+                              "text"
+                            ]
+                          }
+                        },
+                        {
+                          "if": {
+                            "properties": {
+                              "type": {
+                                "const": "polygon"
+                              }
+                            }
+                          },
+                          "then": {
+                            "required": [
+                              "points"
+                            ]
+                          }
+                        },
+                        {
+                          "if": {
+                            "properties": {
+                              "type": {
+                                "const": "particles"
+                              }
+                            }
+                          },
+                          "then": {
+                            "properties": {
+                              "radius": {
+                                "type": "number",
+                                "minimum": 0,
+                                "maximum": 0.02
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
       }
     }

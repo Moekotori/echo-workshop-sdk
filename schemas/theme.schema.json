@@ -23,14 +23,52 @@
     },
     "backgroundAsset": { "$ref": "#/$defs/raster" },
     "stylesheet": { "$ref": "#/$defs/cssPath" },
+    "progressBar": { "$ref": "#/$defs/progressBar" },
     "skin": { "$ref": "#/$defs/skin" },
     "runtime": { "$ref": "#/$defs/runtime" }
   },
   "anyOf": [
     { "required": ["light"] },
-    { "required": ["dark"] }
+    { "required": ["dark"] },
+    { "required": ["progressBar"] }
   ],
+  "allOf": [{ "if": { "required": ["progressBar"] }, "then": { "not": { "anyOf": [
+    { "required": ["light"] }, { "required": ["dark"] }, { "required": ["stylesheet"] },
+    { "required": ["skin"] }, { "required": ["runtime"] }, { "required": ["backgroundAsset"] }
+  ] } } }],
   "$defs": {
+    "progressBar": {
+      "type": "object", "additionalProperties": false, "required": ["height", "thumb", "trail"],
+      "properties": {
+        "height": { "type": "integer", "minimum": 4, "maximum": 32 },
+        "thumb": { "$ref": "#/$defs/progressThumb" },
+        "trail": { "$ref": "#/$defs/progressStrip" },
+        "texture": { "$ref": "#/$defs/progressStrip" }
+      }
+    },
+    "progressStrip": {
+      "type": "object", "additionalProperties": false,
+      "required": ["asset", "width", "height", "steps", "durationMs"],
+      "properties": {
+        "asset": { "$ref": "#/$defs/raster" },
+        "width": { "type": "integer", "minimum": 1, "maximum": 512 },
+        "height": { "type": "integer", "minimum": 1, "maximum": 64 },
+        "steps": { "type": "integer", "minimum": 1, "maximum": 128 },
+        "durationMs": { "type": "integer", "minimum": 100, "maximum": 30000 }
+      }
+    },
+    "progressThumb": {
+      "type": "object", "additionalProperties": false,
+      "required": ["asset", "width", "height", "steps", "durationMs"],
+      "properties": {
+        "asset": { "$ref": "#/$defs/raster" },
+        "width": { "type": "integer", "minimum": 1, "maximum": 96 },
+        "height": { "type": "integer", "minimum": 1, "maximum": 64 },
+        "steps": { "type": "integer", "minimum": 1, "maximum": 16 },
+        "durationMs": { "type": "integer", "minimum": 100, "maximum": 30000 },
+        "bobPx": { "type": "integer", "minimum": 0, "maximum": 4 }
+      }
+    },
     "id": { "type": "string", "minLength": 3, "maxLength": 80, "pattern": "^[a-z0-9](?:[a-z0-9._-]{1,78}[a-z0-9])?$" },
     "hex": { "type": "string", "pattern": "^#[0-9A-Fa-f]{6}$" },
     "path": { "type": "string", "minLength": 1, "maxLength": 240, "pattern": "^(?!/)(?![A-Za-z]:)(?!.*\\\\)(?!.*(?:^|/)\\.{1,2}(?:/|$))[^<>:\"|?*]+$" },
@@ -185,7 +223,7 @@
       "type": "object",
       "additionalProperties": false,
         "required": ["entry", "capabilities"],
-        "allOf": [{"if":{"properties":{"presentation":{"const":"lyrics-view"}},"required":["presentation"]},"then":{"properties":{"capabilities":{"items":{"enum":["playback:read","playback:control","lyrics:read","audio:spectrum","storage"]}}}}}, { "if": { "properties": { "presentation": { "const": "lyrics-background" } }, "required": ["presentation"] }, "then": { "properties": { "capabilities": { "items": { "enum": ["playback:read", "audio:spectrum"] } } } } }],
+        "allOf": [{"if":{"properties":{"presentation":{"const":"lyrics-view"}},"required":["presentation"]},"then":{"properties":{"capabilities":{"items":{"enum":["playback:read","playback:control","lyrics:read", "lyrics:match","audio:spectrum","storage","library:read","library:control","window:control"]}}}}}, { "if": { "properties": { "presentation": { "const": "lyrics-background" } }, "required": ["presentation"] }, "then": { "properties": { "capabilities": { "items": { "enum": ["playback:read", "audio:spectrum"] } } } } }],
       "properties": {
           "entry": { "$ref": "#/$defs/htmlPath" },
           "presentation": { "enum": ["shell", "lyrics-background", "lyrics-view"], "description": "Omit for the full UI shell. lyrics-background preserves the host lyrics and controls; only playback:read and audio:spectrum are allowed." },
@@ -202,7 +240,7 @@
               "queue:read",
               "queue:control",
               "window:control",
-              "lyrics:read",
+              "lyrics:read", "lyrics:match",
               "audio:spectrum",
               "storage"
             ]
