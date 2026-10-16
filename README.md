@@ -1,12 +1,14 @@
 # ECHO Workshop SDK
 
+New authors can follow the [first plug-in tutorial in Chinese](./FIRST-PLUGIN.zh-CN.md): create, edit, check and try the result locally in ECHO.
+
 Afterglow scene packs: [format and import guide](./afterglow-scenes.md). Create a `lyrics-style` project with `--preset afterglow`, then import its content ZIP locally or distribute it through Workshop.
 
 [![ECHO Workshop SDK CI](https://github.com/Moekotori/echo-workshop-sdk/actions/workflows/ci.yml/badge.svg)](https://github.com/Moekotori/echo-workshop-sdk/actions/workflows/ci.yml)
 
 [Public repository](https://github.com/Moekotori/echo-workshop-sdk) · [Latest release](https://github.com/Moekotori/echo-workshop-sdk/releases/latest) · [Report a vulnerability](https://github.com/Moekotori/echo-workshop-sdk/security/advisories/new) · [中文说明](./README.zh-CN.md)
 
-This repository contains the portable developer kit for ECHO Steam Workshop. The SDK version is `1.19.0`; GitHub release assets and the Steam starter are published through separate channels. SDK version `1` targets Workshop manifest schema `1` and plug-in API `2`. The SDK is MIT-licensed, requires Node.js 20+ for local authoring, and is not published to npm. Check the [latest GitHub release](https://github.com/Moekotori/echo-workshop-sdk/releases/latest) for an actual downloadable `.tgz`; source changes do not create a release asset.
+This repository contains the portable developer kit for ECHO Steam Workshop. The SDK version is `1.20.0`; GitHub release assets and the Steam starter are published through separate channels. SDK version `1` targets Workshop manifest schema `1` and plug-in API `2`. The SDK is MIT-licensed, requires Node.js 20+ for local authoring, and is not published to npm. Check the [latest GitHub release](https://github.com/Moekotori/echo-workshop-sdk/releases/latest) for an actual downloadable `.tgz`; source changes do not create a release asset.
 
 | Feature | Minimum ECHO version |
 | --- | --- |
@@ -15,8 +17,11 @@ This repository contains the portable developer kit for ECHO Steam Workshop. The
 | Independent theme/lyrics/background composition, animation libraries and panel presentation from 1.16 | `26.9.16` |
 | Full-trust plug-ins (`system:full` and `trustedEntry`) | `26.8.29`; explicit subscriber approval required |
 | Local manual-playlist edit and item removal (included in 1.19) | An ECHO host build containing these actions; check feature availability at runtime |
+| Native waveform/channel meters and visualization queries (1.20) | An ECHO host build containing these interfaces; check `echo.host.getFeatureAvailability('audio:getVisualization')` or runtime `init.audioVisualizationLimits` |
 
 SDK 1.19 includes the 1.18 additions: a smaller in-app plug-in starter and exposes `echo.library.updatePlaylist(playlistId, { name?, description? })` and `echo.library.removePlaylistItems(playlistId, itemIds)` under `library:control`. The host accepts only local manual playlists; removal checks that every selected item belongs to that playlist and keeps recovery history. Check `echo.host.getFeatureAvailability('library:updatePlaylist')` before showing the edit control on older ECHO builds.
+
+SDK 1.20 adds `echo.audio.getVisualization({ waveformSamples: 2048, spectrum: false, levels: true })` under `audio:spectrum`. Snapshots expose signed mono waveform samples, native channel meters and host limits. Theme and lyrics runtimes can query the same data and select push fields/spacing using `echo:workshop-ui:audio-configure`. See [audio visualization authoring](./lyrics-authoring.md) and the [runtime types](./echo-workshop-ui-runtime.d.ts). The portable preview returns an unavailable waveform when it has no native audio; installing the SDK does not upgrade an older ECHO host.
 
 In ECHO's Workshop **Create** tab, choose a starting path before filling in the project ID and rights holder:
 
@@ -90,6 +95,12 @@ Theme `--preset` values:
 | `stylesheet` | Packaged CSS scoped to the pack id | `26.8.20` |
 | `runtime` | Sandboxed HTML/CSS/JS replacement UI | `26.8.20` |
 
+Declared PNG, JPEG, WebP, theme stylesheets and UI runtime files have no count or byte quota. SVG, executables, and stylesheets that pull remote URLs or scripts are still rejected.
+
+`media-session:control` opens Windows SMTC and Linux MPRIS: read a path-free session status, set enabled buttons and shuffle/repeat, restart the session, and receive media-key commands. Other platforms report `unsupported-platform`.
+
+`companion:control` drives desktop lyrics, the mini player, the pet and the taskbar player. `sleep-timer:control` drives the sleep timer (1–720 minutes). `presence:control` only toggles Discord, Last.fm and ListenBrainz, without login or tokens. `bridge:control` only toggles HQPlayer, the stage bridge, OBS, MQTT and Echo Link; status omits addresses, passwords and pairing material. Account login, cookies, Spotify, downloads and MV search stay closed.
+
 Plugin `--preset` values: `basic` (default), `complete`, `catalog`, `lyrics`, or `full-trust`.
 
 `catalog` is an author-owned searchable directory of direct HTTP(S) streams. It is not a built-in Netease / Spotify / YouTube restore. The host owns search UI, origin confirmation, queue and Audio Core playback.
@@ -114,7 +125,7 @@ node .\bin\echo-workshop-sdk.mjs scaffold .\my-theme --preset runtime
 
 `npm run check` is the complete local gate: it synchronizes packaged content, validates hashes and schemas, runs the quality report, and executes deterministic fixtures. Use `npm run check -- --json` for one machine-readable result, or `--warn-only` to keep iterating with a passing exit code while failures are still reported; publication still requires a clean check. `doctor`, `validate` and `example list` also accept `--json`. The mock host enforces declared plug-in permissions, so undeclared capability use fails locally. `npm run dev` opens a live author console with gate status, permissions, fixtures, the latest changed file, copyable recovery commands and raw diagnostics; stylesheet, runtime, lyrics, visualizer and DSP projects also get a separate fixture preview. `npm run watch` and the dev console debounce editor save bursts, watch nested files and ignore the generated manifest update. This author-controlled local tool is not the production sandbox and must not be used as proof of Steam-client behavior.
 
-The portable CLI and ECHO host share the plug-in package contract in `contracts/plugin-package-limits.json`. The inner executable/text `.echo` package remains capped at 32 files, 512 KiB per UTF-8 file and 2 MiB serialized, with `.css`, `.html`, `.js`, `.mjs` and `.json` assets. A `plugin-package` Workshop item may additionally carry hash-listed `.wasm`, `.onnx`, `.bin` and `.data` files under `assets/`, without outer file or total byte quotas. These assets are package-local: load them with a relative URL such as `new URL('./assets/model.onnx', location.href)`. Native-shell items use the separate `contracts/native-shell-limits.json` surface (512 files, no outer file or total byte quotas). All shared contracts are importable package exports for external tooling. The sandbox entry remains `.js`; a full-trust `trustedEntry` is a separately declared `.mjs` module. Other `.mjs` files may be imported module assets. The inner plug-in `apiVersion` must exactly match the outer Workshop manifest's `compatibility.pluginApiVersion`.
+The portable CLI and ECHO host share the plug-in package contract in `contracts/plugin-package-limits.json`. The inner executable/text `.echo` package has no file-count, UTF-8 file-byte or serialized package-byte quota (`null` in the public contract), with `.css`, `.html`, `.js`, `.mjs` and `.json` assets. A `plugin-package` Workshop item may additionally carry hash-listed `.wasm`, `.onnx`, `.bin` and `.data` files under `assets/`, without outer file-count, file-byte or total-byte quotas. These assets are streamed on demand and are package-local: load them with a relative URL such as `new URL('./assets/model.onnx', location.href)`. Native-shell items use the separate `contracts/native-shell-limits.json` surface (512 files, no outer file or total byte quotas). All shared contracts are importable package exports for external tooling. The sandbox entry remains `.js`; a full-trust `trustedEntry` is a separately declared `.mjs` module. Other `.mjs` files may be imported module assets. The inner plug-in `apiVersion` must exactly match the outer Workshop manifest's `compatibility.pluginApiVersion`.
 
 Generated projects include VS Code JSON Schema mappings and tasks. Run the default build task for `ECHO Workshop: Check`, or start `ECHO Workshop: Dev console` without remembering CLI paths.
 
@@ -250,3 +261,9 @@ The Lattice theme (`echo.lattice-wall`) can run on the Windows desktop after a v
 The SDK files in this package, including its types, schemas, CLI, templates and examples, are licensed under the [MIT License](./LICENSE). ECHO application code is separately licensed under AGPL-3.0-only. This SDK's MIT license covers its types, schemas, CLI, templates and examples; it does not relicense application code or third-party materials. Your original Workshop content remains yours and may use a license you choose, subject to the licenses of any code or assets it incorporates, Steam terms, Workshop policy and applicable law. The SDK license does not grant trademark endorsement.
 
 Local-track uploads are no longer supported. Packages requesting `playback:share` are rejected. The playback upload methods have been removed from the host and SDK; existing local files are not deleted. Authorized direct-stream playback remains available through `sources:direct`.
+
+## Desktop wall and playback rate (local host extension)
+
+`echo.playback.getRate()` uses `playback:read`; `setRate(rate)` uses `playback:control` and accepts finite 0.5–2 values. Status events include `playbackRate`.
+
+Declare `manifest.contributes.desktopWall = { path: "desktop.html" }` and request `window:desktop-wall`. The HTML is a packaged opaque sandbox entry using `__bridge__.js`. Use `echo.window.getDesktopWall()` / `setDesktopWall(enabled)` from the regular panel. In the desktop entry `ui.getContext().desktop.bottomInset` identifies the desktop surface; `ui.openPanel(id)` switches the declared wall context, while `ui.closePanel()` or disabling the desktop wall closes it. Main and desktop settings share the plug-in namespace. Desktop execution provides the bounded playback/library/queue/lyrics/settings subset, and retains the normal request broker. Only the verified enabled revision with approved capabilities and an active Steam subscription can attach. This extension requires the updated local host; it is not yet published.

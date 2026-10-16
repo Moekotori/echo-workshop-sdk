@@ -1,0 +1,72 @@
+{
+  "contractVersion": 1,
+  "protocol": "echo.audio-plugin-adapter",
+  "protocolVersions": [1],
+  "status": "control-plane-only",
+  "audioTransport": "unavailable",
+  "nativeTransportPreview": "audio-plugin-pcm.json",
+  "activation": {
+    "platforms": ["win32"],
+    "environmentVariable": "ECHO_AUDIO_PLUGIN_ADAPTER",
+    "enabledValue": "1",
+    "discoveryFile": "<userData>/audio-plugin-adapter/session.json",
+    "discoveryFields": ["endpoint", "token", "protocol", "version", "pid", "audioTransport"],
+    "executableDiscovery": false,
+    "processSpawn": false
+  },
+  "ipc": {
+    "transport": "windows-named-pipe",
+    "pipeNamePattern": "\\\\.\\pipe\\echo-audio-plugin-adapter-<random-session-id>",
+    "encoding": "utf8-json-lines",
+    "authentication": "session-token",
+    "maximumConnections": 1,
+    "maximumMessageBytes": 262144,
+    "maximumPendingRequests": 16,
+    "requestTimeoutMs": 2000,
+    "heartbeatIntervalMs": 5000
+  },
+  "envelopes": {
+    "request": { "id": "unique-string", "method": "string", "payload": "object" },
+    "success": { "id": "matching-request-id", "result": "object" },
+    "failure": { "id": "matching-request-id", "error": "object" }
+  },
+  "methods": {
+    "adapter:handshake": {
+      "direction": "adapter-to-echo",
+      "implemented": true,
+      "requestSchema": {
+        "type": "object",
+        "required": ["protocol", "version", "token", "name", "pluginClassIds"],
+        "properties": {
+          "protocol": { "const": "echo.audio-plugin-adapter" },
+          "version": { "const": 1 },
+          "token": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "pluginClassIds": {
+            "type": "array", "maxItems": 256,
+            "items": { "type": "string", "pattern": "^[a-fA-F0-9]{32}$" }
+          }
+        }
+      },
+      "response": { "success": true, "audioTransport": "unavailable" }
+    },
+    "adapter:ping": {
+      "direction": "echo-to-adapter",
+      "implemented": true,
+      "request": {},
+      "response": { "success": true }
+    }
+  },
+  "reservedMethods": [
+    "plugin:load", "plugin:unload", "plugin:setParameter", "plugin:setBypass", "plugin:queryState"
+  ],
+  "profileStates": [
+    "adapter-required", "adapter-incompatible", "plugin-missing", "audio-core-required"
+  ],
+  "security": {
+    "workshopContent": "data-only-profile",
+    "sandboxPluginAccess": false,
+    "pcmOverControlChannel": false,
+    "tokenInRendererOrLogs": false
+  }
+}

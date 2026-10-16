@@ -16,7 +16,7 @@
       "required": ["id", "name", "version", "apiVersion", "entry"],
       "properties": {
         "id": { "type": "string", "minLength": 3, "maxLength": 80, "pattern": "^[a-z0-9](?:[a-z0-9._-]{1,78}[a-z0-9])?$" },
-        "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "name": { "type": "string", "minLength": 1 },
         "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+(?:-[0-9a-z]+(?:[.-][0-9a-z]+)*)?$" },
         "apiVersion": { "enum": [1, 2] },
         "minEchoVersion": { "type": "string", "maxLength": 40 },
@@ -25,11 +25,11 @@
         "panel": { "allOf": [{ "$ref": "#/$defs/path" }, { "pattern": "\\.html$" }] },
         "permissions": {
           "type": "array",
-          "maxItems": 32,
           "uniqueItems": true,
           "items": {
             "enum": [
               "navigation",
+              "window:desktop-wall",
               "playback:read",
               "playback:control",
               "audio:spectrum",
@@ -49,6 +49,11 @@
               "lyrics:read",
               "fs:plugin",
               "fs:export",
+              "media-session:control",
+              "companion:control",
+              "sleep-timer:control",
+              "presence:control",
+              "bridge:control",
               "system:full",
               "background:run"
             ]
@@ -59,18 +64,19 @@
           "additionalProperties": false,
           "properties": {
             "commands": { "type": "array", "items": { "$ref": "#/$defs/command" } },
-            "trackContextMenus": { "type": "array", "maxItems": 16, "items": { "$ref": "#/$defs/trackContextMenu" } },
-            "mainMenus": { "type": "array", "maxItems": 16, "items": { "$ref": "#/$defs/mainMenu" } },
-            "columns": { "type": "array", "maxItems": 4, "items": { "$ref": "#/$defs/column" } },
-            "playerBarActions": { "type": "array", "maxItems": 8, "items": { "$ref": "#/$defs/playerBarAction" } },
+            "trackContextMenus": { "type": "array", "items": { "$ref": "#/$defs/trackContextMenu" } },
+            "mainMenus": { "type": "array", "items": { "$ref": "#/$defs/mainMenu" } },
+            "columns": { "type": "array", "items": { "$ref": "#/$defs/column" } },
+            "playerBarActions": { "type": "array", "items": { "$ref": "#/$defs/playerBarAction" } },
+            "desktopWall": { "type": "object", "additionalProperties": false, "required": ["path"], "properties": { "path": { "allOf": [{ "$ref": "#/$defs/path" }, { "pattern": "\\.html$" }] } } },
             "panels": { "type": "array", "items": { "$ref": "#/$defs/panel" } },
-            "agents": { "type": "array", "maxItems": 8, "items": { "$ref": "#/$defs/agent" } },
-            "sourceProviders": { "type": "array", "maxItems": 8, "items": { "$ref": "#/$defs/provider" } },
-            "lyricsProviders": { "type": "array", "maxItems": 8, "items": { "$ref": "#/$defs/lyricsProvider" } },
-            "metadataProviders": { "type": "array", "maxItems": 8, "items": { "$ref": "#/$defs/provider" } },
-            "coverProviders": { "type": "array", "maxItems": 8, "items": { "$ref": "#/$defs/provider" } },
-            "themePresets": { "type": "array", "maxItems": 12, "items": { "$ref": "#/$defs/themePreset" } },
-            "settings": { "type": "array", "maxItems": 32, "items": { "$ref": "#/$defs/setting" } }
+            "agents": { "type": "array", "items": { "$ref": "#/$defs/agent" } },
+            "sourceProviders": { "type": "array", "items": { "$ref": "#/$defs/provider" } },
+            "lyricsProviders": { "type": "array", "items": { "$ref": "#/$defs/lyricsProvider" } },
+            "metadataProviders": { "type": "array", "items": { "$ref": "#/$defs/provider" } },
+            "coverProviders": { "type": "array", "items": { "$ref": "#/$defs/provider" } },
+            "themePresets": { "type": "array", "items": { "$ref": "#/$defs/themePreset" } },
+            "settings": { "type": "array", "items": { "$ref": "#/$defs/setting" } }
           }
         }
       }
@@ -78,14 +84,13 @@
     "files": {
       "type": "array",
       "minItems": 1,
-      "maxItems": 32,
       "items": {
         "type": "object",
         "additionalProperties": false,
         "required": ["path", "content"],
         "properties": {
-          "path": { "allOf": [{ "$ref": "#/$defs/path" }, { "pattern": "\\.(?:css|html|js|json|mjs)$" }] },
-          "content": { "type": "string", "maxLength": 524288 }
+          "path": { "$ref": "#/$defs/path" },
+          "content": { "type": "string" }
         }
       }
     }
@@ -93,8 +98,8 @@
   "$defs": {
     "path": { "type": "string", "minLength": 1, "maxLength": 240, "pattern": "^(?!/)(?![A-Za-z]:)(?!.*\\\\)(?!.*(?:^|/)\\.{1,2}(?:/|$))[^<>:\"|?*]+$" },
     "contributionId": { "type": "string", "minLength": 3, "maxLength": 80, "pattern": "^[a-z0-9](?:[a-z0-9._-]{1,78}[a-z0-9])?$" },
-    "title": { "type": "string", "minLength": 1, "maxLength": 80 },
-    "description": { "type": "string", "maxLength": 180 },
+    "title": { "type": "string", "minLength": 1 },
+    "description": { "type": "string" },
     "contributionIcon": {
       "enum": [
         "blocks", "sparkles", "bot", "radio", "list-music", "heart", "bookmark", "zap",
@@ -132,10 +137,9 @@
         "title": { "$ref": "#/$defs/title" },
         "description": { "$ref": "#/$defs/description" },
         "timeoutMs": { "type": "integer", "minimum": 1 },
-        "confirm": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "confirm": { "type": "string", "minLength": 1 },
         "parameters": {
           "type": "array",
-          "maxItems": 12,
           "items": { "$ref": "#/$defs/commandParameter" }
         }
       }
@@ -152,10 +156,9 @@
         "defaultValue": { "type": ["string", "number", "boolean", "null"] },
         "options": {
           "type": "array",
-          "maxItems": 24,
           "items": { "$ref": "#/$defs/settingOption" }
         },
-        "placeholder": { "type": "string", "maxLength": 120 },
+        "placeholder": { "type": "string" },
         "min": { "type": "number" },
         "max": { "type": "number" },
         "step": { "type": "number", "exclusiveMinimum": 0 },
@@ -232,7 +235,7 @@
         "id": { "$ref": "#/$defs/contributionId" },
         "title": { "$ref": "#/$defs/title" },
         "description": { "$ref": "#/$defs/description" },
-        "inputPlaceholder": { "type": "string", "maxLength": 120 }
+        "inputPlaceholder": { "type": "string" }
       }
     },
     "settingOption": {
@@ -240,8 +243,8 @@
       "additionalProperties": false,
       "required": ["label", "value"],
       "properties": {
-        "label": { "type": "string", "minLength": 1, "maxLength": 80 },
-        "value": { "type": "string", "minLength": 1, "maxLength": 160 }
+        "label": { "type": "string", "minLength": 1 },
+        "value": { "type": "string", "minLength": 1 }
       }
     },
     "setting": {
@@ -254,8 +257,8 @@
         "description": { "$ref": "#/$defs/description" },
         "type": { "enum": ["string", "select", "boolean", "number", "color", "range"] },
         "defaultValue": { "type": ["string", "number", "boolean", "null"] },
-        "options": { "type": "array", "maxItems": 24, "items": { "$ref": "#/$defs/settingOption" } },
-        "placeholder": { "type": "string", "maxLength": 120 },
+        "options": { "type": "array", "items": { "$ref": "#/$defs/settingOption" } },
+        "placeholder": { "type": "string" },
         "min": { "type": "number" },
         "max": { "type": "number" },
         "step": { "type": "number", "exclusiveMinimum": 0 },
@@ -273,8 +276,8 @@
         "basePreset": { "type": "string", "minLength": 1, "maxLength": 80, "not": { "const": "FINAL" } },
         "light": { "type": "object" },
         "dark": { "type": "object" },
-        "preview": { "type": "string", "maxLength": 240 },
-        "swatches": { "type": "array", "maxItems": 6, "uniqueItems": true, "items": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" } }
+        "preview": { "type": "string" },
+        "swatches": { "type": "array", "uniqueItems": true, "items": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" } }
       }
     }
   }

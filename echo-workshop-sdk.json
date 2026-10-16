@@ -1,6 +1,6 @@
 {
   "sdkVersion": 1,
-  "packageVersion": "1.19.0",
+  "packageVersion": "1.20.0",
   "manifest": {
     "type": "echo-workshop-item",
     "schemaVersions": [1],
@@ -29,9 +29,18 @@
       "execution": "isolated-utility-process",
       "moduleExports": ["activate", "handle", "dispose"]
     },
+    "transition": {
+      "permission": "audio:transition",
+      "maximumWindowSeconds": 16,
+      "maximumChunkFrames": 4096,
+      "scheduling": "native-output-frames",
+      "preparationTimeoutMs": 15000
+    },
     "offlineProcessing": {
       "permissions": ["audio:offline-read", "fs:export"],
       "sampleFormat": "s16le",
+      "sampleFormats": ["s16le", "f32le"],
+      "seek": true,
       "sampleRateRange": [8000, 48000],
       "channels": [1, 2],
       "externalAssetDirectory": "assets/",
@@ -94,6 +103,7 @@
     }
   },
   "recipes": [
+    "afterglow-scenes",
     "css-theme",
     "custom-ui",
     "skin-theme",
@@ -124,6 +134,8 @@
   },
   "audioPluginAdapter": {
     "api": "echo.audio-plugin-adapter",
+    "contractFile": "contracts/audio-plugin-adapter.json",
+    "audioTransport": "unavailable",
     "protocolVersions": [1]
   }
 }

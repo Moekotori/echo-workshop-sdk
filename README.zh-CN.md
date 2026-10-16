@@ -1,10 +1,12 @@
 # ECHO 创意工坊 SDK
 
+第一次写插件，从[首个插件完整教程](./FIRST-PLUGIN.zh-CN.md)开始：创建、修改、检查、在 ECHO 本地试用。
+
 [![ECHO Workshop SDK CI](https://github.com/Moekotori/echo-workshop-sdk/actions/workflows/ci.yml/badge.svg)](https://github.com/Moekotori/echo-workshop-sdk/actions/workflows/ci.yml)
 
 [公开仓库](https://github.com/Moekotori/echo-workshop-sdk) · [最新版本](https://github.com/Moekotori/echo-workshop-sdk/releases/latest) · [私密报告安全问题](https://github.com/Moekotori/echo-workshop-sdk/security/advisories/new) · [English](./README.md)
 
-这是给作者用的便携工具箱。SDK 版本为 `1.19.0`；GitHub 发布资产和 Steam 起步包通过各自渠道发布。清单 schema `1`，插件 API `2`。本 SDK 采用 MIT 许可，本地创作需要 Node.js 20+，不发布到 npm。可下载的 `.tgz` 以 [GitHub Releases](https://github.com/Moekotori/echo-workshop-sdk/releases/latest) 实际列出的资产为准；源码改动不会自动生成发布资产。
+这是给作者用的便携工具箱。SDK 版本为 `1.20.0`；GitHub 发布资产和 Steam 起步包通过各自渠道发布。清单 schema `1`，插件 API `2`。本 SDK 采用 MIT 许可，本地创作需要 Node.js 20+，不发布到 npm。可下载的 `.tgz` 以 [GitHub Releases](https://github.com/Moekotori/echo-workshop-sdk/releases/latest) 实际列出的资产为准；源码改动不会自动生成发布资产。
 
 | 能力 | 最低 ECHO 版本 |
 | --- | --- |
@@ -13,8 +15,11 @@
 | 1.16 的独立主题/歌词/背景组合、动画库和面板外观控制 | `26.9.16` |
 | `system:full` 与 `trustedEntry` 完整系统权限插件 | `26.8.29`，且须订阅者明确批准 |
 | 编辑本地手动歌单、移除歌单条目（包含于 1.19） | 包含这两个操作的新版 ECHO 宿主；运行时先检查可用性 |
+| 原生波形、声道电平与可视化查询（1.20） | 包含这些接口的 ECHO 宿主；检查 `echo.host.getFeatureAvailability('audio:getVisualization')` 或运行时 `init.audioVisualizationLimits` |
 
 1.19 包含原 1.18 的改动，让应用内创作台从更小的插件模板起步，并在 `library:control` 下增加 `echo.library.updatePlaylist(playlistId, { name?, description? })` 与 `echo.library.removePlaylistItems(playlistId, itemIds)`。宿主只接受本地手动歌单；移除前核对条目归属并保留恢复记录。旧版 ECHO 中显示编辑入口前，先调用 `echo.host.getFeatureAvailability('library:updatePlaylist')`。
+
+1.20 在 `audio:spectrum` 下新增 `echo.audio.getVisualization({ waveformSamples: 2048, spectrum: false, levels: true })`，返回带正负号的单声道波形、native 各声道电平和宿主上限。主题与歌词运行时可查询相同数据，并通过 `echo:workshop-ui:audio-configure` 选择推送字段和间隔。参见[音频可视化创作说明](./lyrics-authoring.md)和[运行时类型](./echo-workshop-ui-runtime.d.ts)。便携预览没有 native 音频时返回空波形；安装 SDK 不会让旧版 ECHO 自动获得宿主能力。
 
 在 ECHO 创意工坊的**创作**页，先选目标，再填写内容 ID 和权利人：
 
@@ -80,6 +85,12 @@ scaffold . --preset cinema
 | `stylesheet` | 整包 CSS | `26.8.20` |
 | `runtime` | 沙箱 HTML/CSS/JS 自定义界面 | `26.8.20` |
 
+声明过的 PNG、JPEG、WebP、主题样式表和界面运行时文件不再设张数或字节配额。SVG、可执行文件和带有远程地址或脚本的样式表仍然拒绝。
+
+`media-session:control` 开放 Windows SMTC 与 Linux MPRIS：读取不含本机路径的会话状态、设置可用按钮和随机/重复、重启会话，并接收媒体键命令。其他平台返回 `unsupported-platform`。
+
+`companion:control` 控制桌面歌词、迷你播放器、桌宠和任务栏播放器。`sleep-timer:control` 控制睡眠定时器（1–720 分钟）。`presence:control` 只开关 Discord、Last.fm 和 ListenBrainz，不提供登录或令牌。`bridge:control` 只开关 HQPlayer、舞台桥、OBS、MQTT 和 Echo Link，状态不含地址、密码和配对信息。账号登录、Cookie、Spotify、下载和 MV 搜索仍然关闭。
+
 歌词 `--preset`：`editorial`（默认）、`compact`、`cinema`、`cover`。  
 可视化 `--preset`：`bars`（默认）、`wave`、`radial`。宿主没有 `particles`。  
 DSP `--preset`：`flat`（默认）、`vocal`、`bass`、`8bit`，都是官方 31 段；`8bit` 会声明一个由宿主执行的受限 chiptune 风格器，包含方波、三角低频和瞬态门控 LFSR 噪声层。工坊包负责请求的效果参数，Audio Core 负责实时执行和实际生效状态。它属于 PCM 处理；PCM 转 SDM 会先处理，而 Native DSD / DoP 直通不进入这条效果链。
@@ -135,7 +146,7 @@ node .\bin\echo-workshop-sdk.mjs fix .\my-theme
 
 `validate` 会拒绝私网、本机、通配、重复及畸形 `networkHosts`，域名声明必须具备 `network:request` 权限。请求只连接已验证的公网地址并保留 Host/TLS 身份；优先使用 HTTPS。
 
-便携 CLI 与 ECHO 宿主共用 `contracts/plugin-package-limits.json`。内层可执行/文本 `.echo` 包仍最多 32 个文件、单个 UTF-8 文件最多 512 KiB、序列化整包最多 2 MiB，扩展名限 `.css`、`.html`、`.js`、`.mjs`、`.json`。外层 `plugin-package` 工坊项可以在 `assets/` 下额外携带清单哈希覆盖的 `.wasm`、`.onnx`、`.bin`、`.data`，不设外层文件和整包字节配额；插件用 `new URL('./assets/model.onnx', location.href)` 这类相对 URL 读取，不能访问包外文件。`native-shell` 走单独的 `contracts/native-shell-limits.json`（512 文件、不设外层文件和整包字节配额）。官方 Steam 校验仍拒绝订阅者 `.exe` / `.dll`。共享契约都可通过包导出被外部工具直接 import。沙箱入口仍须为 `.js`；完整系统 `trustedEntry` 是单独声明的 `.mjs`，其它 `.mjs` 也可作为模块素材。内层插件 `apiVersion` 必须与外层 Workshop 清单的 `compatibility.pluginApiVersion` 完全一致。
+便携 CLI 与 ECHO 宿主共用 `contracts/plugin-package-limits.json`。内层可执行/文本 `.echo` 包取消文件数量、单个 UTF-8 文件字节和序列化整包字节配额，公开契约用 `null` 表示不限；扩展名为 `.css`、`.html`、`.js`、`.mjs`、`.json`。外层 `plugin-package` 工坊项可以在 `assets/` 下额外携带清单哈希覆盖的 `.wasm`、`.onnx`、`.bin`、`.data`，同样不设文件数量、文件及整包字节配额；二进制素材按需流式读取。插件用 `new URL('./assets/model.onnx', location.href)` 这类相对 URL 读取，不能访问包外文件。`native-shell` 走单独的 `contracts/native-shell-limits.json`（512 文件、不设外层文件和整包字节配额）。官方 Steam 校验仍拒绝订阅者 `.exe` / `.dll`。共享契约都可通过包导出被外部工具直接 import。沙箱入口仍须为 `.js`；完整系统 `trustedEntry` 是单独声明的 `.mjs`，其它 `.mjs` 也可作为模块素材。内层插件 `apiVersion` 必须与外层 Workshop 清单的 `compatibility.pluginApiVersion` 完全一致。
 
 整包 CSS 必须写在 `html[data-workshop-theme-pack="<id>"]` 下面。不能用 `FINAL`、`nyanCat`、`darkSideMoon` 当 `basePreset`。
 

@@ -83,9 +83,9 @@ const idPattern = /^[a-z0-9](?:[a-z0-9._-]{1,78}[a-z0-9])?$/u;
 const sha256Pattern = /^[a-f0-9]{64}$/u;
 const pluginPackageLimits = JSON.parse(await readFile(resolve(sdkRoot, 'contracts', 'plugin-package-limits.json'), 'utf8'));
 const pluginApiContract = JSON.parse(await readFile(resolve(sdkRoot, 'contracts', 'plugin-api.json'), 'utf8'));
-const maximumPluginPackageBytes = Number(pluginPackageLimits.maximumPackageBytes);
-const maximumPluginFiles = Number(pluginPackageLimits.maximumFiles);
-const maximumPluginFileBytes = Number(pluginPackageLimits.maximumFileBytes);
+const maximumPluginPackageBytes = pluginPackageLimits.maximumPackageBytes ?? Infinity;
+const maximumPluginFiles = pluginPackageLimits.maximumFiles ?? Infinity;
+const maximumPluginFileBytes = pluginPackageLimits.maximumFileBytes ?? Infinity;
 const allowedSourceExtensions = new Set(pluginPackageLimits.supportedAssetExtensions);
 const externalAssetPrefix = String(pluginPackageLimits.externalAssetPrefix);
 const maximumExternalAssetFileBytes = pluginPackageLimits.maximumExternalAssetFileBytes;
@@ -93,7 +93,7 @@ const maximumExternalAssetBytes = pluginPackageLimits.maximumExternalAssetBytes;
 const allowedExternalAssetExtensions = new Set(pluginPackageLimits.supportedExternalAssetExtensions);
 const nativeShellLimits = JSON.parse(await readFile(resolve(sdkRoot, 'contracts', 'native-shell-limits.json'), 'utf8'));
 const maximumNativeShellPackageBytes = nativeShellLimits.maximumPackageBytes;
-const maximumNativeShellFiles = Number(nativeShellLimits.maximumFiles);
+const maximumNativeShellFiles = nativeShellLimits.maximumFiles ?? Infinity;
 const maximumNativeShellFileBytes = nativeShellLimits.maximumFileBytes;
 const allowedNativeShellExtensions = new Set(nativeShellLimits.supportedAssetExtensions);
 const previewPng = createListingPreviewPng();
@@ -179,8 +179,10 @@ const collectSourceFiles = async (root, current = root) => {
     if (entry.isDirectory()) { output.push(...await collectSourceFiles(root, path)); continue; }
     if (!entry.isFile()) fail(`Special source file is not allowed: ${entry.name}`);
     const relativePath = toSlash(relative(root, path));
-    if (!allowedSourceExtensions.has(extname(relativePath).toLowerCase())) fail(`Unsupported source file: ${relativePath}`);
-    const content = await readFile(path, 'utf8');
+    if (!allowedSourceExtensions.has('*') && !allowedSourceExtensions.has(extname(relativePath).toLowerCase())) fail(`Unsupported source file: ${relativePath}`);
+    let content;
+    try { content = new TextDecoder('utf-8', { fatal: true }).decode(await readFile(path)); }
+    catch { fail(`Source must be UTF-8 text; put binary payloads in content/assets: ${relativePath}`); }
     if (Buffer.byteLength(content) > maximumPluginFileBytes) {
       fail(`Source file exceeds ${maximumPluginFileBytes} bytes: ${relativePath}`);
     }
@@ -201,7 +203,7 @@ const collectContentInventory = async (root, current = root, kind = null) => {
     const fileStat = await lstat(path);
     const normalizedPath = relativePath.toLowerCase();
     const isExternalPluginAsset = kind === 'plugin-package' && normalizedPath.startsWith(externalAssetPrefix);
-    if (isExternalPluginAsset && !allowedExternalAssetExtensions.has(extname(relativePath).toLowerCase())) {
+    if (isExternalPluginAsset && !allowedExternalAssetExtensions.has('*') && !allowedExternalAssetExtensions.has(extname(relativePath).toLowerCase())) {
       fail(`Unsupported external plug-in asset: ${relativePath}`);
     }
     if (kind === 'native-shell' && !allowedNativeShellExtensions.has(extname(relativePath).toLowerCase())) {
@@ -225,7 +227,7 @@ const validatePackage = (value, expectedId, expectedApiVersion) => {
   const paths = new Set();
   for (const file of value.files) {
     if (!file || !isSafeRelativePath(file.path) || typeof file.content !== 'string'
-      || !allowedSourceExtensions.has(extname(file.path).toLowerCase())
+      || (!allowedSourceExtensions.has('*') && !allowedSourceExtensions.has(extname(file.path).toLowerCase()))
       || Buffer.byteLength(file.content) > maximumPluginFileBytes) fail('Plug-in file is invalid');
     const key = file.path.toLowerCase();
     if (paths.has(key)) fail(`Duplicate plug-in file: ${file.path}`);
@@ -257,7 +259,8 @@ const validateProject = async (rootInput) => {
   if (!versionPattern.test(manifest.compatibility?.minEchoVersion)) fail('Compatibility declaration is invalid');
   if (manifest.content.kind === 'plugin-package' && ![1, 2].includes(manifest.compatibility?.pluginApiVersion)) fail('Plug-in compatibility declaration is invalid');
   if (!Array.isArray(manifest.files) || manifest.files.length < 1
-    || manifest.files.length > (manifest.content.kind === 'native-shell' ? maximumNativeShellFiles : 512)) {
+    || manifest.files.length > (manifest.content.kind === 'native-shell' ? maximumNativeShellFiles
+      : manifest.content.kind === 'plugin-package' ? maximumPluginFiles : Infinity)) {
     fail('Outer manifest file inventory is invalid');
   }
   const inventory = await collectContentInventory(contentRoot, contentRoot, manifest.content.kind);
@@ -340,6 +343,7 @@ const copyPortableSdk = async (echoSdkRoot) => {
   await cp(resolve(sdkRoot, 'echo-workshop-animation-library.d.ts'), resolve(echoSdkRoot, 'echo-workshop-animation-library.d.ts'));
   await cp(resolve(sdkRoot, 'echo-workshop-afterglow.d.ts'), resolve(echoSdkRoot, 'echo-workshop-afterglow.d.ts'));
   await cp(resolve(sdkRoot, 'afterglow-scenes.md'), resolve(echoSdkRoot, 'afterglow-scenes.md'));
+  await cp(resolve(sdkRoot, 'FIRST-PLUGIN.zh-CN.md'), resolve(echoSdkRoot, 'FIRST-PLUGIN.zh-CN.md'));
   await cp(resolve(sdkRoot, 'bin', 'echo-workshop-sdk.mjs'), resolve(echoSdkRoot, 'bin', 'echo-workshop-sdk.mjs'));
   // Steam's unpacked SDK omits shell launchers; Node and npm use the .mjs entry.
   try {
@@ -776,6 +780,7 @@ const fixProject = async (rootInput) => {
 
 const doctor = async () => {
   const required = [
+    'FIRST-PLUGIN.zh-CN.md',
     'echo-workshop-sdk.json',
     'echo-workshop-plugin.d.ts',
     'echo-workshop-ui-runtime.d.ts',
@@ -853,9 +858,9 @@ const versionSurface = async () => {
     stylesheetMinEchoVersion: descriptor.theme.stylesheetMinEchoVersion,
     animationLibrary: descriptor.animationLibrary,
     pluginPackageLimits: {
-      maximumFiles: maximumPluginFiles,
-      maximumFileBytes: maximumPluginFileBytes,
-      maximumPackageBytes: maximumPluginPackageBytes,
+      maximumFiles: pluginPackageLimits.maximumFiles,
+      maximumFileBytes: pluginPackageLimits.maximumFileBytes,
+      maximumPackageBytes: pluginPackageLimits.maximumPackageBytes,
       supportedAssetExtensions: pluginPackageLimits.supportedAssetExtensions,
       externalAssetPrefix,
       maximumExternalAssetFileBytes,
@@ -887,8 +892,8 @@ const formatVersionSurface = (surface) => [
   `UI runtime protocol: ${surface.uiRuntimeProtocolVersion} · stylesheet/runtime min ECHO: ${surface.stylesheetMinEchoVersion}`,
   `Animation library schema: ${surface.animationLibrary.schemaVersion} · min ECHO: ${surface.animationLibrary.minimumEchoVersion} · ${surface.animationLibrary.properties.length} bounded properties · ${surface.animationLibrary.clipDirections.length} reveals · ${surface.animationLibrary.staggerOrigins.length} stagger orders`,
   `Content kinds: ${surface.contentKinds.join(', ')}`,
-  `Plug-in limits: ${surface.pluginPackageLimits.maximumFiles} files · ${surface.pluginPackageLimits.maximumFileBytes} B/file · ${surface.pluginPackageLimits.maximumPackageBytes} B/package`,
-  `Native-shell limits: ${surface.nativeShellLimits.maximumFiles} files · no content byte quota`,
+  `Plug-in limits: ${surface.pluginPackageLimits.maximumFiles ?? 'no quota on'} files · ${surface.pluginPackageLimits.maximumFileBytes === null ? 'no file byte quota' : `${surface.pluginPackageLimits.maximumFileBytes} B/file`} · ${surface.pluginPackageLimits.maximumPackageBytes === null ? 'no package byte quota' : `${surface.pluginPackageLimits.maximumPackageBytes} B/package`}`,
+  `Native-shell limits: ${Number.isFinite(surface.nativeShellLimits.maximumFiles) ? surface.nativeShellLimits.maximumFiles : "no quota on"} files · no content byte quota`,
   `Recipes: ${surface.recipes.length} · guide topics: ${surface.guideTopics.length} · snippets: ${surface.snippets.length} (per-kind entries/tags via --json)`,
   `Machine-readable contracts: ${surface.contracts.join(', ')}`,
 ].join('\n');

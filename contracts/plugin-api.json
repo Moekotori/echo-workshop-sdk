@@ -85,6 +85,10 @@
       "method": "echo.audio.getSpectrum",
       "permission": "audio:spectrum"
     },
+    "audio:getVisualization": {
+      "method": "echo.audio.getVisualization",
+      "permission": "audio:spectrum"
+    },
     "audio:dsp:getModule": {
       "method": "echo.audio.dsp.getModule",
       "permission": "audio:dsp-read"
@@ -277,6 +281,10 @@
       "method": "echo.network.request/get/post",
       "permission": "network:request"
     },
+    "network:cancel": {
+      "method": "echo.network.cancel",
+      "permission": "network:request"
+    },
     "agent:run": {
       "method": "echo.agents.run",
       "permission": "agent:runtime"
@@ -316,6 +324,104 @@
     "ui:notify": {
       "method": "echo.ui.notify",
       "permission": null
+    },
+    "playback:getRate": {
+      "method": "echo.playback.getRate",
+      "permission": "playback:read"
+    },
+    "playback:setRate": {
+      "method": "echo.playback.setRate",
+      "permission": "playback:control"
+    },
+    "window:getDesktopWall": {
+      "method": "echo.window.getDesktopWall",
+      "permission": "window:desktop-wall"
+    },
+    "window:setDesktopWall": {
+      "method": "echo.window.setDesktopWall",
+      "permission": "window:desktop-wall"
+    },
+    "media-session:getStatus": {
+      "method": "echo.mediaSession.getStatus",
+      "permission": "media-session:control"
+    },
+    "media-session:setEnabledActions": {
+      "method": "echo.mediaSession.setEnabledActions",
+      "permission": "media-session:control"
+    },
+    "media-session:setPlaybackModes": {
+      "method": "echo.mediaSession.setPlaybackModes",
+      "permission": "media-session:control"
+    },
+    "media-session:restart": {
+      "method": "echo.mediaSession.restart",
+      "permission": "media-session:control"
+    },
+    "companion:getDesktopLyrics": { "method": "echo.companion.desktopLyrics.getState", "permission": "companion:control" },
+    "companion:showDesktopLyrics": { "method": "echo.companion.desktopLyrics.show", "permission": "companion:control" },
+    "companion:hideDesktopLyrics": { "method": "echo.companion.desktopLyrics.hide", "permission": "companion:control" },
+    "companion:setDesktopLyricsLocked": { "method": "echo.companion.desktopLyrics.setLocked", "permission": "companion:control" },
+    "companion:resetDesktopLyrics": { "method": "echo.companion.desktopLyrics.reset", "permission": "companion:control" },
+    "companion:getMiniPlayer": { "method": "echo.companion.miniPlayer.getState", "permission": "companion:control" },
+    "companion:showMiniPlayer": { "method": "echo.companion.miniPlayer.show", "permission": "companion:control" },
+    "companion:hideMiniPlayer": { "method": "echo.companion.miniPlayer.hide", "permission": "companion:control" },
+    "companion:setMiniPlayerLocked": { "method": "echo.companion.miniPlayer.setLocked", "permission": "companion:control" },
+    "companion:setMiniPlayerLayout": { "method": "echo.companion.miniPlayer.setLayout", "permission": "companion:control" },
+    "companion:resetMiniPlayer": { "method": "echo.companion.miniPlayer.reset", "permission": "companion:control" },
+    "companion:getPet": { "method": "echo.companion.pet.getState", "permission": "companion:control" },
+    "companion:showPet": { "method": "echo.companion.pet.show", "permission": "companion:control" },
+    "companion:hidePet": { "method": "echo.companion.pet.hide", "permission": "companion:control" },
+    "companion:setPetScale": { "method": "echo.companion.pet.setScale", "permission": "companion:control" },
+    "companion:resetPet": { "method": "echo.companion.pet.reset", "permission": "companion:control" },
+    "companion:getTaskbar": { "method": "echo.companion.taskbar.getState", "permission": "companion:control" },
+    "companion:showTaskbar": { "method": "echo.companion.taskbar.show", "permission": "companion:control" },
+    "companion:hideTaskbar": { "method": "echo.companion.taskbar.hide", "permission": "companion:control" },
+    "companion:setTaskbarEnabled": { "method": "echo.companion.taskbar.setEnabled", "permission": "companion:control" },
+    "sleep-timer:getStatus": { "method": "echo.sleepTimer.getStatus", "permission": "sleep-timer:control" },
+    "sleep-timer:start": { "method": "echo.sleepTimer.start", "permission": "sleep-timer:control" },
+    "sleep-timer:cancel": { "method": "echo.sleepTimer.cancel", "permission": "sleep-timer:control" },
+    "presence:getDiscord": { "method": "echo.presence.discord.getStatus", "permission": "presence:control" },
+    "presence:setDiscordEnabled": { "method": "echo.presence.discord.setEnabled", "permission": "presence:control" },
+    "presence:getLastFm": { "method": "echo.presence.lastfm.getStatus", "permission": "presence:control" },
+    "presence:setLastFmEnabled": { "method": "echo.presence.lastfm.setEnabled", "permission": "presence:control" },
+    "presence:setLastFmNowPlaying": { "method": "echo.presence.lastfm.setNowPlayingEnabled", "permission": "presence:control" },
+    "presence:setLastFmScrobble": { "method": "echo.presence.lastfm.setScrobbleEnabled", "permission": "presence:control" },
+    "presence:disconnectLastFm": { "method": "echo.presence.lastfm.disconnect", "permission": "presence:control" },
+    "presence:getListenBrainz": { "method": "echo.presence.listenBrainz.getStatus", "permission": "presence:control" },
+    "presence:setListenBrainz": { "method": "echo.presence.listenBrainz.setFlags", "permission": "presence:control" },
+    "presence:disconnectListenBrainz": { "method": "echo.presence.listenBrainz.disconnect", "permission": "presence:control" },
+    "bridge:getStage": { "method": "echo.bridge.stage.getStatus", "permission": "bridge:control" },
+    "bridge:setStage": { "method": "echo.bridge.stage.setEnabled", "permission": "bridge:control" },
+    "bridge:getObsBrowser": { "method": "echo.bridge.obsBrowser.getStatus", "permission": "bridge:control" },
+    "bridge:setObsBrowser": { "method": "echo.bridge.obsBrowser.update", "permission": "bridge:control" },
+    "bridge:getObsWebSocket": { "method": "echo.bridge.obsWebSocket.getStatus", "permission": "bridge:control" },
+    "bridge:setObsWebSocketEnabled": { "method": "echo.bridge.obsWebSocket.setEnabled", "permission": "bridge:control" },
+    "bridge:getMqtt": { "method": "echo.bridge.mqtt.getStatus", "permission": "bridge:control" },
+    "bridge:setMqttEnabled": { "method": "echo.bridge.mqtt.setEnabled", "permission": "bridge:control" },
+    "bridge:getHqPlayer": { "method": "echo.bridge.hqPlayer.getStatus", "permission": "bridge:control" },
+    "bridge:setHqPlayerEnabled": { "method": "echo.bridge.hqPlayer.setEnabled", "permission": "bridge:control" },
+    "bridge:sendHqPlayerControl": { "method": "echo.bridge.hqPlayer.sendLastControl", "permission": "bridge:control" },
+    "bridge:getEchoLink": { "method": "echo.bridge.echoLink.getStatus", "permission": "bridge:control" },
+    "bridge:setEchoLinkEnabled": { "method": "echo.bridge.echoLink.setEnabled", "permission": "bridge:control" },
+    "audio:offline:seek": {
+      "method": "echo.audio.offline.seek",
+      "permission": "audio:offline-read"
+    },
+    "playback:nextAt": {
+      "method": "echo.playback.nextAt",
+      "permission": "playback:control"
+    },
+    "audio:transition:registerProvider": {
+      "method": "echo.audio.transition.registerProvider",
+      "permission": "audio:transition"
+    },
+    "audio:transition:unregisterProvider": {
+      "method": "echo.audio.transition.unregisterProvider",
+      "permission": "audio:transition"
+    },
+    "queue:reorder": {
+      "method": "echo.queue.reorder",
+      "permission": "queue:control"
     }
   },
   "registrations": {
@@ -350,7 +456,11 @@
     "queue:changed": "queue:read",
     "library:changed": "library:read",
     "library:liked-changed": "library:read",
-    "settings:changed": "fs:plugin"
+    "settings:changed": "fs:plugin",
+    "transition:committed": "playback:read",
+    "media-session:command": "media-session:control",
+    "companion:state": "companion:control",
+    "sleep-timer:tick": "sleep-timer:control"
   },
   "commonErrors": {
     "panel-context-required": {

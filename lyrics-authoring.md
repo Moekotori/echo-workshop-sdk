@@ -99,8 +99,43 @@
 `echo:workshop-ui:audio` 推送当前曲 `trackId` 和有权限读取的字段。
 `playback:read` 允许 `audio`（codec、文件 sampleRate、bitDepth、实际 deviceSampleRate、
 outputDevice 显示名称、outputBackend、outputMode、replayGainDb/replayGainActive）；
-`audio:spectrum` 允许 `levels`（peakDb/rmsDb/source）与 `spectrum`。未获能力的字段不发送。
+`audio:spectrum` 允许 `levels`（peakDb/rmsDb/source/channels）、`waveform` 与 `spectrum`。未获能力的字段不发送。
+`levels.channels` 按 native 输出声道顺序提供全部声道的 Peak/RMS（dBFS），最多 32 路：立体声为左、右，单声道只有一项，缺少真实声道遥测时为空数组。
+`waveform` 为 `{samples, sampleRate, channels: 1, source: "native_post_dsp"}` 或 `null`；
+`samples` 默认提供 native 分析窗口最新的 256 个单声道时域采样点，保留正负号及超过 `[-1, 1]` 的有限幅值，
+`sampleRate` 是分析降采样后的实际采样率。它是间断的可视化快照；暂停或宿主不支持时为 `null`，不根据频谱伪造。
+作者可在 `echo:workshop-ui:ready` 中附加 `audioVisualization: { waveformSamples: 2048 }`，
+按需选择 0～2048 点；0 表示不发送波形，可再次发送 ready 调整。作者自行决定示波器缩放、削波显示和可视分析方式。
+还可配置 `intervalMs: 16～1000`、`spectrum: false`、`levels: false`，按需减少字段或提高推送频率；
+实际更新受 native 状态事件、可见性和渲染预算约束。完整主题音频事件默认 100 ms，歌词背景默认 33 ms。
+运行中发送 `{type:"echo:workshop-ui:audio-configure",audioVisualization:{waveformSamples:1024,intervalMs:33,spectrum:false}}`
+即可替换配置，无需重新 ready；未填写的选项恢复默认值。
+发送命令 `audio:getVisualization` 可即时查询，payload 使用同样的波形及字段选项，结果从 `echo:workshop-ui:result.value` 读取，
+不会修改推送配置。`init.audioVisualizationLimits` 和快照 `visualizationLimits` 声明宿主上限；普通插件可调用
+`echo.audio.getVisualization({waveformSamples:2048,spectrum:false})`，同样要求 `audio:spectrum`。
+独立歌词背景（`runtime.presentation: "lyrics-background"`）在 `echo:workshop-ui:state` 中接收相同的 `levels` 与 `waveform`；完整主题和歌词视图使用 `echo:workshop-ui:audio`。两种形式共用本节参数及[运行时类型声明](./echo-workshop-ui-runtime.d.ts)。
 这是可选的协议 1 扩展；旧客户端不提供音频信息时作者应显示不可用，不能从模拟数据补齐。
+
+音频信息还可包含 `channels` 与 `bitrate`（bit/s）。当前曲快照可提供
+`trackNo`、`genre`、`bpm`、`bpmEstimated` 与 `beatOffsetMs`；这些元数据只在变化时随时钟发送。
+
+### 精细 Canvas 音频统计
+
+`init.features` 中的 `canvas-audio` 表示宿主提供以下 `audio:canvas` 只读接口。
+该能力独立于普通 `audio:spectrum`，不会为本样式额外开启原生 128 段频谱分析：
+
+- `audio:getCanvasProfile` `{trackId}`：当前本地曲的原版 1400 段波形、480 段 RMS、
+  估算响度/动态范围、文件字节数与扩展名；或 `pending / unavailable`。
+- `audio:getCanvasSpectrum` `{trackId,positionSeconds}`：最多 32 个频谱帧，60 Hz 时间轴，
+  每帧 8192 个 byte 频率值以 base64 编码。参数为 16384 点 FFT、Blackman 窗、
+  0.8 平滑、−100 至 −30 dB 映射；这是原文件的显示分析，不能当成实时 DSP 输出电平。
+- `audio:canvasHeartbeat` `{trackId}` 与 `audio:releaseCanvas`：维护/释放当前可见视图的租约。
+
+时钟仍由 Audio Core 提供。位置不得离当前宿主进度超过 3 秒，只能访问当前本地曲，
+不能传路径、读取其它曲或得到 PCM。Native FFmpeg 解码与统计在独立 worker 中分批完成，
+不保存整曲音频；最多两个租约，受 memory broker、可见性、空闲与解码超时限制。
+离开页面、切歌、隐藏或内存压力上升会停止任务。旧宿主未声明 `canvas-audio` 时不要调用，
+也不要把低分辨率频谱或归一化能量数据当成同一种分析。
 
 电平单位为 dBFS：`native_post_dsp` 表示宿主原生 DSP 后测量，
 `pre_native_estimated_post_dsp` 在本事件中只提供其 **输入 Peak/RMS**，不提供估算输出。

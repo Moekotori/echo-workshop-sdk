@@ -1,5 +1,71 @@
 # ECHO Workshop SDK changelog
 
+## 1.20.0 — 2026-10-16 (source update; release assets and Steam starter not updated)
+
+- Added `echo.audio.getVisualization(options)` and the matching theme/lyrics query under `audio:spectrum`. Snapshots include up to 2048 signed mono time-domain samples, up to 32 native channel Peak/RMS meters, optional spectrum, and host capability limits.
+- Theme and lyrics runtimes can select waveform length, push spacing and returned fields at ready time or through `echo:workshop-ui:audio-configure`. Existing defaults remain 256 samples, with host-owned timing and visibility limits.
+- Waveform amplitudes retain finite values outside `[-1, 1]`; the host does not fabricate channel meters or waveform samples when unavailable. The portable mock and UI preview expose the new API with an unavailable native waveform.
+- Updated public TypeScript declarations, the action/permission contract and bilingual entry documentation. Authors must check runtime feature availability; this source update does not claim that an older installed ECHO host supports the new telemetry.
+- Included the existing audio-transition authoring guide in the public export and refreshed the literary-Chinese example manifest after its earlier content cleanup, so standalone example validation succeeds.
+
+## Source follow-up — 2026-10-14 author onboarding (not published)
+
+- Added a complete Chinese first-plugin tutorial and `guide first-plugin`, covering source edits, checks, mock development and local ECHO import before publication.
+- Generated plugin customization guides now explain the first visible change and the edit/check/reimport loop. Portable project SDK copies include the tutorial.
+- The in-app creator can edit packaged scripts, HTML and CSS directly, with local trial separate from publishing. Basic starter panels follow host theme context and display meaningful running/results states.
+
+## Source follow-up — 2026-10-10 host controls (not published)
+
+- Added `companion:control`, `sleep-timer:control`, `presence:control` and
+  `bridge:control`. Approved plug-ins can drive companion windows, the sleep
+  timer, Discord / Last.fm / ListenBrainz switches, and HQPlayer, stage, OBS,
+  MQTT and Echo Link enablement. Returned status omits paths, addresses,
+  credentials, topics and pairing material. Account login, cookies, Spotify,
+  downloads and MV search stay closed.
+
+## Source follow-up — 2026-10-10 media session (not published)
+
+- Added `media-session:control`. Approved plug-ins can read a path-free
+  Windows SMTC or Linux MPRIS status, set enabled transport buttons and
+  shuffle/repeat modes, restart the session, and receive media-key commands.
+  Other platforms report `unsupported-platform`. Account, Discord, Last.fm
+  and device-control surfaces stay closed.
+
+## Source follow-up — 2026-10-10 (not published)
+
+- Removed the theme and lyrics-scene product quotas on packaged raster count,
+  raster bytes, UI runtime file bytes and theme stylesheet bytes. Declared
+  PNG/JPEG/WebP files stay hash-checked; image type is read from the file
+  header. SVG, executable extensions and unsafe stylesheet constructs stay
+  rejected. One active stylesheet remains cached for the selected theme.
+
+## Source follow-up — 2026-10-09 (not published)
+
+- Removed declaration quotas for settings/options, menus, panels, Agents,
+  providers, columns and themes, authored text clipping and sidebar page hiding.
+- Opened plug-in UTF-8 data extensions and streamed external assets, including
+  fonts/SVG and opaque binaries. SDK and host use the same wildcard contract.
+- Generalized acknowledged chunks to typed requests, invocation inputs and
+  commands/Agents/providers; removed Agent/enhancement aggregate byte/count
+  ceilings and extra private-storage quotas. Enhancement candidates use pages
+  without discarding later choices. Static inventories and host/dependency lists
+  no longer have fixed count quotas. Runtime execution budgets remain.
+
+## Source follow-up — 2026-10-08 (not published)
+
+- Added full normalized lyrics queries and lossless original `providerResult`
+  results, including raw responses, secondary lyrics and nullable metadata.
+  Lyrics result counts, text and aggregate payloads are no longer truncated.
+- Large HTTP/lyrics payloads use acknowledged chunks with bounded active
+  transfers and lifecycle cleanup. HTTP text/URL/body byte ceilings are removed.
+- Added scoped `echo.network.cancel(requestId)`, original-provider Origin and
+  User-Agent headers, and a separate complete-lookup HTTP request budget.
+
+- Removed plug-in package byte, text-file byte and file-count quotas. Public
+  quota fields are null, including outer plug-in inventories. ZIP import,
+  trusted entries and manifest reads no longer reject those larger packages.
+  SDK schemas and host checks agree; hashes, paths and permissions remain checked.
+
 ## 1.19.0 — 2026-09-30
 
 - Added data-only Afterglow scene packs through the existing `lyrics-style` kind: seven drawing primitives, palette colours, simple motion, and mixed or pack-only rotation. The host retains lyrics, playback, transport and quality scheduling.

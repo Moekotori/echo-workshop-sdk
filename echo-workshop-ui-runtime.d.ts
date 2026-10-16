@@ -21,6 +21,7 @@ type EchoWorkshopUiCapability =
   | 'lyrics:read'
   | 'lyrics:match'
   | 'audio:spectrum'
+  | 'audio:canvas'
   | 'storage';
 
 type EchoWorkshopUiCommand =
@@ -68,6 +69,12 @@ type EchoWorkshopUiCommand =
   | 'lyrics:get'
   | 'lyrics:matchAmll'
   | 'audio:getSpectrum'
+  | 'audio:getVisualization'
+  /** audio:canvas; current local track only, host-owned bounded Canvas analysis. */
+  | 'audio:getCanvasProfile'
+  | 'audio:getCanvasSpectrum'
+  | 'audio:canvasHeartbeat'
+  | 'audio:releaseCanvas'
   | 'queue:get'
   | 'queue:playTrack'
   | 'queue:enqueueTrack'
@@ -100,6 +107,14 @@ interface EchoWorkshopUiTrack {
   durationSeconds?: number | null;
   coverUrl?: string | null;
   liked?: boolean;
+  trackNo?: number | null;
+  genre?: string | null;
+  bpm?: number | null;
+  bpmEstimated?: boolean;
+  beatOffsetMs?: number | null;
+  sampleRate?: number | null;
+  bitDepth?: number | null;
+  bitrate?: number | null;
 }
 
 interface EchoWorkshopUiAppearance {
@@ -124,9 +139,28 @@ interface EchoWorkshopUiLyricsPeek {
   translation: string | null;
 }
 
+interface EchoWorkshopUiAudioVisualizationOptions {
+  waveformSamples?: number;
+  /** Requested minimum spacing, 16..1000 ms. Actual cadence follows host updates and render budget. */
+  intervalMs?: number;
+  spectrum?: boolean;
+  levels?: boolean;
+}
+interface EchoWorkshopUiAudioVisualizationLimits {
+  maximumWaveformSamples: number; maximumMeterChannels: number;
+  minimumIntervalMs: number; maximumIntervalMs: number;
+  waveformLayout: 'mono'; continuous: false;
+}
+interface EchoWorkshopUiAudioConfigureMessage {
+  type: 'echo:workshop-ui:audio-configure';
+  audioVisualization: EchoWorkshopUiAudioVisualizationOptions;
+}
 interface EchoWorkshopUiReadyMessage {
   type: 'echo:workshop-ui:ready';
   protocolVersion?: 1;
+  /** Optional native waveform precision. Default 256; integer 0..2048.
+   * 0 omits waveform snapshots. Requires audio:spectrum. May be renegotiated via ready. */
+  audioVisualization?: EchoWorkshopUiAudioVisualizationOptions;
 }
 
 interface EchoWorkshopUiCommandMessage {
@@ -143,7 +177,8 @@ interface EchoWorkshopUiInitMessage {
   capabilities: EchoWorkshopUiCapability[];
   presentation?: 'shell' | 'lyrics-background' | 'lyrics-view';
   appearance?: EchoWorkshopUiAppearance;
-  features?: Array<'lyrics-events' | 'clock' | 'audio-events' | 'lyrics-interaction'>;
+  features?: Array<'lyrics-events' | 'clock' | 'audio-events' | 'lyrics-interaction' | 'canvas-audio'>;
+  audioVisualizationLimits?: EchoWorkshopUiAudioVisualizationLimits;
   /** Lattice desktop extension only; the host owns Windows desktop attachment. */
   desktop?: boolean;
   bottomInset?: number;
@@ -191,6 +226,11 @@ interface EchoWorkshopUiStateMessage {
     transient: number;
     state: string;
   };
+  /** Lyrics backgrounds with audio:spectrum receive these on state messages. */
+  visualization?: Required<EchoWorkshopUiAudioVisualizationOptions>;
+  visualizationLimits?: EchoWorkshopUiAudioVisualizationLimits;
+  levels?: EchoWorkshopUiAudioMessage['levels'];
+  waveform?: EchoWorkshopUiAudioMessage['waveform'];
 }
 
 interface EchoWorkshopUiResultMessage<T = unknown> {
@@ -213,6 +253,7 @@ type EchoWorkshopUiHostMessage =
   | EchoWorkshopUiAudioMessage;
 
 type EchoWorkshopUiFrameMessage =
+  | EchoWorkshopUiAudioConfigureMessage
   | EchoWorkshopLyricsInteraction
   | EchoWorkshopUiReadyMessage
   | EchoWorkshopUiCommandMessage
@@ -267,7 +308,7 @@ interface EchoWorkshopUiClockMessage {
   type: 'echo:workshop-ui:clock'; protocolVersion: 1;
   /** Included on song/metadata changes and ready handshake, omitted on ordinary clock ticks.
    * Apply it together with the clock so switching identity cannot briefly erase artwork/title. */
-  currentTrack?: { id: string; title: string; artist: string; album: string; coverUrl: string | null; durationSeconds: number } | null;
+  currentTrack?: EchoWorkshopUiTrack | null;
   clock: {
     currentTrackId: string | null; state: string;
     positionSeconds: number; durationSeconds: number; playbackRate: number;
@@ -278,23 +319,38 @@ interface EchoWorkshopUiClockMessage {
 }
 interface EchoWorkshopUiPingMessage { type: 'echo:workshop-ui:ping'; protocolVersion: 1; }
 /** Existing capabilities: audio metadata needs playback:read, meters/spectrum need audio:spectrum.
- * At most 10 Hz from existing Audio Core status. No PCM, device IDs or local paths.
+ * Defaults to 10 Hz (backgrounds roughly 30 Hz); configurable spacing follows Audio Core updates and the render budget.
+ * No playback PCM stream, device IDs or local paths.
  */
 interface EchoWorkshopUiAudioMessage {
   type: 'echo:workshop-ui:audio'; protocolVersion: 1; trackId: string | null;
+  visualization?: Required<EchoWorkshopUiAudioVisualizationOptions>;
+  visualizationLimits?: EchoWorkshopUiAudioVisualizationLimits;
   audio?: {
     codec: string | null; sampleRate: number | null; bitDepth: number | null;
+    channels: number | null; bitrate: number | null;
     deviceSampleRate: number | null; outputDevice: string | null;
     outputBackend: string | null; outputMode: string | null; replayGainDb: number | null;
     replayGainActive: boolean | null;
   } | null;
   levels?: {
-    /** dBFS; input before native DSP unless source is native_post_dsp. Never independent L/R. */
+    /** dBFS; input before native DSP unless source is native_post_dsp. */
     peakDb: number | null; rmsDb: number | null;
     source: 'native_post_dsp' | 'pre_native_estimated_post_dsp' | null;
+    /** All native output channels, up to 32, in native order: [left, right] for stereo; one entry for mono.
+     * Empty if per-channel native telemetry is unavailable. Never synthesize a missing channel. */
+    channels: { peakDb: number | null; rmsDb: number | null }[];
   };
+  /** Latest signed mono samples from the native analysis window: default 256, up to 2048.
+   * Finite amplitudes are preserved, including values beyond [-1, 1].
+   * sampleRate is the effective analysis rate, not necessarily the file rate.
+   * Null when paused or native waveform telemetry is unavailable. Not continuous audio. */
+  waveform?: { samples: number[]; sampleRate: number; channels: 1; source: 'native_post_dsp' } | null;
   spectrum?: EchoWorkshopUiStateMessage['spectrum'];
 }
 interface EchoWorkshopUiPongMessage { type: 'echo:workshop-ui:pong'; protocolVersion: 1; }
 interface EchoWorkshopUiErrorMessage { type: 'echo:workshop-ui:error'; protocolVersion: 1; }
+
 type EchoWorkshopUiLyricsResult = EchoWorkshopUiResultMessage<EchoWorkshopUiLyrics | null>;
+/** audio:getVisualization returns a snapshot, without event envelope fields. */
+type EchoWorkshopUiAudioVisualizationResult = EchoWorkshopUiResultMessage<Omit<EchoWorkshopUiAudioMessage, 'type' | 'protocolVersion'>>;

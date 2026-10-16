@@ -2,7 +2,95 @@
 
 type EchoWorkshopUnsubscribe = () => void;
 
+type EchoWorkshopMediaSessionCommand =
+  | 'play'
+  | 'pause'
+  | 'playPause'
+  | 'previous'
+  | 'next'
+  | 'stop'
+  | { type: 'seek'; positionSeconds: number }
+  | { type: 'setShuffle'; enabled: boolean }
+  | { type: 'setRepeat'; mode: 'none' | 'track' | 'list' };
+
+interface EchoWorkshopMediaSessionStatus {
+  transport: 'smtc' | 'mpris';
+  enabled: boolean;
+  hostState: string;
+  playbackState: string | null;
+  positionSeconds: number | null;
+  durationSeconds: number | null;
+  enabledActions: { play: boolean; pause: boolean; previous: boolean; next: boolean; seek: boolean } | null;
+  playbackModes: { shuffle: boolean; repeat: 'none' | 'track' | 'list' } | null;
+}
+
+interface EchoWorkshopCompanionDesktopLyrics {
+  visible: boolean;
+  locked: boolean;
+  enabled: boolean;
+}
+
+interface EchoWorkshopCompanionMiniPlayer {
+  visible: boolean;
+  locked: boolean;
+  layout: 'compact' | 'expanded' | 'queue';
+  queueOpen: boolean;
+  dockEdge: 'top' | 'bottom' | 'left' | 'right' | null;
+  enabled: boolean;
+}
+
+interface EchoWorkshopCompanionPet {
+  visible: boolean;
+  enabled: boolean;
+  scalePercent: number;
+}
+
+interface EchoWorkshopCompanionTaskbar {
+  visible: boolean;
+  supported: boolean;
+  unsupportedReason: string | null;
+  edge: 'top' | 'bottom' | 'left' | 'right' | null;
+  enabled: boolean;
+}
+
+interface EchoWorkshopCompanionState {
+  surface: 'desktopLyrics' | 'miniPlayer' | 'pet' | 'taskbar';
+  state: EchoWorkshopCompanionDesktopLyrics | EchoWorkshopCompanionMiniPlayer | EchoWorkshopCompanionPet | EchoWorkshopCompanionTaskbar;
+}
+
+interface EchoWorkshopSleepTimerStatus {
+  isActive: boolean;
+  remainingMs: number;
+  action: 'pause' | 'stop' | 'quit';
+  fadeOutEnabled: boolean;
+  durationMinutes: number;
+}
+
+interface EchoWorkshopDiscordPresence {
+  enabled: boolean;
+  available: boolean;
+  connected: boolean;
+}
+
+interface EchoWorkshopLastFmPresence {
+  enabled: boolean;
+  scrobbleEnabled: boolean;
+  nowPlayingEnabled: boolean;
+  connected: boolean;
+  authPending: boolean;
+}
+
+interface EchoWorkshopListenBrainzPresence {
+  enabled: boolean;
+  nowPlayingEnabled: boolean;
+  scrobbleEnabled: boolean;
+  phase: 'disabled' | 'idle' | 'ready' | 'error';
+  connected: boolean;
+  tokenConfigured: boolean;
+}
+
 interface EchoWorkshopPlaybackStatus {
+  playbackRate?: number;
   state: string;
   currentTrackId: string | null;
   positionSeconds: number;
@@ -12,6 +100,23 @@ interface EchoWorkshopPlaybackStatus {
   repeatMode?: 'off' | 'one' | 'all';
 }
 
+interface EchoWorkshopAudioVisualizationOptions {
+  /** Latest 0..2048 mono samples; default 256. */
+  waveformSamples?: number;
+  spectrum?: boolean;
+  levels?: boolean;
+}
+interface EchoWorkshopAudioVisualization {
+  trackId: string | null;
+  visualization: { waveformSamples: number; intervalMs: number; spectrum: boolean; levels: boolean };
+  visualizationLimits: { maximumWaveformSamples: number; maximumMeterChannels: number;
+    minimumIntervalMs: number; maximumIntervalMs: number; waveformLayout: 'mono'; continuous: false };
+  levels?: { peakDb: number | null; rmsDb: number | null;
+    source: 'native_post_dsp' | 'pre_native_estimated_post_dsp' | null;
+    channels: { peakDb: number | null; rmsDb: number | null }[] };
+  waveform: { samples: number[]; sampleRate: number; channels: 1; source: 'native_post_dsp' } | null;
+  spectrum?: EchoWorkshopSpectrum;
+}
 interface EchoWorkshopSpectrum {
   bands: number[];
   energy: number;
@@ -19,10 +124,36 @@ interface EchoWorkshopSpectrum {
   state: string;
 }
 
+interface EchoWorkshopTransitionPreparation {
+  sessionId: string;
+  from: { trackId: string; queueId: string; title: string; durationSeconds: number };
+  to: { trackId: string; queueId: string; title: string; durationSeconds: number };
+  plan: { positionSeconds: number; currentFadeStartSeconds: number; nextStartSeconds: number; windowFrames: number };
+  sampleRate: number;
+  channels: 1 | 2;
+}
+interface EchoWorkshopTransitionProvider {
+  windowFrames(input: Pick<EchoWorkshopTransitionPreparation, 'sampleRate' | 'plan'>): number | Promise<number>;
+  prepare(input: EchoWorkshopTransitionPreparation): void | Promise<void>;
+  /** Interleaved float32, exactly frameCount * channels samples. Called before arming output. */
+  render(input: { frameOffset: number; frameCount: number; progress: number }): Float32Array | number[] | Promise<Float32Array | number[]>;
+  /** Describes the provider; the host limits processing to its prepared window. */
+  rewritesSamples(): boolean | Promise<boolean>;
+}
+interface EchoWorkshopTransitionCommitted {
+  planId: string;
+  fromTrackId: string;
+  toTrackId: string;
+  fromItemId: string;
+  toItemId: string;
+  queueRevision: number;
+  outputFrame: number;
+  sourcePositionSeconds: number;
+}
 interface EchoWorkshopOfflineAudioFormat {
   sampleRate: number;
   channels: 1 | 2;
-  sampleFormat: 's16le';
+  sampleFormat: 's16le' | 'f32le';
 }
 
 interface EchoWorkshopOfflineAudioSession {
@@ -394,6 +525,13 @@ interface EchoWorkshopSourceProviderHandlers {
 }
 
 interface EchoWorkshopLyricsCandidate {
+  providerResult?: EchoWorkshopLyricsProviderResult;
+  providerLyricsId?: string;
+  instrumental?: boolean;
+  karaokeLyrics?: string;
+  translationLyrics?: string;
+  romanizationLyrics?: string;
+  matchReasons?: string[];
   ttml?: string;
   artist?: string;
   album?: string;
@@ -407,13 +545,57 @@ interface EchoWorkshopLyricsCandidate {
   text?: string;
 }
 
+interface EchoWorkshopLyricsProviderResult {
+  provider: string;
+  providerLyricsId: string | null;
+  title: string;
+  artist: string;
+  album: string | null;
+  durationSeconds: number | null;
+  instrumental: boolean;
+  plainLyrics: string | null;
+  syncedLyrics: string | null;
+  karaokeLyrics?: string | null;
+  translationLyrics?: string | null;
+  romanizationLyrics?: string | null;
+  sourceUrl?: string | null;
+  sourceLabel?: string;
+  matchReasons?: string[];
+  raw?: unknown;
+}
+
 interface EchoWorkshopLyricsRequest {
+  lookup?: {
+    /** Full host-normalized identity; contains no file path. */
+    normalized?: {
+      osuIdentity?: {title:string|null;artist:string|null};
+      rawTitle:string;rawArtist:string;rawAlbum:string|null;durationSeconds:number|null;
+      searchTitle:string;searchArtist:string;searchAlbum:string|null;
+      identityTitle:string;identityArtist:string;identityAlbum:string|null;
+      versionFlags:Record<string,boolean>;coverIntent:boolean;hasReliableDuration:boolean;
+      possibleOriginalTitle:string|null;possibleCoverTitle:string|null;
+      searchVariants:Array<{title:string;artist:string;album:string|null;reason:string;priority:number}>;
+    };
+    timeoutMs: number;
+    collectAllCandidates: boolean;
+    searchVariants: Array<{ title: string; artist: string; album: string | null; reason: string; priority: number }>;
+    identity?: {
+      versionFlags: Record<string, boolean>;
+      coverIntent: boolean;
+      possibleOriginalTitle: string | null;
+      osuIdentity?: { title: string | null; artist: string | null };
+    };
+  };
   track: {
     id: string | null;
     title: string;
     artist: string;
-    album: string;
-    durationSeconds: number;
+    album: string | null;
+    durationSeconds: number | null;
+    mediaType?: 'local' | 'remote' | 'streaming';
+    sourceId?: string | null;
+    stableKey?: string | null;
+    osuIdentity?: {title:string|null;artist:string|null};
   };
   query?: string;
 }
@@ -444,6 +626,7 @@ interface EchoWorkshopCoverCandidate {
 }
 
 interface EchoWorkshopNetworkRequest {
+  requestId?: string;
   url: string;
   method?: 'GET' | 'POST';
   headers?: Record<string, string>;
@@ -550,6 +733,8 @@ interface EchoWorkshopParentPage {
 
 interface EchoWorkshopUiContext {
   surface: 'runtime' | 'panel';
+  /** Present only in a host-managed desktop runtime. */
+  desktop?: { bottomInset: number };
   panel: { id: string; placement: 'main' | 'utility' | 'sidebar' | 'home' | 'lyrics' | 'queue' | 'track-detail' | 'player' | 'page' } | null;
   visible: boolean;
   locale: string;
@@ -565,6 +750,10 @@ interface EchoWorkshopUiContext {
 type EchoWorkshopCommandInput = Record<string, string | number | boolean | null>;
 
 interface EchoWorkshopApi {
+  window: {
+    getDesktopWall(): Promise<{ supported: boolean; enabled: boolean }>;
+    setDesktopWall(enabled: boolean): Promise<{ supported: boolean; enabled: boolean }>;
+  };
   host: {
     /** Returns sanitized API 2 feature states; it never includes account, device, path, or license data. */
     getCapabilities(): Promise<EchoWorkshopHostCapabilities>;
@@ -586,7 +775,11 @@ interface EchoWorkshopApi {
     list(): ReadonlyArray<EchoWorkshopRegisteredCommand>;
   };
   events: {
+    on(eventName: 'transition:committed', handler: (payload: EchoWorkshopTransitionCommitted) => unknown): EchoWorkshopUnsubscribe;
     on(eventName: 'playback:status' | 'audio:spectrum' | 'queue:changed' | 'library:changed' | 'library:liked-changed' | 'settings:changed', handler: (payload: unknown) => unknown): EchoWorkshopUnsubscribe;
+    on(eventName: 'media-session:command', handler: (payload: EchoWorkshopMediaSessionCommand) => unknown): EchoWorkshopUnsubscribe;
+    on(eventName: 'companion:state', handler: (payload: EchoWorkshopCompanionState) => unknown): EchoWorkshopUnsubscribe;
+    on(eventName: 'sleep-timer:tick', handler: (payload: { remainingMs: number }) => unknown): EchoWorkshopUnsubscribe;
   };
   navigation: {
     /**
@@ -598,13 +791,112 @@ interface EchoWorkshopApi {
      */
     open(routeId: string): Promise<null>;
   };
+  mediaSession: {
+    /** Windows SMTC or Linux MPRIS. Requires `media-session:control`. Paths and host names are omitted. */
+    getStatus(): Promise<EchoWorkshopMediaSessionStatus>;
+    setEnabledActions(actions: { play: boolean; pause: boolean; previous: boolean; next: boolean; seek?: boolean }): Promise<null>;
+    setPlaybackModes(modes: { shuffle: boolean; repeat: 'none' | 'track' | 'list' }): Promise<null>;
+    restart(): Promise<EchoWorkshopMediaSessionStatus>;
+    onCommand(handler: (command: EchoWorkshopMediaSessionCommand) => unknown): EchoWorkshopUnsubscribe;
+  };
+  companion: {
+    /** Local companion windows. Requires `companion:control`. Bounds and file paths are omitted. */
+    desktopLyrics: {
+      getState(): Promise<EchoWorkshopCompanionDesktopLyrics>;
+      show(): Promise<EchoWorkshopCompanionDesktopLyrics>;
+      hide(): Promise<EchoWorkshopCompanionDesktopLyrics>;
+      setLocked(locked: boolean): Promise<EchoWorkshopCompanionDesktopLyrics>;
+      reset(): Promise<EchoWorkshopCompanionDesktopLyrics>;
+    };
+    miniPlayer: {
+      getState(): Promise<EchoWorkshopCompanionMiniPlayer>;
+      show(): Promise<EchoWorkshopCompanionMiniPlayer>;
+      hide(): Promise<EchoWorkshopCompanionMiniPlayer>;
+      setLocked(locked: boolean): Promise<EchoWorkshopCompanionMiniPlayer>;
+      setLayout(layout: 'compact' | 'expanded' | 'queue'): Promise<EchoWorkshopCompanionMiniPlayer>;
+      reset(): Promise<EchoWorkshopCompanionMiniPlayer>;
+    };
+    pet: {
+      getState(): Promise<EchoWorkshopCompanionPet>;
+      show(): Promise<EchoWorkshopCompanionPet>;
+      hide(): Promise<EchoWorkshopCompanionPet>;
+      setScale(scalePercent: number): Promise<EchoWorkshopCompanionPet>;
+      reset(): Promise<EchoWorkshopCompanionPet>;
+    };
+    /** Missing on non-Windows hosts; those calls reject with `unsupported-platform`. */
+    taskbar: {
+      getState(): Promise<EchoWorkshopCompanionTaskbar>;
+      show(): Promise<EchoWorkshopCompanionTaskbar>;
+      hide(): Promise<EchoWorkshopCompanionTaskbar>;
+      setEnabled(enabled: boolean): Promise<EchoWorkshopCompanionTaskbar>;
+    };
+    onState(handler: (payload: EchoWorkshopCompanionState) => unknown): EchoWorkshopUnsubscribe;
+  };
+  sleepTimer: {
+    /** Requires `sleep-timer:control`. Duration is 1 to 720 minutes. */
+    getStatus(): Promise<EchoWorkshopSleepTimerStatus>;
+    start(request: { durationMinutes: number; action: 'pause' | 'stop' | 'quit'; fadeOut: boolean }): Promise<EchoWorkshopSleepTimerStatus>;
+    cancel(): Promise<EchoWorkshopSleepTimerStatus>;
+    onTick(handler: (payload: { remainingMs: number }) => unknown): EchoWorkshopUnsubscribe;
+  };
+  presence: {
+    /** Requires `presence:control`. Login, tokens, passwords and account names are not exposed. */
+    discord: {
+      getStatus(): Promise<EchoWorkshopDiscordPresence>;
+      setEnabled(enabled: boolean): Promise<EchoWorkshopDiscordPresence>;
+    };
+    lastfm: {
+      getStatus(): Promise<EchoWorkshopLastFmPresence>;
+      setEnabled(enabled: boolean): Promise<EchoWorkshopLastFmPresence>;
+      setNowPlayingEnabled(enabled: boolean): Promise<EchoWorkshopLastFmPresence>;
+      setScrobbleEnabled(enabled: boolean): Promise<EchoWorkshopLastFmPresence>;
+      disconnect(): Promise<EchoWorkshopLastFmPresence>;
+    };
+    listenBrainz: {
+      getStatus(): Promise<EchoWorkshopListenBrainzPresence>;
+      setFlags(flags: { enabled?: boolean; nowPlayingEnabled?: boolean; scrobbleEnabled?: boolean }): Promise<EchoWorkshopListenBrainzPresence>;
+      disconnect(): Promise<EchoWorkshopListenBrainzPresence>;
+    };
+  };
+  bridge: {
+    /** Requires `bridge:control`. Addresses, ports, passwords, topics and pairing material are omitted. */
+    stage: {
+      getStatus(): Promise<{ running: boolean; obsEnabled: boolean; apiEnabled: boolean; eventClients: number }>;
+      setEnabled(patch: { obsBrowserSourceEnabled?: boolean; stageApiEnabled?: boolean }): Promise<{ running: boolean; obsEnabled: boolean; apiEnabled: boolean; eventClients: number }>;
+    };
+    obsBrowser: {
+      getStatus(): Promise<{ enabled: boolean; fontSize: number; translation: boolean; romanization: boolean; showTrack: boolean; background: 'transparent' | 'cover'; offsetMs: number; clients: number }>;
+      update(patch: { enabled?: boolean; fontSize?: number; translation?: boolean; romanization?: boolean; showTrack?: boolean; background?: 'transparent' | 'cover'; offsetMs?: number }): Promise<{ enabled: boolean; fontSize: number; translation: boolean; romanization: boolean; showTrack: boolean; background: 'transparent' | 'cover'; offsetMs: number; clients: number }>;
+    };
+    obsWebSocket: {
+      getStatus(): Promise<{ enabled: boolean; phase: 'disabled' | 'connecting' | 'connected' | 'error'; connected: boolean; passwordConfigured: boolean }>;
+      setEnabled(enabled: boolean): Promise<{ enabled: boolean; phase: 'disabled' | 'connecting' | 'connected' | 'error'; connected: boolean; passwordConfigured: boolean }>;
+    };
+    mqtt: {
+      getStatus(): Promise<{ enabled: boolean; phase: 'disabled' | 'connecting' | 'connected' | 'error'; connected: boolean; passwordConfigured: boolean; homeAssistantDiscoveryEnabled: boolean }>;
+      setEnabled(enabled: boolean): Promise<{ enabled: boolean; phase: 'disabled' | 'connecting' | 'connected' | 'error'; connected: boolean; passwordConfigured: boolean; homeAssistantDiscoveryEnabled: boolean }>;
+    };
+    hqPlayer: {
+      getStatus(): Promise<{ enabled: boolean; state: string; mediaServerEnabled: boolean; defaultPlaybackBackend: 'echoNative' | 'hqplayer' | 'ask' }>;
+      setEnabled(enabled: boolean): Promise<{ enabled: boolean; state: string; mediaServerEnabled: boolean; defaultPlaybackBackend: 'echoNative' | 'hqplayer' | 'ask' }>;
+      sendLastControl(): Promise<{ state: string; reason: string | null; command: string }>;
+    };
+    echoLink: {
+      getStatus(): Promise<{ enabled: boolean; running: boolean; pairingActive: boolean; clientCount: number }>;
+      setEnabled(enabled: boolean): Promise<{ enabled: boolean; running: boolean; pairingActive: boolean; clientCount: number }>;
+    };
+  };
   playback: {
     getStatus(): Promise<EchoWorkshopPlaybackStatus>;
+    getRate(): Promise<number>;
+    setRate(rate: number): Promise<number>;
     play(): Promise<null>;
     pause(): Promise<null>;
     seek(positionSeconds: number): Promise<null>;
     previous(): Promise<null>;
     next(): Promise<null>;
+    /** Schedule the boundary at this media position of the currently playing track. */
+    nextAt(positionSeconds: number): Promise<EchoWorkshopTransitionPreparation>;
     setVolume(volume: number): Promise<null>;
     setShuffle(enabled: boolean): Promise<null>;
     toggleShuffle(): Promise<null>;
@@ -614,6 +906,11 @@ interface EchoWorkshopApi {
   };
   audio: {
     getSpectrum(): Promise<EchoWorkshopSpectrum>;
+    /** Current native visualization snapshot. Requires audio:spectrum; does not start a decoder or add a poller. */
+    getVisualization(options?: EchoWorkshopAudioVisualizationOptions): Promise<EchoWorkshopAudioVisualization>;
+    transition: {
+      registerProvider(id: string, meta: { name?: string }, provider: EchoWorkshopTransitionProvider): Promise<() => Promise<void>>;
+    };
     dsp: {
       getModule<T extends EchoWorkshopDspModuleId>(moduleId: T): Promise<EchoWorkshopDspModuleStateMap[T]>;
       setModule<T extends EchoWorkshopDspModuleId>(moduleId: T, state: Partial<EchoWorkshopDspWritableStateMap[T]>): Promise<EchoWorkshopDspModuleStateMap[T]>;
@@ -622,9 +919,11 @@ interface EchoWorkshopApi {
     };
     offline: {
       /** Starts a host-decoded local-track PCM stream after per-track user confirmation. */
-      open(options: { trackId: string; sampleRate?: number; channels?: 1 | 2 }): Promise<EchoWorkshopOfflineAudioSession>;
+      open(options: { trackId: string; sampleRate?: number; channels?: 1 | 2; sampleFormat?: 's16le' | 'f32le' }): Promise<EchoWorkshopOfflineAudioSession>;
       /** Reads a bounded sequential PCM chunk. At most one read may be pending per session. */
       read(sessionId: string, options?: { maxFrames?: number }): Promise<EchoWorkshopOfflineAudioChunk>;
+      /** Replaces the decoder with an accurate input-side seek; rejects while a read is pending. */
+      seek(sessionId: string, positionSeconds: number): Promise<null>;
       close(sessionId: string): Promise<null>;
     };
   };
@@ -657,6 +956,8 @@ interface EchoWorkshopApi {
     enqueueTrack(trackId: string): Promise<EchoWorkshopTrackActionResult>;
     playItem(queueId: string): Promise<null>;
     moveItem(queueId: string, toIndex: number): Promise<null>;
+    /** Exact complete permutation of queue identities; current playback stays active. */
+    reorder(queueIds: string[]): Promise<null>;
     removeItem(queueId: string): Promise<null>;
     clear(): Promise<null>;
     playAlbum(albumId: string): Promise<EchoWorkshopCollectionPlayResult>;
@@ -680,6 +981,7 @@ interface EchoWorkshopApi {
     run(agentId: string, input: unknown): Promise<unknown>;
   };
   network: {
+    cancel(requestId: string): Promise<null>;
     request(options: EchoWorkshopNetworkRequest): Promise<EchoWorkshopNetworkResponse>;
     get(url: string, options?: Omit<EchoWorkshopNetworkRequest, 'url' | 'method' | 'body'>): Promise<EchoWorkshopNetworkResponse>;
     post(url: string, body: string, options?: Omit<EchoWorkshopNetworkRequest, 'url' | 'method' | 'body'>): Promise<EchoWorkshopNetworkResponse>;

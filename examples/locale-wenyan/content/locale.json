@@ -4595,8 +4595,6 @@
     "lyricsSettings.display.miniPlayerShortcut": "捷径掌",
     "lyricsSettings.display.miniPlayerShortcutDescription": "启并系后，底栏只随此捷径示之或隐之，两项鼠标离开行为暂止生效。",
     "lyricsSettings.display.miniPlayerTrigger": "捷径",
-    "lyricsSettings.display.preferUtatenKana": "日文歌辞优先示之假名",
-    "lyricsSettings.display.preferUtatenKanaDescription": "常定闭之；启后会尝试在日文歌辞上示之假名，找不到时自改用罗马音。",
     "lyricsSettings.display.resetDesktopPosition": "复置桌面歌辞位置",
     "lyricsSettings.display.showRomanization": "示之罗马音",
     "lyricsSettings.display.showRomanizationDescription": "优先使用歌辞源供的罗马音；无时会为日文歌辞本处生成。",

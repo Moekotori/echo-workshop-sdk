@@ -1,0 +1,53 @@
+{
+  "contractVersion": 1,
+  "protocol": "echo.audio-plugin-pcm",
+  "status": "native-transport-preview",
+  "productionHostAttached": false,
+  "vst3LoaderIncluded": false,
+  "headerFile": "audio-plugin-pcm.h",
+  "byteOrder": "little-endian",
+  "sampleFormat": "float32-interleaved",
+  "limits": { "slotCount": 4, "maximumFrames": 512, "maximumChannels": 8, "regionBytes": 131392 },
+  "layout": {
+    "headerBytes": 64,
+    "slotBytes": 32832,
+    "slotHeaderBytes": 64,
+    "dryOffsetInSlot": 64,
+    "wetOffsetInSlot": 16448,
+    "payloadCapacitySamples": 4096
+  },
+  "headerFields": ["magic", "version", "regionBytes", "slots", "sampleRate", "channels", "maxFrames"],
+  "slotFields": ["state", "cancelled", "generation", "sequence", "projectTimeSamples", "frames", "flags"],
+  "states": { "free": 0, "dry-ready": 1, "processing": 2, "wet-ready": 3, "host-writing": 4, "host-reading": 5 },
+  "processContext": { "playingFlag": 1, "tempo": "unknown", "timeSignature": "unknown" },
+  "mapping": {
+    "namePrefix": "echo-ap-",
+    "nameMaximumLength": 30,
+    "windowsNamespace": "Local",
+    "windowsAccess": "creator-user-SID-only",
+    "posixMode": "0600",
+    "backingSize": "logical region bytes or exactly page-rounded region bytes",
+    "createExclusive": true,
+    "ownerMustUnlinkOnPosix": true
+  },
+  "synchronization": {
+    "wordBytes": 4,
+    "alignmentBytes": 4,
+    "windows": "Interlocked",
+    "clangGcc": "lock-free __atomic acquire/release",
+    "deviceCallbackWait": false,
+    "serializedHostOwners": 1,
+    "serializedAdapterWorkers": 1
+  },
+  "rules": [
+    "Publish dry-ready only after metadata and actual dry samples are written.",
+    "Only the adapter holding processing may write wet samples; publish wet-ready after all writes.",
+    "Accept wet output only for the exact generation, sequence and actual frame count.",
+    "Reject nonfinite samples before copying any part of the result; zero-valued output is valid.",
+    "Cancellation never steals a processing slot; the adapter must release ownership before reuse.",
+    "An adapter crash can leave slots processing: recovery uses a fresh mapping, never resets the live region.",
+    "Immutable format/ABI header is initialized before sharing and cannot change during mapping lifetime.",
+    "No native PCM payloads or mapping names are exposed through renderer or sandbox plugin IPC.",
+    "Block exchange supplies no delay line, latency compensation, output device, EOF or drain authority."
+  ]
+}
