@@ -36,6 +36,7 @@
               "audio:dsp-read",
               "audio:dsp-write",
               "audio:offline-read",
+              "audio:transition",
               "library:read",
               "library:path",
               "library:control",

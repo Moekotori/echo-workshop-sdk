@@ -1,20 +1,21 @@
 # ECHO Workshop SDK changelog
 
-## 1.20.0 — 2026-10-16 (source update; release assets and Steam starter not updated)
+## 1.20.0 — 2026-10-16
 
 - Added `echo.audio.getVisualization(options)` and the matching theme/lyrics query under `audio:spectrum`. Snapshots include up to 2048 signed mono time-domain samples, up to 32 native channel Peak/RMS meters, optional spectrum, and host capability limits.
 - Theme and lyrics runtimes can select waveform length, push spacing and returned fields at ready time or through `echo:workshop-ui:audio-configure`. Existing defaults remain 256 samples, with host-owned timing and visibility limits.
 - Waveform amplitudes retain finite values outside `[-1, 1]`; the host does not fabricate channel meters or waveform samples when unavailable. The portable mock and UI preview expose the new API with an unavailable native waveform.
 - Updated public TypeScript declarations, the action/permission contract and bilingual entry documentation. Authors must check runtime feature availability; this source update does not claim that an older installed ECHO host supports the new telemetry.
 - Included the existing audio-transition authoring guide in the public export and refreshed the literary-Chinese example manifest after its earlier content cleanup, so standalone example validation succeeds.
+- Matched the package Schema's `audio:transition` permission to the existing host/API contract before assembling the 1.20.0 release assets.
 
-## Source follow-up — 2026-10-14 author onboarding (not published)
+## Source follow-up — 2026-10-14 author onboarding (included in 1.20.0)
 
 - Added a complete Chinese first-plugin tutorial and `guide first-plugin`, covering source edits, checks, mock development and local ECHO import before publication.
 - Generated plugin customization guides now explain the first visible change and the edit/check/reimport loop. Portable project SDK copies include the tutorial.
 - The in-app creator can edit packaged scripts, HTML and CSS directly, with local trial separate from publishing. Basic starter panels follow host theme context and display meaningful running/results states.
 
-## Source follow-up — 2026-10-10 host controls (not published)
+## Source follow-up — 2026-10-10 host controls (included in 1.20.0)
 
 - Added `companion:control`, `sleep-timer:control`, `presence:control` and
   `bridge:control`. Approved plug-ins can drive companion windows, the sleep
@@ -23,7 +24,7 @@
   credentials, topics and pairing material. Account login, cookies, Spotify,
   downloads and MV search stay closed.
 
-## Source follow-up — 2026-10-10 media session (not published)
+## Source follow-up — 2026-10-10 media session (included in 1.20.0)
 
 - Added `media-session:control`. Approved plug-ins can read a path-free
   Windows SMTC or Linux MPRIS status, set enabled transport buttons and
@@ -31,7 +32,7 @@
   Other platforms report `unsupported-platform`. Account, Discord, Last.fm
   and device-control surfaces stay closed.
 
-## Source follow-up — 2026-10-10 (not published)
+## Source follow-up — 2026-10-10 (included in 1.20.0)
 
 - Removed the theme and lyrics-scene product quotas on packaged raster count,
   raster bytes, UI runtime file bytes and theme stylesheet bytes. Declared
@@ -39,7 +40,7 @@
   header. SVG, executable extensions and unsafe stylesheet constructs stay
   rejected. One active stylesheet remains cached for the selected theme.
 
-## Source follow-up — 2026-10-09 (not published)
+## Source follow-up — 2026-10-09 (included in 1.20.0)
 
 - Removed declaration quotas for settings/options, menus, panels, Agents,
   providers, columns and themes, authored text clipping and sidebar page hiding.
@@ -51,7 +52,7 @@
   without discarding later choices. Static inventories and host/dependency lists
   no longer have fixed count quotas. Runtime execution budgets remain.
 
-## Source follow-up — 2026-10-08 (not published)
+## Source follow-up — 2026-10-08 (included in 1.20.0)
 
 - Added full normalized lyrics queries and lossless original `providerResult`
   results, including raw responses, secondary lyrics and nullable metadata.
