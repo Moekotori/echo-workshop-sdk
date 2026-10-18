@@ -1,0 +1,14 @@
+{
+  "domain": "controls",
+  "minimumEchoVersion": "26.10.18",
+  "owner": "Typed host service adapters; native audio remains authoritative",
+  "events": {
+    "audio:dsp-changed": "audio:dsp-read",
+    "home:changed": "home:read",
+    "presence:changed": "presence:control",
+    "bridge:changed": "bridge:control",
+    "media-session:changed": "media-session:control"
+  },
+  "limits": { "pendingInvalidationDomains": 5, "snapshotCache": 0, "pollingTimers": 0 },
+  "meaning": "Null invalidations after host settings or successful control mutations. Read only visible affected state again. These events do not stream audio, telemetry or remote-service diagnostics."
+}

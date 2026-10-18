@@ -1,6 +1,75 @@
 {
   "apiVersion": 2,
+  "commandExecution": { "defaultTimeoutMs": 5000, "maximumTimeoutMs": 2147483647 },
   "actions": {
+    "lyrics:providers:list": {"method":"echo.lyrics.providers.list","permission":"lyrics:read"},
+    "lyrics:candidates:get": {"method":"echo.lyrics.candidates.get","permission":"lyrics:read"},
+    "lyrics:candidates:search": {"method":"echo.lyrics.candidates.search","permission":"lyrics:search"},
+    "lyrics:candidates:preview": {"method":"echo.lyrics.candidates.preview","permission":"lyrics:read"},
+    "lyrics:candidates:apply": {"method":"echo.lyrics.candidates.apply","permission":"lyrics:write"},
+    "lyrics:candidates:reject": {"method":"echo.lyrics.candidates.reject","permission":"lyrics:write"},
+    "lyrics:candidates:cancel": {"method":"echo.lyrics.candidates.cancel","permission":"lyrics:search"},
+    "metadata:providers:list": {"method":"echo.metadata.providers.list","permission":"metadata:read"},
+    "metadata:candidates:get": {"method":"echo.metadata.candidates.get","permission":"metadata:read"},
+    "metadata:candidates:search": {"method":"echo.metadata.candidates.search","permission":"metadata:search"},
+    "metadata:candidates:preview": {"method":"echo.metadata.candidates.preview","permission":"metadata:read"},
+    "metadata:candidates:apply": {"method":"echo.metadata.candidates.apply","permission":"metadata:write"},
+    "metadata:candidates:reject": {"method":"echo.metadata.candidates.reject","permission":"metadata:write"},
+    "metadata:candidates:cancel": {"method":"echo.metadata.candidates.cancel","permission":"metadata:search"},
+    "covers:providers:list": {"method":"echo.covers.providers.list","permission":"covers:read"},
+    "covers:candidates:get": {"method":"echo.covers.candidates.get","permission":"covers:read"},
+    "covers:candidates:search": {"method":"echo.covers.candidates.search","permission":"covers:search"},
+    "covers:candidates:preview": {"method":"echo.covers.candidates.preview","permission":"covers:read"},
+    "covers:candidates:apply": {"method":"echo.covers.candidates.apply","permission":"covers:write"},
+    "covers:candidates:reject": {"method":"echo.covers.candidates.reject","permission":"covers:write"},
+    "covers:candidates:cancel": {"method":"echo.covers.candidates.cancel","permission":"covers:search"},
+    "audio:output:getStatus": { "method": "echo.audio.output.getStatus", "permission": "audio:output-read" },
+    "audio:output:listDevices": { "method": "echo.audio.output.listDevices", "permission": "audio:output-read" },
+    "audio:output:refreshDevices": { "method": "echo.audio.output.refreshDevices", "permission": "audio:output-read" },
+    "audio:output:getDeviceVolume": { "method": "echo.audio.output.getDeviceVolume", "permission": "audio:output-read" },
+    "audio:output:setOutput": { "method": "echo.audio.output.setOutput", "permission": "audio:output-write" },
+    "audio:output:setDeviceVolume": { "method": "echo.audio.output.setDeviceVolume", "permission": "audio:output-write" },
+    "audio:output:setVolumeControlMode": { "method": "echo.audio.output.setVolumeControlMode", "permission": "audio:output-write" },
+    "library:getTracksByIds": {"method":"echo.library.getTracksByIds","permission":"library:read"},
+    "library:playlists:list": {"method":"echo.library.playlists.list","permission":"library:read"},
+    "library:playlists:get": {"method":"echo.library.playlists.get","permission":"library:read"},
+    "library:playlists:delete": {"method":"echo.library.playlists.delete","permission":"library:playlist-delete"},
+    "library:playlists:moveItem": {"method":"echo.library.playlists.moveItem","permission":"library:control"},
+    "library:playlists:getRules": {"method":"echo.library.playlists.getRules","permission":"library:read"},
+    "library:playlists:previewRules": {"method":"echo.library.playlists.previewRules","permission":"library:read"},
+    "library:playlists:createSmart": {"method":"echo.library.playlists.createSmart","permission":"library:control"},
+    "library:playlists:updateRules": {"method":"echo.library.playlists.updateRules","permission":"library:control"},
+    "library:playlists:freeze": {"method":"echo.library.playlists.freeze","permission":"library:control"},
+    "library:favorites:getAlbums": {"method":"echo.library.favorites.getAlbums","permission":"library:read"},
+    "library:favorites:getAlbumStates": {"method":"echo.library.favorites.getAlbumStates","permission":"library:read"},
+    "library:favorites:setTrack": {"method":"echo.library.favorites.setTrack","permission":"library:control"},
+    "library:favorites:setAlbum": {"method":"echo.library.favorites.setAlbum","permission":"library:control"},
+    "library:favorites:moveTrack": {"method":"echo.library.favorites.moveTrack","permission":"library:control"},
+    "library:tags:list": {"method":"echo.library.tags.list","permission":"library:read"},
+    "library:tags:change": {"method":"echo.library.tags.change","permission":"library:personal-write"},
+    "library:tags:getItems": {"method":"echo.library.tags.getItems","permission":"library:read"},
+    "library:listenLater:list": {"method":"echo.library.listenLater.list","permission":"library:read"},
+    "library:listenLater:get": {"method":"echo.library.listenLater.get","permission":"library:read"},
+    "library:listenLater:change": {"method":"echo.library.listenLater.change","permission":"library:personal-write"},
+    "library:playQuery": {"method":"echo.library.playQuery","permission":"queue:control","requiredPermissions":["library:read"]},
+    "lyrics:getDisplayPreferences": { "method": "echo.lyrics.getDisplayPreferences", "permission": "lyrics:read" },
+    "lyrics:watchDisplayPreferences": { "method": "echo.lyrics.onDisplayPreferencesChanged", "permission": "lyrics:read" },
+    "lyrics:setCurrentOffset": { "method": "echo.lyrics.setCurrentOffset", "permission": "lyrics:write" },
+    "artwork:getPalette": { "method": "echo.artwork.getPalette", "permission": "playback:read" },
+    "artwork:watchPalette": { "method": "echo.artwork.onPaletteChanged", "permission": "playback:read" },
+    "ui:getLayout": { "method": "echo.ui.getLayout", "permission": null },
+    "ui:watchLayout": { "method": "echo.ui.onLayoutChanged", "permission": null },
+    "ui:getRenderBudget": { "method": "echo.ui.getRenderBudget", "permission": null },
+    "ui:watchRenderBudget": { "method": "echo.ui.onRenderBudgetChanged", "permission": null },
+    "extensions:list": { "method": "echo.extensions.list", "permission": "extensions:read" },
+    "extensions:launch": { "method": "echo.extensions.launch", "permission": "extensions:launch" },
+    "window:minimize": { "method": "echo.window.minimize", "permission": "window:control" },
+    "window:isMaximized": { "method": "echo.window.isMaximized", "permission": "window:control" },
+    "window:isFullscreen": { "method": "echo.window.isFullscreen", "permission": "window:control" },
+    "window:toggleMaximize": { "method": "echo.window.toggleMaximize", "permission": "window:control" },
+    "window:toggleFullscreen": { "method": "echo.window.toggleFullscreen", "permission": "window:control" },
+    "window:close": { "method": "echo.window.close", "permission": "window:control" },
+    "playback:stop": { "method": "echo.playback.stop", "permission": "playback:control" },
     "host:getCapabilities": {
       "method": "echo.host.getCapabilities",
       "permission": null
@@ -85,6 +154,10 @@
       "method": "echo.audio.getSpectrum",
       "permission": "audio:spectrum"
     },
+    "audio:getSpectrogram": {
+      "method": "echo.audio.getSpectrogram",
+      "permission": "audio:spectrum"
+    },
     "audio:getVisualization": {
       "method": "echo.audio.getVisualization",
       "permission": "audio:spectrum"
@@ -117,92 +190,33 @@
       "method": "echo.audio.offline.close",
       "permission": "audio:offline-read"
     },
-    "library:getSummary": {
-      "method": "echo.library.getSummary",
-      "permission": "library:read"
-    },
-    "library:getTracks": {
-      "method": "echo.library.getTracks",
-      "permission": "library:read"
-    },
-    "library:getTrack": {
-      "method": "echo.library.getTrack",
-      "permission": "library:read"
-    },
-    "library:getAlbums": {
-      "method": "echo.library.getAlbums",
-      "permission": "library:read"
-    },
-    "library:getAlbumTracks": {
-      "method": "echo.library.getAlbumTracks",
-      "permission": "library:read"
-    },
-    "library:getArtists": {
-      "method": "echo.library.getArtists",
-      "permission": "library:read"
-    },
-    "library:getArtistTracks": {
-      "method": "echo.library.getArtistTracks",
-      "permission": "library:read"
-    },
-    "library:getArtistAlbums": {
-      "method": "echo.library.getArtistAlbums",
-      "permission": "library:read"
-    },
-    "library:getGenres": {
-      "method": "echo.library.getGenres",
-      "permission": "library:read"
-    },
-    "library:getGenreTracks": {
-      "method": "echo.library.getGenreTracks",
-      "permission": "library:read"
-    },
-    "library:getGenreAlbums": {
-      "method": "echo.library.getGenreAlbums",
-      "permission": "library:read"
-    },
-    "library:getPlaylists": {
-      "method": "echo.library.getPlaylists",
-      "permission": "library:read"
-    },
-    "library:getPlaylistItems": {
-      "method": "echo.library.getPlaylistItems",
-      "permission": "library:read"
-    },
-    "library:getLikedTracks": {
-      "method": "echo.library.getLikedTracks",
-      "permission": "library:read"
-    },
-    "library:getLikedTrackIds": {
-      "method": "echo.library.getLikedTrackIds",
-      "permission": "library:read"
-    },
-    "library:toggleTrackLiked": {
-      "method": "echo.library.toggleTrackLiked",
-      "permission": "library:control"
-    },
-    "library:toggleAlbumLiked": {
-      "method": "echo.library.toggleAlbumLiked",
-      "permission": "library:control"
-    },
-    "library:createPlaylist": {
-      "method": "echo.library.createPlaylist",
-      "permission": "library:control"
-    },
-    "library:addTracksToPlaylist": {
-      "method": "echo.library.addTracksToPlaylist",
-      "permission": "library:control"
-    },
-    "library:updatePlaylist": {
-      "method": "echo.library.updatePlaylist",
-      "permission": "library:control"
-    },
-    "library:removePlaylistItems": {
-      "method": "echo.library.removePlaylistItems",
-      "permission": "library:control"
-    },
+    "library:getSummary": {"method":"echo.library.getSummary","permission":"library:read"},
+    "library:getTracks": {"method":"echo.library.getTracks","permission":"library:read"},
+    "library:getTrack": {"method":"echo.library.getTrack","permission":"library:read"},
+    "library:getAlbums": {"method":"echo.library.getAlbums","permission":"library:read"},
+    "library:getAlbumTracks": {"method":"echo.library.getAlbumTracks","permission":"library:read"},
+    "library:getArtists": {"method":"echo.library.getArtists","permission":"library:read"},
+    "library:getArtistTracks": {"method":"echo.library.getArtistTracks","permission":"library:read"},
+    "library:getArtistAlbums": {"method":"echo.library.getArtistAlbums","permission":"library:read"},
+    "library:getGenres": {"method":"echo.library.getGenres","permission":"library:read"},
+    "library:getGenreTracks": {"method":"echo.library.getGenreTracks","permission":"library:read"},
+    "library:getGenreAlbums": {"method":"echo.library.getGenreAlbums","permission":"library:read"},
+    "library:getPlaylists": {"method":"echo.library.getPlaylists","permission":"library:read"},
+    "library:getPlaylistItems": {"method":"echo.library.getPlaylistItems","permission":"library:read"},
+    "library:getLikedTracks": {"method":"echo.library.getLikedTracks","permission":"library:read"},
+    "library:getLikedTrackIds": {"method":"echo.library.getLikedTrackIds","permission":"library:read"},
+    "library:toggleTrackLiked": {"method":"echo.library.toggleTrackLiked","permission":"library:control"},
+    "library:toggleAlbumLiked": {"method":"echo.library.toggleAlbumLiked","permission":"library:control"},
+    "library:createPlaylist": {"method":"echo.library.createPlaylist","permission":"library:control"},
+    "library:addTracksToPlaylist": {"method":"echo.library.addTracksToPlaylist","permission":"library:control"},
+    "library:updatePlaylist": {"method":"echo.library.updatePlaylist","permission":"library:control"},
+    "library:removePlaylistItems": {"method":"echo.library.removePlaylistItems","permission":"library:control"},
     "queue:get": {
       "method": "echo.queue.get",
+      "permission": "queue:read"
+    },
+    "queue:getPage": {
+      "method": "echo.queue.getPage",
       "permission": "queue:read"
     },
     "queue:playTrack": {
@@ -289,6 +303,21 @@
       "method": "echo.agents.run",
       "permission": "agent:runtime"
     },
+    "home:getSettings": { "method": "echo.home.getSettings", "permission": "home:read" },
+    "home:updateSettings": { "method": "echo.home.updateSettings", "permission": "home:control" },
+    "home:getHistory": { "method": "echo.home.getHistory", "permission": "home:read" },
+    "home:getHistorySummary": { "method": "echo.home.getHistorySummary", "permission": "home:read" },
+    "home:getStats": { "method": "echo.home.getStats", "permission": "home:read" },
+    "lyrics:listProviders": { "method": "echo.lyrics.listProviders", "permission": "lyrics:read" },
+    "lyrics:searchProvider": { "method": "echo.lyrics.searchProvider", "permission": "lyrics:search" },
+    "lyrics:getStoredCandidates": { "method": "echo.lyrics.getStoredCandidates", "permission": "lyrics:read" },
+    "lyrics:searchCandidates": { "method": "echo.lyrics.searchCandidates", "permission": "lyrics:search" },
+    "lyrics:previewCandidate": { "method": "echo.lyrics.previewCandidate", "permission": "lyrics:read" },
+    "lyrics:applyCandidate": { "method": "echo.lyrics.applyCandidate", "permission": "lyrics:write" },
+    "lyrics:applyCustom": { "method": "echo.lyrics.applyCustom", "permission": "lyrics:write" },
+    "lyrics:setOffset": { "method": "echo.lyrics.setOffset", "permission": "lyrics:write" },
+    "lyrics:markInstrumental": { "method": "echo.lyrics.markInstrumental", "permission": "lyrics:write" },
+    "lyrics:clearCache": { "method": "echo.lyrics.clearCache", "permission": "lyrics:write" },
     "lyrics:get": {
       "method": "echo.lyrics.get",
       "permission": "lyrics:read"
@@ -341,6 +370,8 @@
       "method": "echo.window.setDesktopWall",
       "permission": "window:desktop-wall"
     },
+    "media-session:setEnabled": { "method": "echo.mediaSession.setEnabled", "permission": "media-session:control" },
+    "media-session:setLyricsEnabled": { "method": "echo.mediaSession.setLyricsEnabled", "permission": "media-session:control" },
     "media-session:getStatus": {
       "method": "echo.mediaSession.getStatus",
       "permission": "media-session:control"
@@ -380,6 +411,14 @@
     "sleep-timer:getStatus": { "method": "echo.sleepTimer.getStatus", "permission": "sleep-timer:control" },
     "sleep-timer:start": { "method": "echo.sleepTimer.start", "permission": "sleep-timer:control" },
     "sleep-timer:cancel": { "method": "echo.sleepTimer.cancel", "permission": "sleep-timer:control" },
+    "presence:steam:getStatus": { "method": "echo.presence.steam.getStatus", "permission": "presence:control" },
+    "presence:steam:getSettings": { "method": "echo.presence.steam.getSettings", "permission": "presence:control" },
+    "presence:steam:updateSettings": { "method": "echo.presence.steam.updateSettings", "permission": "presence:control" },
+    "presence:steam:getOptions": { "method": "echo.presence.steam.getOptions", "permission": "presence:control" },
+    "presence:steam:setEnabled": { "method": "echo.presence.steam.setEnabled", "permission": "presence:control" },
+    "presence:steam:setMode": { "method": "echo.presence.steam.setMode", "permission": "presence:control" },
+    "presence:steam:setTemporaryStatus": { "method": "echo.presence.steam.setTemporaryStatus", "permission": "presence:control" },
+    "presence:steam:clearTemporaryStatus": { "method": "echo.presence.steam.clearTemporaryStatus", "permission": "presence:control" },
     "presence:getDiscord": { "method": "echo.presence.discord.getStatus", "permission": "presence:control" },
     "presence:setDiscordEnabled": { "method": "echo.presence.discord.setEnabled", "permission": "presence:control" },
     "presence:getLastFm": { "method": "echo.presence.lastfm.getStatus", "permission": "presence:control" },
@@ -416,7 +455,8 @@
       "permission": "audio:transition"
     },
     "audio:transition:unregisterProvider": {
-      "method": "echo.audio.transition.unregisterProvider",
+      "method": "echo.audio.transition.registerProvider",
+      "invocation": "returned-unsubscribe",
       "permission": "audio:transition"
     },
     "queue:reorder": {
@@ -451,6 +491,22 @@
     }
   },
   "events": {
+    "media-session:changed": "media-session:control",
+    "bridge:changed": "bridge:control",
+    "presence:changed": "presence:control",
+    "home:changed": "home:read",
+    "audio:dsp-changed": "audio:dsp-read",
+    "covers:candidates-changed": "covers:read",
+    "covers:providers-changed": "covers:read",
+    "metadata:candidates-changed": "metadata:read",
+    "metadata:providers-changed": "metadata:read",
+    "lyrics:candidates-changed": "lyrics:read",
+    "lyrics:providers-changed": "lyrics:read",
+    "lyrics:display-preferences-changed": "lyrics:read",
+    "artwork:palette-changed": "playback:read",
+    "window:maximized-changed": "window:control",
+    "window:fullscreen-changed": "window:control",
+    "extensions:changed": "extensions:read",
     "playback:status": "playback:read",
     "audio:spectrum": "audio:spectrum",
     "queue:changed": "queue:read",
@@ -463,6 +519,10 @@
     "sleep-timer:tick": "sleep-timer:control"
   },
   "commonErrors": {
+    "playback_queue_read_stale": {
+      "retry": false,
+      "recovery": "Discard pages from the previous queue revision and read a fresh first page without sessionId/revision. Do not merge pages across revisions."
+    },
     "panel-context-required": {
       "retry": false,
       "recovery": "Call panel presentation or close methods only from the currently visible sandbox panel; background runtimes cannot mutate host chrome."
@@ -581,7 +641,7 @@
     },
     "storage-quota-exceeded": {
       "retry": false,
-      "recovery": "Reduce the JSON value below 16 KiB and the plug-in namespace below 64 KiB."
+      "recovery": "Use JSON-compatible state within browser Web Storage capacity. Failed writes preserve the previously saved state."
     }
   }
 }

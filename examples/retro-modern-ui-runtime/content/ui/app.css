@@ -9,7 +9,7 @@
 }
 
 * { box-sizing: border-box; }
-html, body { margin: 0; height: 100%; background: #0c1219; color: var(--ink); }
+html, body { margin: 0; height: 100%; background: var(--appBg, #0c1219); color: var(--ink); }
 #app { min-height: 100%; display: grid; grid-template-rows: auto 1fr auto; }
 .top, .player {
   display: flex;
@@ -29,7 +29,7 @@ ol { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
 li, button, input {
   border: 1px solid var(--line);
   border-radius: 12px;
-  background: #182433;
+  background: var(--panel);
   color: inherit;
 }
 li, button { padding: 10px 12px; cursor: pointer; text-align: left; }

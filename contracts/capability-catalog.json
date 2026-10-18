@@ -1,0 +1,3066 @@
+{
+  "apiVersion": 2,
+  "domains": {
+    "library": {
+      "contract": "contracts/library.json",
+      "owner": "Library Core via typed library API",
+      "minimumEchoVersion": "26.10.18",
+      "limits": {
+        "pageSize": 100,
+        "batchIds": 200,
+        "smartResultTracks": 100,
+        "smartPlaylistTracks": 1000,
+        "maximumConditionNodes": 256
+      }
+    },
+    "providers": {
+      "contract": "contracts/providers.json",
+      "owner": "Host lyrics service and Library candidate database/cache",
+      "minimumEchoVersion": "26.10.18",
+      "limits": {
+        "candidatesPerSearch": 20,
+        "concurrentSearchesPerRuntime": 4,
+        "queryCharacters": 512,
+        "workshopLyricsBytesPerRuntime": 1048576
+      }
+    },
+    "controls": {
+      "contract": "contracts/controls.json",
+      "owner": "Typed host service adapters; native audio remains authoritative",
+      "minimumEchoVersion": "26.10.18",
+      "limits": {
+        "pendingInvalidationDomains": 5,
+        "snapshotCache": 0,
+        "pollingTimers": 0
+      }
+    }
+  },
+  "actions": {
+    "lyrics:providers:list": {
+      "method": "echo.lyrics.providers.list",
+      "permission": "lyrics:read",
+      "domain": "lyrics",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/providers.json",
+      "minimumEchoVersion": "26.10.18",
+      "result": "EchoWorkshopProviderDescriptor[]",
+      "arguments": []
+    },
+    "lyrics:candidates:get": {
+      "method": "echo.lyrics.candidates.get",
+      "permission": "lyrics:read",
+      "domain": "lyrics",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/providers.json",
+      "minimumEchoVersion": "26.10.18",
+      "result": "EchoWorkshopCandidate[]",
+      "arguments": [
+        "trackId: string"
+      ]
+    },
+    "lyrics:candidates:search": {
+      "method": "echo.lyrics.candidates.search",
+      "permission": "lyrics:search",
+      "domain": "lyrics",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/providers.json",
+      "minimumEchoVersion": "26.10.18",
+      "result": "EchoWorkshopCandidate[]",
+      "arguments": [
+        "trackId: string",
+        "options: EchoWorkshopCandidateSearch"
+      ]
+    },
+    "lyrics:candidates:preview": {
+      "method": "echo.lyrics.candidates.preview",
+      "permission": "lyrics:read",
+      "domain": "lyrics",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/providers.json",
+      "minimumEchoVersion": "26.10.18",
+      "result": "EchoWorkshopCandidatePreview",
+      "arguments": [
+        "trackId: string",
+        "candidateId: string"
+      ]
+    },
+    "lyrics:candidates:apply": {
+      "method": "echo.lyrics.candidates.apply",
+      "permission": "lyrics:write",
+      "domain": "lyrics",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/providers.json",
+      "minimumEchoVersion": "26.10.18",
+      "result": "unknown",
+      "arguments": [
+        "trackId: string",
+        "candidateId: string"
+      ]
+    },
+    "lyrics:candidates:reject": {
+      "method": "echo.lyrics.candidates.reject",
+      "permission": "lyrics:write",
+      "domain": "lyrics",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/providers.json",
+      "minimumEchoVersion": "26.10.18",
+      "result": "unknown",
+      "arguments": [
+        "trackId: string",
+        "candidateId: string"
+      ]
+    },
+    "lyrics:candidates:cancel": {
+      "method": "echo.lyrics.candidates.cancel",
+      "permission": "lyrics:search",
+      "domain": "lyrics",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/providers.json",
+      "minimumEchoVersion": "26.10.18",
+      "result": "boolean",
+      "arguments": [
+        "requestId: string"
+      ]
+    },
+    "metadata:providers:list": {
+      "method": "echo.metadata.providers.list",
+      "permission": "metadata:read",
+      "domain": "metadata",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/providers.json",
+      "minimumEchoVersion": "26.10.18",
+      "result": "EchoWorkshopProviderDescriptor[]",
+      "arguments": []
+    },
+    "metadata:candidates:get": {
+      "method": "echo.metadata.candidates.get",
+      "permission": "metadata:read",
+      "domain": "metadata",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/providers.json",
+      "minimumEchoVersion": "26.10.18",
+      "result": "EchoWorkshopCandidate[]",
+      "arguments": [
+        "trackId: string"
+      ]
+    },
+    "metadata:candidates:search": {
+      "method": "echo.metadata.candidates.search",
+      "permission": "metadata:search",
+      "domain": "metadata",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/providers.json",
+      "minimumEchoVersion": "26.10.18",
+      "result": "EchoWorkshopCandidate[]",
+      "arguments": [
+        "trackId: string",
+        "options: EchoWorkshopCandidateSearch"
+      ]
+    },
+    "metadata:candidates:preview": {
+      "method": "echo.metadata.candidates.preview",
+      "permission": "metadata:read",
+      "domain": "metadata",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/providers.json",
+      "minimumEchoVersion": "26.10.18",
+      "result": "EchoWorkshopCandidatePreview",
+      "arguments": [
+        "trackId: string",
+        "candidateId: string"
+      ]
+    },
+    "metadata:candidates:apply": {
+      "method": "echo.metadata.candidates.apply",
+      "permission": "metadata:write",
+      "domain": "metadata",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/providers.json",
+      "minimumEchoVersion": "26.10.18",
+      "result": "unknown",
+      "arguments": [
+        "trackId: string",
+        "candidateId: string"
+      ]
+    },
+    "metadata:candidates:reject": {
+      "method": "echo.metadata.candidates.reject",
+      "permission": "metadata:write",
+      "domain": "metadata",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/providers.json",
+      "minimumEchoVersion": "26.10.18",
+      "result": "unknown",
+      "arguments": [
+        "trackId: string",
+        "candidateId: string"
+      ]
+    },
+    "metadata:candidates:cancel": {
+      "method": "echo.metadata.candidates.cancel",
+      "permission": "metadata:search",
+      "domain": "metadata",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/providers.json",
+      "minimumEchoVersion": "26.10.18",
+      "result": "boolean",
+      "arguments": [
+        "requestId: string"
+      ]
+    },
+    "covers:providers:list": {
+      "method": "echo.covers.providers.list",
+      "permission": "covers:read",
+      "domain": "covers",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/providers.json",
+      "minimumEchoVersion": "26.10.18",
+      "result": "EchoWorkshopProviderDescriptor[]",
+      "arguments": []
+    },
+    "covers:candidates:get": {
+      "method": "echo.covers.candidates.get",
+      "permission": "covers:read",
+      "domain": "covers",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/providers.json",
+      "minimumEchoVersion": "26.10.18",
+      "result": "EchoWorkshopCandidate[]",
+      "arguments": [
+        "trackId: string"
+      ]
+    },
+    "covers:candidates:search": {
+      "method": "echo.covers.candidates.search",
+      "permission": "covers:search",
+      "domain": "covers",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/providers.json",
+      "minimumEchoVersion": "26.10.18",
+      "result": "EchoWorkshopCandidate[]",
+      "arguments": [
+        "trackId: string",
+        "options: EchoWorkshopCandidateSearch"
+      ]
+    },
+    "covers:candidates:preview": {
+      "method": "echo.covers.candidates.preview",
+      "permission": "covers:read",
+      "domain": "covers",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/providers.json",
+      "minimumEchoVersion": "26.10.18",
+      "result": "EchoWorkshopCandidatePreview",
+      "arguments": [
+        "trackId: string",
+        "candidateId: string"
+      ]
+    },
+    "covers:candidates:apply": {
+      "method": "echo.covers.candidates.apply",
+      "permission": "covers:write",
+      "domain": "covers",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/providers.json",
+      "minimumEchoVersion": "26.10.18",
+      "result": "unknown",
+      "arguments": [
+        "trackId: string",
+        "candidateId: string"
+      ]
+    },
+    "covers:candidates:reject": {
+      "method": "echo.covers.candidates.reject",
+      "permission": "covers:write",
+      "domain": "covers",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/providers.json",
+      "minimumEchoVersion": "26.10.18",
+      "result": "unknown",
+      "arguments": [
+        "trackId: string",
+        "candidateId: string"
+      ]
+    },
+    "covers:candidates:cancel": {
+      "method": "echo.covers.candidates.cancel",
+      "permission": "covers:search",
+      "domain": "covers",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/providers.json",
+      "minimumEchoVersion": "26.10.18",
+      "result": "boolean",
+      "arguments": [
+        "requestId: string"
+      ]
+    },
+    "audio:output:getStatus": {
+      "method": "echo.audio.output.getStatus",
+      "permission": "audio:output-read",
+      "domain": "audio",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "audio:output:listDevices": {
+      "method": "echo.audio.output.listDevices",
+      "permission": "audio:output-read",
+      "domain": "audio",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "audio:output:refreshDevices": {
+      "method": "echo.audio.output.refreshDevices",
+      "permission": "audio:output-read",
+      "domain": "audio",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "audio:output:getDeviceVolume": {
+      "method": "echo.audio.output.getDeviceVolume",
+      "permission": "audio:output-read",
+      "domain": "audio",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "audio:output:setOutput": {
+      "method": "echo.audio.output.setOutput",
+      "permission": "audio:output-write",
+      "domain": "audio",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "audio:output:setDeviceVolume": {
+      "method": "echo.audio.output.setDeviceVolume",
+      "permission": "audio:output-write",
+      "domain": "audio",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "audio:output:setVolumeControlMode": {
+      "method": "echo.audio.output.setVolumeControlMode",
+      "permission": "audio:output-write",
+      "domain": "audio",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "library:getTracksByIds": {
+      "method": "echo.library.getTracksByIds",
+      "permission": "library:read",
+      "domain": "library",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/library.json",
+      "minimumEchoVersion": "26.10.18",
+      "result": "EchoWorkshopTrack[]",
+      "arguments": [
+        {
+          "name": "trackIds",
+          "type": "string[]",
+          "optional": false
+        }
+      ],
+      "aliases": []
+    },
+    "library:playlists:list": {
+      "method": "echo.library.playlists.list",
+      "permission": "library:read",
+      "domain": "library",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/library.json",
+      "minimumEchoVersion": "26.10.18",
+      "result": "EchoWorkshopPage<EchoWorkshopPlaylist>",
+      "arguments": [
+        {
+          "name": "query",
+          "type": "EchoWorkshopPageQuery",
+          "optional": true
+        }
+      ],
+      "aliases": []
+    },
+    "library:playlists:get": {
+      "method": "echo.library.playlists.get",
+      "permission": "library:read",
+      "domain": "library",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/library.json",
+      "minimumEchoVersion": "26.10.18",
+      "result": "EchoWorkshopPlaylist",
+      "arguments": [
+        {
+          "name": "playlistId",
+          "type": "string",
+          "optional": false
+        }
+      ],
+      "aliases": []
+    },
+    "library:playlists:delete": {
+      "method": "echo.library.playlists.delete",
+      "permission": "library:playlist-delete",
+      "domain": "library",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/library.json",
+      "minimumEchoVersion": "26.10.18",
+      "result": "null",
+      "arguments": [
+        {
+          "name": "playlistId",
+          "type": "string",
+          "optional": false
+        }
+      ],
+      "aliases": []
+    },
+    "library:playlists:moveItem": {
+      "method": "echo.library.playlists.moveItem",
+      "permission": "library:control",
+      "domain": "library",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/library.json",
+      "minimumEchoVersion": "26.10.18",
+      "result": "null",
+      "arguments": [
+        {
+          "name": "playlistId",
+          "type": "string",
+          "optional": false
+        },
+        {
+          "name": "itemId",
+          "type": "string",
+          "optional": false
+        },
+        {
+          "name": "position",
+          "type": "number",
+          "optional": false
+        }
+      ],
+      "aliases": []
+    },
+    "library:playlists:getRules": {
+      "method": "echo.library.playlists.getRules",
+      "permission": "library:read",
+      "domain": "library",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/library.json",
+      "minimumEchoVersion": "26.10.18",
+      "result": "EchoWorkshopSmartRules",
+      "arguments": [
+        {
+          "name": "playlistId",
+          "type": "string",
+          "optional": false
+        }
+      ],
+      "aliases": []
+    },
+    "library:playlists:previewRules": {
+      "method": "echo.library.playlists.previewRules",
+      "permission": "library:read",
+      "domain": "library",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/library.json",
+      "minimumEchoVersion": "26.10.18",
+      "result": "EchoWorkshopSmartPreview",
+      "arguments": [
+        {
+          "name": "input",
+          "type": "EchoWorkshopSmartInput",
+          "optional": false
+        }
+      ],
+      "aliases": []
+    },
+    "library:playlists:createSmart": {
+      "method": "echo.library.playlists.createSmart",
+      "permission": "library:control",
+      "domain": "library",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/library.json",
+      "minimumEchoVersion": "26.10.18",
+      "result": "EchoWorkshopPlaylist",
+      "arguments": [
+        {
+          "name": "input",
+          "type": "EchoWorkshopSmartInput",
+          "optional": false
+        }
+      ],
+      "aliases": []
+    },
+    "library:playlists:updateRules": {
+      "method": "echo.library.playlists.updateRules",
+      "permission": "library:control",
+      "domain": "library",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/library.json",
+      "minimumEchoVersion": "26.10.18",
+      "result": "EchoWorkshopPlaylist",
+      "arguments": [
+        {
+          "name": "playlistId",
+          "type": "string",
+          "optional": false
+        },
+        {
+          "name": "input",
+          "type": "EchoWorkshopSmartInput",
+          "optional": false
+        }
+      ],
+      "aliases": []
+    },
+    "library:playlists:freeze": {
+      "method": "echo.library.playlists.freeze",
+      "permission": "library:control",
+      "domain": "library",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/library.json",
+      "minimumEchoVersion": "26.10.18",
+      "result": "EchoWorkshopPlaylist",
+      "arguments": [
+        {
+          "name": "playlistId",
+          "type": "string",
+          "optional": false
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "optional": true
+        }
+      ],
+      "aliases": []
+    },
+    "library:favorites:getAlbums": {
+      "method": "echo.library.favorites.getAlbums",
+      "permission": "library:read",
+      "domain": "library",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/library.json",
+      "minimumEchoVersion": "26.10.18",
+      "result": "EchoWorkshopPage<EchoWorkshopPlaylistItem>",
+      "arguments": [
+        {
+          "name": "query",
+          "type": "EchoWorkshopPageQuery",
+          "optional": true
+        }
+      ],
+      "aliases": []
+    },
+    "library:favorites:getAlbumStates": {
+      "method": "echo.library.favorites.getAlbumStates",
+      "permission": "library:read",
+      "domain": "library",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/library.json",
+      "minimumEchoVersion": "26.10.18",
+      "result": "Record<string, boolean>",
+      "arguments": [
+        {
+          "name": "albumIds",
+          "type": "string[]",
+          "optional": false
+        }
+      ],
+      "aliases": []
+    },
+    "library:favorites:setTrack": {
+      "method": "echo.library.favorites.setTrack",
+      "permission": "library:control",
+      "domain": "library",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/library.json",
+      "minimumEchoVersion": "26.10.18",
+      "result": "EchoWorkshopLikedTrackResult",
+      "arguments": [
+        {
+          "name": "trackId",
+          "type": "string",
+          "optional": false
+        },
+        {
+          "name": "liked",
+          "type": "boolean",
+          "optional": false
+        }
+      ],
+      "aliases": []
+    },
+    "library:favorites:setAlbum": {
+      "method": "echo.library.favorites.setAlbum",
+      "permission": "library:control",
+      "domain": "library",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/library.json",
+      "minimumEchoVersion": "26.10.18",
+      "result": "EchoWorkshopLikedAlbumResult",
+      "arguments": [
+        {
+          "name": "albumId",
+          "type": "string",
+          "optional": false
+        },
+        {
+          "name": "liked",
+          "type": "boolean",
+          "optional": false
+        }
+      ],
+      "aliases": []
+    },
+    "library:favorites:moveTrack": {
+      "method": "echo.library.favorites.moveTrack",
+      "permission": "library:control",
+      "domain": "library",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/library.json",
+      "minimumEchoVersion": "26.10.18",
+      "result": "null",
+      "arguments": [
+        {
+          "name": "itemId",
+          "type": "string",
+          "optional": false
+        },
+        {
+          "name": "position",
+          "type": "number",
+          "optional": false
+        }
+      ],
+      "aliases": []
+    },
+    "library:tags:list": {
+      "method": "echo.library.tags.list",
+      "permission": "library:read",
+      "domain": "library",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/library.json",
+      "minimumEchoVersion": "26.10.18",
+      "result": "EchoWorkshopPersonalTag[]",
+      "arguments": [
+        {
+          "name": "target",
+          "type": "EchoWorkshopTagTarget",
+          "optional": true
+        }
+      ],
+      "aliases": []
+    },
+    "library:tags:change": {
+      "method": "echo.library.tags.change",
+      "permission": "library:personal-write",
+      "domain": "library",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/library.json",
+      "minimumEchoVersion": "26.10.18",
+      "result": "null",
+      "arguments": [
+        {
+          "name": "change",
+          "type": "EchoWorkshopTagChange",
+          "optional": false
+        }
+      ],
+      "aliases": []
+    },
+    "library:tags:getItems": {
+      "method": "echo.library.tags.getItems",
+      "permission": "library:read",
+      "domain": "library",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/library.json",
+      "minimumEchoVersion": "26.10.18",
+      "result": "EchoWorkshopPage<EchoWorkshopTagItem>",
+      "arguments": [
+        {
+          "name": "tagId",
+          "type": "string",
+          "optional": false
+        },
+        {
+          "name": "page",
+          "type": "number",
+          "optional": true
+        }
+      ],
+      "aliases": []
+    },
+    "library:listenLater:list": {
+      "method": "echo.library.listenLater.list",
+      "permission": "library:read",
+      "domain": "library",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/library.json",
+      "minimumEchoVersion": "26.10.18",
+      "result": "EchoWorkshopPage<EchoWorkshopListenLaterEntry>",
+      "arguments": [
+        {
+          "name": "query",
+          "type": "{ page?: number; search?: string; completed?: boolean }",
+          "optional": true
+        }
+      ],
+      "aliases": []
+    },
+    "library:listenLater:get": {
+      "method": "echo.library.listenLater.get",
+      "permission": "library:read",
+      "domain": "library",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/library.json",
+      "minimumEchoVersion": "26.10.18",
+      "result": "EchoWorkshopListenLaterEntry | null",
+      "arguments": [
+        {
+          "name": "albumId",
+          "type": "string",
+          "optional": false
+        }
+      ],
+      "aliases": []
+    },
+    "library:listenLater:change": {
+      "method": "echo.library.listenLater.change",
+      "permission": "library:personal-write",
+      "domain": "library",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/library.json",
+      "minimumEchoVersion": "26.10.18",
+      "result": "null",
+      "arguments": [
+        {
+          "name": "change",
+          "type": "{ albumId: string; action: 'add' | 'remove' | 'complete' | 'reset' }",
+          "optional": false
+        }
+      ],
+      "aliases": []
+    },
+    "library:playQuery": {
+      "method": "echo.library.playQuery",
+      "permission": "queue:control",
+      "requiredPermissions": [
+        "library:read"
+      ],
+      "domain": "library",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/library.json",
+      "minimumEchoVersion": "26.10.18",
+      "result": "EchoWorkshopCollectionPlayResult",
+      "arguments": [
+        {
+          "name": "query",
+          "type": "EchoWorkshopPageQuery",
+          "optional": false
+        },
+        {
+          "name": "trackId",
+          "type": "string",
+          "optional": true
+        }
+      ],
+      "aliases": []
+    },
+    "lyrics:getDisplayPreferences": {
+      "method": "echo.lyrics.getDisplayPreferences",
+      "permission": "lyrics:read",
+      "domain": "lyrics",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "lyrics:watchDisplayPreferences": {
+      "method": "echo.lyrics.onDisplayPreferencesChanged",
+      "permission": "lyrics:read",
+      "domain": "lyrics",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "lyrics:setCurrentOffset": {
+      "method": "echo.lyrics.setCurrentOffset",
+      "permission": "lyrics:write",
+      "domain": "lyrics",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "artwork:getPalette": {
+      "method": "echo.artwork.getPalette",
+      "permission": "playback:read",
+      "domain": "artwork",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "artwork:watchPalette": {
+      "method": "echo.artwork.onPaletteChanged",
+      "permission": "playback:read",
+      "domain": "artwork",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "ui:getLayout": {
+      "method": "echo.ui.getLayout",
+      "permission": null,
+      "domain": "ui",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "ui:watchLayout": {
+      "method": "echo.ui.onLayoutChanged",
+      "permission": null,
+      "domain": "ui",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "ui:getRenderBudget": {
+      "method": "echo.ui.getRenderBudget",
+      "permission": null,
+      "domain": "ui",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "ui:watchRenderBudget": {
+      "method": "echo.ui.onRenderBudgetChanged",
+      "permission": null,
+      "domain": "ui",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "extensions:list": {
+      "method": "echo.extensions.list",
+      "permission": "extensions:read",
+      "domain": "extensions",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "extensions:launch": {
+      "method": "echo.extensions.launch",
+      "permission": "extensions:launch",
+      "domain": "extensions",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "window:minimize": {
+      "method": "echo.window.minimize",
+      "permission": "window:control",
+      "domain": "window",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "window:isMaximized": {
+      "method": "echo.window.isMaximized",
+      "permission": "window:control",
+      "domain": "window",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "window:isFullscreen": {
+      "method": "echo.window.isFullscreen",
+      "permission": "window:control",
+      "domain": "window",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "window:toggleMaximize": {
+      "method": "echo.window.toggleMaximize",
+      "permission": "window:control",
+      "domain": "window",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "window:toggleFullscreen": {
+      "method": "echo.window.toggleFullscreen",
+      "permission": "window:control",
+      "domain": "window",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "window:close": {
+      "method": "echo.window.close",
+      "permission": "window:control",
+      "domain": "window",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "playback:stop": {
+      "method": "echo.playback.stop",
+      "permission": "playback:control",
+      "domain": "playback",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "host:getCapabilities": {
+      "method": "echo.host.getCapabilities",
+      "permission": null,
+      "domain": "host",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "host:getFeatureAvailability": {
+      "method": "echo.host.getFeatureAvailability",
+      "permission": null,
+      "domain": "host",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "ui:getContext": {
+      "method": "echo.ui.getContext",
+      "permission": null,
+      "domain": "ui",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "ui:getParentPage": {
+      "method": "echo.ui.getParentPage",
+      "permission": null,
+      "domain": "ui",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "ui:setPanelPresentation": {
+      "method": "echo.ui.setPanelPresentation",
+      "permission": null,
+      "domain": "ui",
+      "surfaces": [
+        "plugin"
+      ],
+      "minimumEchoVersion": null
+    },
+    "ui:closePanel": {
+      "method": "echo.ui.closePanel",
+      "permission": null,
+      "domain": "ui",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "ui:openPanel": {
+      "method": "echo.ui.openPanel",
+      "permission": null,
+      "domain": "ui",
+      "surfaces": [
+        "plugin"
+      ],
+      "minimumEchoVersion": null
+    },
+    "navigation:open": {
+      "method": "echo.navigation.open",
+      "permission": "navigation",
+      "domain": "navigation",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "playback:getStatus": {
+      "method": "echo.playback.getStatus",
+      "permission": "playback:read",
+      "domain": "playback",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "playback:play": {
+      "method": "echo.playback.play",
+      "permission": "playback:control",
+      "domain": "playback",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "playback:pause": {
+      "method": "echo.playback.pause",
+      "permission": "playback:control",
+      "domain": "playback",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "playback:seek": {
+      "method": "echo.playback.seek",
+      "permission": "playback:control",
+      "domain": "playback",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "playback:previous": {
+      "method": "echo.playback.previous",
+      "permission": "playback:control",
+      "domain": "playback",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "playback:next": {
+      "method": "echo.playback.next",
+      "permission": "playback:control",
+      "domain": "playback",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "playback:setVolume": {
+      "method": "echo.playback.setVolume",
+      "permission": "playback:control",
+      "domain": "playback",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "playback:setShuffle": {
+      "method": "echo.playback.setShuffle",
+      "permission": "playback:control",
+      "domain": "playback",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "playback:toggleShuffle": {
+      "method": "echo.playback.toggleShuffle",
+      "permission": "playback:control",
+      "domain": "playback",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "playback:setRepeat": {
+      "method": "echo.playback.setRepeat",
+      "permission": "playback:control",
+      "domain": "playback",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "playback:cycleRepeat": {
+      "method": "echo.playback.cycleRepeat",
+      "permission": "playback:control",
+      "domain": "playback",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "playback:playUrl": {
+      "method": "echo.playback.playUrl",
+      "permission": "sources:direct",
+      "domain": "playback",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "audio:getSpectrum": {
+      "method": "echo.audio.getSpectrum",
+      "permission": "audio:spectrum",
+      "domain": "audio",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "audio:getSpectrogram": {
+      "method": "echo.audio.getSpectrogram",
+      "permission": "audio:spectrum",
+      "domain": "audio",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "audio:getVisualization": {
+      "method": "echo.audio.getVisualization",
+      "permission": "audio:spectrum",
+      "domain": "audio",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "audio:dsp:getModule": {
+      "method": "echo.audio.dsp.getModule",
+      "permission": "audio:dsp-read",
+      "domain": "audio",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "audio:dsp:getRackOrder": {
+      "method": "echo.audio.dsp.getRackOrder",
+      "permission": "audio:dsp-read",
+      "domain": "audio",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "audio:dsp:setModule": {
+      "method": "echo.audio.dsp.setModule",
+      "permission": "audio:dsp-write",
+      "domain": "audio",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "audio:dsp:setRackOrder": {
+      "method": "echo.audio.dsp.setRackOrder",
+      "permission": "audio:dsp-write",
+      "domain": "audio",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "audio:offline:open": {
+      "method": "echo.audio.offline.open",
+      "permission": "audio:offline-read",
+      "domain": "audio",
+      "surfaces": [
+        "plugin"
+      ],
+      "minimumEchoVersion": null
+    },
+    "audio:offline:read": {
+      "method": "echo.audio.offline.read",
+      "permission": "audio:offline-read",
+      "domain": "audio",
+      "surfaces": [
+        "plugin"
+      ],
+      "minimumEchoVersion": null
+    },
+    "audio:offline:close": {
+      "method": "echo.audio.offline.close",
+      "permission": "audio:offline-read",
+      "domain": "audio",
+      "surfaces": [
+        "plugin"
+      ],
+      "minimumEchoVersion": null
+    },
+    "library:getSummary": {
+      "method": "echo.library.getSummary",
+      "permission": "library:read",
+      "domain": "library",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/library.json",
+      "minimumEchoVersion": null,
+      "result": "EchoWorkshopLibrarySummary",
+      "arguments": [],
+      "aliases": []
+    },
+    "library:getTracks": {
+      "method": "echo.library.getTracks",
+      "permission": "library:read",
+      "domain": "library",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/library.json",
+      "minimumEchoVersion": null,
+      "result": "EchoWorkshopPage<EchoWorkshopTrack>",
+      "arguments": [
+        {
+          "name": "query",
+          "type": "EchoWorkshopPageQuery",
+          "optional": true
+        }
+      ],
+      "aliases": []
+    },
+    "library:getTrack": {
+      "method": "echo.library.getTrack",
+      "permission": "library:read",
+      "domain": "library",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/library.json",
+      "minimumEchoVersion": null,
+      "result": "EchoWorkshopTrack",
+      "arguments": [
+        {
+          "name": "trackId",
+          "type": "string",
+          "optional": false
+        }
+      ],
+      "aliases": []
+    },
+    "library:getAlbums": {
+      "method": "echo.library.getAlbums",
+      "permission": "library:read",
+      "domain": "library",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/library.json",
+      "minimumEchoVersion": null,
+      "result": "EchoWorkshopPage<EchoWorkshopAlbum>",
+      "arguments": [
+        {
+          "name": "query",
+          "type": "EchoWorkshopPageQuery",
+          "optional": true
+        }
+      ],
+      "aliases": []
+    },
+    "library:getAlbumTracks": {
+      "method": "echo.library.getAlbumTracks",
+      "permission": "library:read",
+      "domain": "library",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/library.json",
+      "minimumEchoVersion": null,
+      "result": "EchoWorkshopPage<EchoWorkshopTrack>",
+      "arguments": [
+        {
+          "name": "id",
+          "type": "string",
+          "optional": false
+        },
+        {
+          "name": "query",
+          "type": "EchoWorkshopPageQuery",
+          "optional": true
+        }
+      ],
+      "aliases": []
+    },
+    "library:getArtists": {
+      "method": "echo.library.getArtists",
+      "permission": "library:read",
+      "domain": "library",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/library.json",
+      "minimumEchoVersion": null,
+      "result": "EchoWorkshopPage<EchoWorkshopArtist>",
+      "arguments": [
+        {
+          "name": "query",
+          "type": "EchoWorkshopPageQuery",
+          "optional": true
+        }
+      ],
+      "aliases": []
+    },
+    "library:getArtistTracks": {
+      "method": "echo.library.getArtistTracks",
+      "permission": "library:read",
+      "domain": "library",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/library.json",
+      "minimumEchoVersion": null,
+      "result": "EchoWorkshopPage<EchoWorkshopTrack>",
+      "arguments": [
+        {
+          "name": "id",
+          "type": "string",
+          "optional": false
+        },
+        {
+          "name": "query",
+          "type": "EchoWorkshopPageQuery",
+          "optional": true
+        }
+      ],
+      "aliases": []
+    },
+    "library:getArtistAlbums": {
+      "method": "echo.library.getArtistAlbums",
+      "permission": "library:read",
+      "domain": "library",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/library.json",
+      "minimumEchoVersion": null,
+      "result": "EchoWorkshopPage<EchoWorkshopAlbum>",
+      "arguments": [
+        {
+          "name": "id",
+          "type": "string",
+          "optional": false
+        },
+        {
+          "name": "query",
+          "type": "EchoWorkshopPageQuery",
+          "optional": true
+        }
+      ],
+      "aliases": []
+    },
+    "library:getGenres": {
+      "method": "echo.library.getGenres",
+      "permission": "library:read",
+      "domain": "library",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/library.json",
+      "minimumEchoVersion": null,
+      "result": "EchoWorkshopPage<EchoWorkshopGenre>",
+      "arguments": [
+        {
+          "name": "query",
+          "type": "EchoWorkshopPageQuery",
+          "optional": true
+        }
+      ],
+      "aliases": []
+    },
+    "library:getGenreTracks": {
+      "method": "echo.library.getGenreTracks",
+      "permission": "library:read",
+      "domain": "library",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/library.json",
+      "minimumEchoVersion": null,
+      "result": "EchoWorkshopPage<EchoWorkshopTrack>",
+      "arguments": [
+        {
+          "name": "id",
+          "type": "string",
+          "optional": false
+        },
+        {
+          "name": "query",
+          "type": "EchoWorkshopPageQuery",
+          "optional": true
+        }
+      ],
+      "aliases": []
+    },
+    "library:getGenreAlbums": {
+      "method": "echo.library.getGenreAlbums",
+      "permission": "library:read",
+      "domain": "library",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/library.json",
+      "minimumEchoVersion": null,
+      "result": "EchoWorkshopPage<EchoWorkshopAlbum>",
+      "arguments": [
+        {
+          "name": "id",
+          "type": "string",
+          "optional": false
+        },
+        {
+          "name": "query",
+          "type": "EchoWorkshopPageQuery",
+          "optional": true
+        }
+      ],
+      "aliases": []
+    },
+    "library:getPlaylists": {
+      "method": "echo.library.getPlaylists",
+      "permission": "library:read",
+      "domain": "library",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/library.json",
+      "minimumEchoVersion": null,
+      "result": "EchoWorkshopPlaylist[]",
+      "arguments": [],
+      "aliases": []
+    },
+    "library:getPlaylistItems": {
+      "method": "echo.library.getPlaylistItems",
+      "permission": "library:read",
+      "domain": "library",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/library.json",
+      "minimumEchoVersion": null,
+      "result": "EchoWorkshopPage<EchoWorkshopPlaylistItem>",
+      "arguments": [
+        {
+          "name": "id",
+          "type": "string",
+          "optional": false
+        },
+        {
+          "name": "query",
+          "type": "EchoWorkshopPageQuery",
+          "optional": true
+        }
+      ],
+      "aliases": [
+        "echo.library.playlists.getItems"
+      ]
+    },
+    "library:getLikedTracks": {
+      "method": "echo.library.getLikedTracks",
+      "permission": "library:read",
+      "domain": "library",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/library.json",
+      "minimumEchoVersion": null,
+      "result": "EchoWorkshopPage<EchoWorkshopPlaylistItem>",
+      "arguments": [
+        {
+          "name": "query",
+          "type": "EchoWorkshopPageQuery",
+          "optional": true
+        }
+      ],
+      "aliases": [
+        "echo.library.favorites.getTracks"
+      ]
+    },
+    "library:getLikedTrackIds": {
+      "method": "echo.library.getLikedTrackIds",
+      "permission": "library:read",
+      "domain": "library",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/library.json",
+      "minimumEchoVersion": null,
+      "result": "Record<string, boolean>",
+      "arguments": [
+        {
+          "name": "trackIds",
+          "type": "string[]",
+          "optional": false
+        }
+      ],
+      "aliases": [
+        "echo.library.favorites.getTrackStates"
+      ]
+    },
+    "library:toggleTrackLiked": {
+      "method": "echo.library.toggleTrackLiked",
+      "permission": "library:control",
+      "domain": "library",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/library.json",
+      "minimumEchoVersion": null,
+      "result": "EchoWorkshopLikedTrackResult",
+      "arguments": [
+        {
+          "name": "trackId",
+          "type": "string",
+          "optional": false
+        }
+      ],
+      "aliases": []
+    },
+    "library:toggleAlbumLiked": {
+      "method": "echo.library.toggleAlbumLiked",
+      "permission": "library:control",
+      "domain": "library",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/library.json",
+      "minimumEchoVersion": null,
+      "result": "EchoWorkshopLikedAlbumResult",
+      "arguments": [
+        {
+          "name": "albumId",
+          "type": "string",
+          "optional": false
+        }
+      ],
+      "aliases": []
+    },
+    "library:createPlaylist": {
+      "method": "echo.library.createPlaylist",
+      "permission": "library:control",
+      "domain": "library",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/library.json",
+      "minimumEchoVersion": null,
+      "result": "EchoWorkshopPlaylist",
+      "arguments": [
+        {
+          "name": "input",
+          "type": "{ name: string; description?: string }",
+          "optional": false
+        }
+      ],
+      "aliases": [
+        "echo.library.playlists.create"
+      ]
+    },
+    "library:addTracksToPlaylist": {
+      "method": "echo.library.addTracksToPlaylist",
+      "permission": "library:control",
+      "domain": "library",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/library.json",
+      "minimumEchoVersion": null,
+      "result": "EchoWorkshopPlaylistItem[]",
+      "arguments": [
+        {
+          "name": "playlistId",
+          "type": "string",
+          "optional": false
+        },
+        {
+          "name": "trackIds",
+          "type": "string[]",
+          "optional": false
+        }
+      ],
+      "aliases": [
+        "echo.library.playlists.addTracks"
+      ]
+    },
+    "library:updatePlaylist": {
+      "method": "echo.library.updatePlaylist",
+      "permission": "library:control",
+      "domain": "library",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/library.json",
+      "minimumEchoVersion": null,
+      "result": "EchoWorkshopPlaylist",
+      "arguments": [
+        {
+          "name": "playlistId",
+          "type": "string",
+          "optional": false
+        },
+        {
+          "name": "patch",
+          "type": "EchoWorkshopPlaylistPatch",
+          "optional": false
+        }
+      ],
+      "aliases": [
+        "echo.library.playlists.update"
+      ]
+    },
+    "library:removePlaylistItems": {
+      "method": "echo.library.removePlaylistItems",
+      "permission": "library:control",
+      "domain": "library",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "contract": "contracts/library.json",
+      "minimumEchoVersion": null,
+      "result": "{ affectedCount: number }",
+      "arguments": [
+        {
+          "name": "playlistId",
+          "type": "string",
+          "optional": false
+        },
+        {
+          "name": "itemIds",
+          "type": "string[]",
+          "optional": false
+        }
+      ],
+      "aliases": [
+        "echo.library.playlists.removeItems"
+      ]
+    },
+    "queue:get": {
+      "method": "echo.queue.get",
+      "permission": "queue:read",
+      "domain": "queue",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "queue:getPage": {
+      "method": "echo.queue.getPage",
+      "permission": "queue:read",
+      "domain": "queue",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "queue:playTrack": {
+      "method": "echo.queue.playTrack",
+      "permission": "queue:control",
+      "domain": "queue",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "queue:enqueueTrack": {
+      "method": "echo.queue.enqueueTrack",
+      "permission": "queue:control",
+      "domain": "queue",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "queue:playItem": {
+      "method": "echo.queue.playItem",
+      "permission": "queue:control",
+      "domain": "queue",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "queue:moveItem": {
+      "method": "echo.queue.moveItem",
+      "permission": "queue:control",
+      "domain": "queue",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "queue:removeItem": {
+      "method": "echo.queue.removeItem",
+      "permission": "queue:control",
+      "domain": "queue",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "queue:clear": {
+      "method": "echo.queue.clear",
+      "permission": "queue:control",
+      "domain": "queue",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "queue:playAlbum": {
+      "method": "echo.queue.playAlbum",
+      "permission": "queue:control",
+      "domain": "queue",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "queue:playArtist": {
+      "method": "echo.queue.playArtist",
+      "permission": "queue:control",
+      "domain": "queue",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "queue:playGenre": {
+      "method": "echo.queue.playGenre",
+      "permission": "queue:control",
+      "domain": "queue",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "queue:playPlaylist": {
+      "method": "echo.queue.playPlaylist",
+      "permission": "queue:control",
+      "domain": "queue",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "queue:playLiked": {
+      "method": "echo.queue.playLiked",
+      "permission": "queue:control",
+      "domain": "queue",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "source-provider:search": {
+      "method": "echo.sources.search",
+      "permission": "sources:provide",
+      "domain": "source-provider",
+      "surfaces": [
+        "plugin"
+      ],
+      "minimumEchoVersion": null
+    },
+    "source-provider:browse": {
+      "method": "echo.sources.browse",
+      "permission": "sources:provide",
+      "domain": "source-provider",
+      "surfaces": [
+        "plugin"
+      ],
+      "minimumEchoVersion": null
+    },
+    "source-provider:listCollection": {
+      "method": "echo.sources.listCollection",
+      "permission": "sources:provide",
+      "domain": "source-provider",
+      "surfaces": [
+        "plugin"
+      ],
+      "minimumEchoVersion": null
+    },
+    "source-provider:resolve": {
+      "method": "echo.sources.resolve",
+      "permission": "sources:provide",
+      "domain": "source-provider",
+      "surfaces": [
+        "plugin"
+      ],
+      "minimumEchoVersion": null
+    },
+    "sources:playDirect": {
+      "method": "echo.sources.playDirect",
+      "permission": "sources:direct",
+      "domain": "sources",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "sources:enqueueDirect": {
+      "method": "echo.sources.enqueueDirect",
+      "permission": "sources:direct",
+      "domain": "sources",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "sources:playQueue": {
+      "method": "echo.sources.playQueue",
+      "permission": "sources:direct",
+      "domain": "sources",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "network:request": {
+      "method": "echo.network.request/get/post",
+      "permission": "network:request",
+      "domain": "network",
+      "surfaces": [
+        "plugin"
+      ],
+      "minimumEchoVersion": null
+    },
+    "network:cancel": {
+      "method": "echo.network.cancel",
+      "permission": "network:request",
+      "domain": "network",
+      "surfaces": [
+        "plugin"
+      ],
+      "minimumEchoVersion": null
+    },
+    "agent:run": {
+      "method": "echo.agents.run",
+      "permission": "agent:runtime",
+      "domain": "agent",
+      "surfaces": [
+        "plugin"
+      ],
+      "minimumEchoVersion": null
+    },
+    "home:getSettings": {
+      "method": "echo.home.getSettings",
+      "permission": "home:read",
+      "domain": "home",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "home:updateSettings": {
+      "method": "echo.home.updateSettings",
+      "permission": "home:control",
+      "domain": "home",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "home:getHistory": {
+      "method": "echo.home.getHistory",
+      "permission": "home:read",
+      "domain": "home",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "home:getHistorySummary": {
+      "method": "echo.home.getHistorySummary",
+      "permission": "home:read",
+      "domain": "home",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "home:getStats": {
+      "method": "echo.home.getStats",
+      "permission": "home:read",
+      "domain": "home",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "lyrics:listProviders": {
+      "method": "echo.lyrics.listProviders",
+      "permission": "lyrics:read",
+      "domain": "lyrics",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "lyrics:searchProvider": {
+      "method": "echo.lyrics.searchProvider",
+      "permission": "lyrics:search",
+      "domain": "lyrics",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "lyrics:getStoredCandidates": {
+      "method": "echo.lyrics.getStoredCandidates",
+      "permission": "lyrics:read",
+      "domain": "lyrics",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "lyrics:searchCandidates": {
+      "method": "echo.lyrics.searchCandidates",
+      "permission": "lyrics:search",
+      "domain": "lyrics",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "lyrics:previewCandidate": {
+      "method": "echo.lyrics.previewCandidate",
+      "permission": "lyrics:read",
+      "domain": "lyrics",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "lyrics:applyCandidate": {
+      "method": "echo.lyrics.applyCandidate",
+      "permission": "lyrics:write",
+      "domain": "lyrics",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "lyrics:applyCustom": {
+      "method": "echo.lyrics.applyCustom",
+      "permission": "lyrics:write",
+      "domain": "lyrics",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "lyrics:setOffset": {
+      "method": "echo.lyrics.setOffset",
+      "permission": "lyrics:write",
+      "domain": "lyrics",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "lyrics:markInstrumental": {
+      "method": "echo.lyrics.markInstrumental",
+      "permission": "lyrics:write",
+      "domain": "lyrics",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "lyrics:clearCache": {
+      "method": "echo.lyrics.clearCache",
+      "permission": "lyrics:write",
+      "domain": "lyrics",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "lyrics:get": {
+      "method": "echo.lyrics.get",
+      "permission": "lyrics:read",
+      "domain": "lyrics",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "settings:get": {
+      "method": "echo.settings.get",
+      "permission": "fs:plugin",
+      "domain": "settings",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "settings:set": {
+      "method": "echo.settings.set",
+      "permission": "fs:plugin",
+      "domain": "settings",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "storage:get": {
+      "method": "echo.storage.get",
+      "permission": "fs:plugin",
+      "domain": "storage",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "storage:set": {
+      "method": "echo.storage.set",
+      "permission": "fs:plugin",
+      "domain": "storage",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "storage:remove": {
+      "method": "echo.storage.remove",
+      "permission": "fs:plugin",
+      "domain": "storage",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "files:export": {
+      "method": "echo.files.export",
+      "permission": "fs:export",
+      "domain": "files",
+      "surfaces": [
+        "plugin"
+      ],
+      "minimumEchoVersion": null
+    },
+    "trusted:invoke": {
+      "method": "echo.trusted.invoke",
+      "permission": "system:full",
+      "domain": "trusted",
+      "surfaces": [
+        "plugin"
+      ],
+      "minimumEchoVersion": null
+    },
+    "ui:notify": {
+      "method": "echo.ui.notify",
+      "permission": null,
+      "domain": "ui",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "playback:getRate": {
+      "method": "echo.playback.getRate",
+      "permission": "playback:read",
+      "domain": "playback",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "playback:setRate": {
+      "method": "echo.playback.setRate",
+      "permission": "playback:control",
+      "domain": "playback",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "window:getDesktopWall": {
+      "method": "echo.window.getDesktopWall",
+      "permission": "window:desktop-wall",
+      "domain": "window",
+      "surfaces": [
+        "plugin"
+      ],
+      "minimumEchoVersion": null
+    },
+    "window:setDesktopWall": {
+      "method": "echo.window.setDesktopWall",
+      "permission": "window:desktop-wall",
+      "domain": "window",
+      "surfaces": [
+        "plugin"
+      ],
+      "minimumEchoVersion": null
+    },
+    "media-session:setEnabled": {
+      "method": "echo.mediaSession.setEnabled",
+      "permission": "media-session:control",
+      "domain": "media-session",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "media-session:setLyricsEnabled": {
+      "method": "echo.mediaSession.setLyricsEnabled",
+      "permission": "media-session:control",
+      "domain": "media-session",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "media-session:getStatus": {
+      "method": "echo.mediaSession.getStatus",
+      "permission": "media-session:control",
+      "domain": "media-session",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "media-session:setEnabledActions": {
+      "method": "echo.mediaSession.setEnabledActions",
+      "permission": "media-session:control",
+      "domain": "media-session",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "media-session:setPlaybackModes": {
+      "method": "echo.mediaSession.setPlaybackModes",
+      "permission": "media-session:control",
+      "domain": "media-session",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "media-session:restart": {
+      "method": "echo.mediaSession.restart",
+      "permission": "media-session:control",
+      "domain": "media-session",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "companion:getDesktopLyrics": {
+      "method": "echo.companion.desktopLyrics.getState",
+      "permission": "companion:control",
+      "domain": "companion",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "companion:showDesktopLyrics": {
+      "method": "echo.companion.desktopLyrics.show",
+      "permission": "companion:control",
+      "domain": "companion",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "companion:hideDesktopLyrics": {
+      "method": "echo.companion.desktopLyrics.hide",
+      "permission": "companion:control",
+      "domain": "companion",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "companion:setDesktopLyricsLocked": {
+      "method": "echo.companion.desktopLyrics.setLocked",
+      "permission": "companion:control",
+      "domain": "companion",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "companion:resetDesktopLyrics": {
+      "method": "echo.companion.desktopLyrics.reset",
+      "permission": "companion:control",
+      "domain": "companion",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "companion:getMiniPlayer": {
+      "method": "echo.companion.miniPlayer.getState",
+      "permission": "companion:control",
+      "domain": "companion",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "companion:showMiniPlayer": {
+      "method": "echo.companion.miniPlayer.show",
+      "permission": "companion:control",
+      "domain": "companion",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "companion:hideMiniPlayer": {
+      "method": "echo.companion.miniPlayer.hide",
+      "permission": "companion:control",
+      "domain": "companion",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "companion:setMiniPlayerLocked": {
+      "method": "echo.companion.miniPlayer.setLocked",
+      "permission": "companion:control",
+      "domain": "companion",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "companion:setMiniPlayerLayout": {
+      "method": "echo.companion.miniPlayer.setLayout",
+      "permission": "companion:control",
+      "domain": "companion",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "companion:resetMiniPlayer": {
+      "method": "echo.companion.miniPlayer.reset",
+      "permission": "companion:control",
+      "domain": "companion",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "companion:getPet": {
+      "method": "echo.companion.pet.getState",
+      "permission": "companion:control",
+      "domain": "companion",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "companion:showPet": {
+      "method": "echo.companion.pet.show",
+      "permission": "companion:control",
+      "domain": "companion",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "companion:hidePet": {
+      "method": "echo.companion.pet.hide",
+      "permission": "companion:control",
+      "domain": "companion",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "companion:setPetScale": {
+      "method": "echo.companion.pet.setScale",
+      "permission": "companion:control",
+      "domain": "companion",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "companion:resetPet": {
+      "method": "echo.companion.pet.reset",
+      "permission": "companion:control",
+      "domain": "companion",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "companion:getTaskbar": {
+      "method": "echo.companion.taskbar.getState",
+      "permission": "companion:control",
+      "domain": "companion",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "companion:showTaskbar": {
+      "method": "echo.companion.taskbar.show",
+      "permission": "companion:control",
+      "domain": "companion",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "companion:hideTaskbar": {
+      "method": "echo.companion.taskbar.hide",
+      "permission": "companion:control",
+      "domain": "companion",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "companion:setTaskbarEnabled": {
+      "method": "echo.companion.taskbar.setEnabled",
+      "permission": "companion:control",
+      "domain": "companion",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "sleep-timer:getStatus": {
+      "method": "echo.sleepTimer.getStatus",
+      "permission": "sleep-timer:control",
+      "domain": "sleep-timer",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "sleep-timer:start": {
+      "method": "echo.sleepTimer.start",
+      "permission": "sleep-timer:control",
+      "domain": "sleep-timer",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "sleep-timer:cancel": {
+      "method": "echo.sleepTimer.cancel",
+      "permission": "sleep-timer:control",
+      "domain": "sleep-timer",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "presence:steam:getStatus": {
+      "method": "echo.presence.steam.getStatus",
+      "permission": "presence:control",
+      "domain": "presence",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "presence:steam:getSettings": {
+      "method": "echo.presence.steam.getSettings",
+      "permission": "presence:control",
+      "domain": "presence",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "presence:steam:updateSettings": {
+      "method": "echo.presence.steam.updateSettings",
+      "permission": "presence:control",
+      "domain": "presence",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "presence:steam:getOptions": {
+      "method": "echo.presence.steam.getOptions",
+      "permission": "presence:control",
+      "domain": "presence",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "presence:steam:setEnabled": {
+      "method": "echo.presence.steam.setEnabled",
+      "permission": "presence:control",
+      "domain": "presence",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "presence:steam:setMode": {
+      "method": "echo.presence.steam.setMode",
+      "permission": "presence:control",
+      "domain": "presence",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "presence:steam:setTemporaryStatus": {
+      "method": "echo.presence.steam.setTemporaryStatus",
+      "permission": "presence:control",
+      "domain": "presence",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "presence:steam:clearTemporaryStatus": {
+      "method": "echo.presence.steam.clearTemporaryStatus",
+      "permission": "presence:control",
+      "domain": "presence",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "presence:getDiscord": {
+      "method": "echo.presence.discord.getStatus",
+      "permission": "presence:control",
+      "domain": "presence",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "presence:setDiscordEnabled": {
+      "method": "echo.presence.discord.setEnabled",
+      "permission": "presence:control",
+      "domain": "presence",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "presence:getLastFm": {
+      "method": "echo.presence.lastfm.getStatus",
+      "permission": "presence:control",
+      "domain": "presence",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "presence:setLastFmEnabled": {
+      "method": "echo.presence.lastfm.setEnabled",
+      "permission": "presence:control",
+      "domain": "presence",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "presence:setLastFmNowPlaying": {
+      "method": "echo.presence.lastfm.setNowPlayingEnabled",
+      "permission": "presence:control",
+      "domain": "presence",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "presence:setLastFmScrobble": {
+      "method": "echo.presence.lastfm.setScrobbleEnabled",
+      "permission": "presence:control",
+      "domain": "presence",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "presence:disconnectLastFm": {
+      "method": "echo.presence.lastfm.disconnect",
+      "permission": "presence:control",
+      "domain": "presence",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "presence:getListenBrainz": {
+      "method": "echo.presence.listenBrainz.getStatus",
+      "permission": "presence:control",
+      "domain": "presence",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "presence:setListenBrainz": {
+      "method": "echo.presence.listenBrainz.setFlags",
+      "permission": "presence:control",
+      "domain": "presence",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "presence:disconnectListenBrainz": {
+      "method": "echo.presence.listenBrainz.disconnect",
+      "permission": "presence:control",
+      "domain": "presence",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "bridge:getStage": {
+      "method": "echo.bridge.stage.getStatus",
+      "permission": "bridge:control",
+      "domain": "bridge",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "bridge:setStage": {
+      "method": "echo.bridge.stage.setEnabled",
+      "permission": "bridge:control",
+      "domain": "bridge",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "bridge:getObsBrowser": {
+      "method": "echo.bridge.obsBrowser.getStatus",
+      "permission": "bridge:control",
+      "domain": "bridge",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "bridge:setObsBrowser": {
+      "method": "echo.bridge.obsBrowser.update",
+      "permission": "bridge:control",
+      "domain": "bridge",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "bridge:getObsWebSocket": {
+      "method": "echo.bridge.obsWebSocket.getStatus",
+      "permission": "bridge:control",
+      "domain": "bridge",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "bridge:setObsWebSocketEnabled": {
+      "method": "echo.bridge.obsWebSocket.setEnabled",
+      "permission": "bridge:control",
+      "domain": "bridge",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "bridge:getMqtt": {
+      "method": "echo.bridge.mqtt.getStatus",
+      "permission": "bridge:control",
+      "domain": "bridge",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "bridge:setMqttEnabled": {
+      "method": "echo.bridge.mqtt.setEnabled",
+      "permission": "bridge:control",
+      "domain": "bridge",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "bridge:getHqPlayer": {
+      "method": "echo.bridge.hqPlayer.getStatus",
+      "permission": "bridge:control",
+      "domain": "bridge",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "bridge:setHqPlayerEnabled": {
+      "method": "echo.bridge.hqPlayer.setEnabled",
+      "permission": "bridge:control",
+      "domain": "bridge",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "bridge:sendHqPlayerControl": {
+      "method": "echo.bridge.hqPlayer.sendLastControl",
+      "permission": "bridge:control",
+      "domain": "bridge",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "bridge:getEchoLink": {
+      "method": "echo.bridge.echoLink.getStatus",
+      "permission": "bridge:control",
+      "domain": "bridge",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "bridge:setEchoLinkEnabled": {
+      "method": "echo.bridge.echoLink.setEnabled",
+      "permission": "bridge:control",
+      "domain": "bridge",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    },
+    "audio:offline:seek": {
+      "method": "echo.audio.offline.seek",
+      "permission": "audio:offline-read",
+      "domain": "audio",
+      "surfaces": [
+        "plugin"
+      ],
+      "minimumEchoVersion": null
+    },
+    "playback:nextAt": {
+      "method": "echo.playback.nextAt",
+      "permission": "playback:control",
+      "domain": "playback",
+      "surfaces": [
+        "plugin"
+      ],
+      "minimumEchoVersion": null
+    },
+    "audio:transition:registerProvider": {
+      "method": "echo.audio.transition.registerProvider",
+      "permission": "audio:transition",
+      "domain": "audio",
+      "surfaces": [
+        "plugin"
+      ],
+      "minimumEchoVersion": null
+    },
+    "audio:transition:unregisterProvider": {
+      "method": "echo.audio.transition.registerProvider",
+      "invocation": "returned-unsubscribe",
+      "permission": "audio:transition",
+      "domain": "audio",
+      "surfaces": [
+        "plugin"
+      ],
+      "minimumEchoVersion": null
+    },
+    "queue:reorder": {
+      "method": "echo.queue.reorder",
+      "permission": "queue:control",
+      "domain": "queue",
+      "surfaces": [
+        "plugin",
+        "theme"
+      ],
+      "minimumEchoVersion": null
+    }
+  },
+  "events": {
+    "media-session:changed": "media-session:control",
+    "bridge:changed": "bridge:control",
+    "presence:changed": "presence:control",
+    "home:changed": "home:read",
+    "audio:dsp-changed": "audio:dsp-read",
+    "covers:candidates-changed": "covers:read",
+    "covers:providers-changed": "covers:read",
+    "metadata:candidates-changed": "metadata:read",
+    "metadata:providers-changed": "metadata:read",
+    "lyrics:candidates-changed": "lyrics:read",
+    "lyrics:providers-changed": "lyrics:read",
+    "lyrics:display-preferences-changed": "lyrics:read",
+    "artwork:palette-changed": "playback:read",
+    "window:maximized-changed": "window:control",
+    "window:fullscreen-changed": "window:control",
+    "extensions:changed": "extensions:read",
+    "playback:status": "playback:read",
+    "audio:spectrum": "audio:spectrum",
+    "queue:changed": "queue:read",
+    "library:changed": "library:read",
+    "library:liked-changed": "library:read",
+    "settings:changed": "fs:plugin",
+    "transition:committed": "playback:read",
+    "media-session:command": "media-session:control",
+    "companion:state": "companion:control",
+    "sleep-timer:tick": "sleep-timer:control",
+    "playback:clock": "playback:read",
+    "lyrics:changed": "lyrics:read",
+    "ui:context-changed": null,
+    "ui:layout-changed": null,
+    "ui:render-budget-changed": null
+  },
+  "registrations": {
+    "echo.commands.register": {
+      "permission": null,
+      "declaration": "manifest.contributes.commands"
+    },
+    "echo.agents.register": {
+      "permission": "agent:runtime",
+      "declaration": "manifest.contributes.agents"
+    },
+    "echo.sources.registerProvider": {
+      "permission": "sources:provide",
+      "declaration": "manifest.contributes.sourceProviders"
+    },
+    "echo.lyrics.registerProvider": {
+      "permission": "lyrics:provide",
+      "declaration": "manifest.contributes.lyricsProviders"
+    },
+    "echo.metadata.registerProvider": {
+      "permission": null,
+      "declaration": "manifest.contributes.metadataProviders"
+    },
+    "echo.covers.registerProvider": {
+      "permission": null,
+      "declaration": "manifest.contributes.coverProviders"
+    }
+  }
+}

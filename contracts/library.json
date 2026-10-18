@@ -1,0 +1,1065 @@
+{
+  "domain": "library",
+  "permissions": ["library:playlist-delete", "library:personal-write"],
+  "apiVersion": 2,
+  "minimumEchoVersion": "26.10.18",
+  "surfaces": [
+    "plugin",
+    "theme"
+  ],
+  "owner": "Library Core via typed library API",
+  "events": {
+    "library:changed": {
+      "permission": "library:read",
+      "payload": "null",
+      "meaning": "Refresh affected visible library, playlist and personal-library queries."
+    },
+    "library:liked-changed": {
+      "permission": "library:read",
+      "payload": "null",
+      "meaning": "Refresh visible favorite states."
+    }
+  },
+  "limits": {
+    "pageSize": 100,
+    "batchIds": 200,
+    "smartResultTracks": 100,
+    "smartPlaylistTracks": 1000,
+    "maximumConditionNodes": 256
+  },
+  "queryEnums": {
+    "sort": [
+      "default",
+      "createdAsc",
+      "createdDesc",
+      "yearAsc",
+      "yearDesc",
+      "titleAsc",
+      "titleDesc",
+      "trackCountAsc",
+      "trackCountDesc",
+      "albumCountDesc",
+      "durationAsc",
+      "durationDesc",
+      "fileModifiedAsc",
+      "fileModifiedDesc",
+      "qualityAsc",
+      "qualityDesc",
+      "codecAsc",
+      "codecDesc",
+      "audioSpecAsc",
+      "audioSpecDesc",
+      "bitrateAsc",
+      "bitrateDesc",
+      "bpmAsc",
+      "bpmDesc",
+      "trackNumber",
+      "frequent",
+      "playCountAsc",
+      "playCountDesc",
+      "lastPlayed",
+      "random",
+      "title",
+      "artist",
+      "artistDesc",
+      "artistAlbum",
+      "album",
+      "albumDesc",
+      "recent",
+      "addedAsc"
+    ],
+    "audioFormatFilter": [
+      "all",
+      "sampleRate44100",
+      "sampleRate48000",
+      "sampleRate88200",
+      "sampleRate96000",
+      "sampleRate176400",
+      "sampleRate192000",
+      "sampleRate352800",
+      "sampleRate384000",
+      "dsd",
+      "otherSampleRate"
+    ],
+    "fileFormatFilter": [
+      "all",
+      "flac",
+      "mp3",
+      "wav",
+      "aiff",
+      "alac",
+      "aac",
+      "ogg",
+      "opus",
+      "dsd",
+      "other"
+    ],
+    "vocalFilter": [
+      "all",
+      "instrumental",
+      "excludeInstrumental"
+    ],
+    "lyricsFilter": [
+      "all",
+      "withLyrics",
+      "withoutLyrics",
+      "withWordTiming",
+      "withoutWordTiming"
+    ],
+    "artistGrouping": [
+      "split",
+      "albumArtist"
+    ],
+    "duplicateMode": [
+      "strict",
+      "balanced",
+      "aggressive"
+    ]
+  },
+  "queryBooleans": [
+    "hideDuplicates",
+    "showDuplicatesOnly",
+    "showOsuOnly",
+    "excludeOsuAlbums",
+    "collapseAlbumVersions"
+  ],
+  "actions": {
+    "library:getSummary": {
+      "method": "echo.library.getSummary",
+      "permission": "library:read",
+      "arguments": [],
+      "result": "EchoWorkshopLibrarySummary",
+      "payload": {
+        "spread": null,
+        "fields": {}
+      },
+      "aliases": [],
+      "legacy": true
+    },
+    "library:getTracks": {
+      "method": "echo.library.getTracks",
+      "permission": "library:read",
+      "arguments": [
+        {
+          "name": "query",
+          "type": "EchoWorkshopPageQuery",
+          "optional": true
+        }
+      ],
+      "result": "EchoWorkshopPage<EchoWorkshopTrack>",
+      "payload": {
+        "spread": "query",
+        "fields": {}
+      },
+      "aliases": [],
+      "legacy": true
+    },
+    "library:getAlbums": {
+      "method": "echo.library.getAlbums",
+      "permission": "library:read",
+      "arguments": [
+        {
+          "name": "query",
+          "type": "EchoWorkshopPageQuery",
+          "optional": true
+        }
+      ],
+      "result": "EchoWorkshopPage<EchoWorkshopAlbum>",
+      "payload": {
+        "spread": "query",
+        "fields": {}
+      },
+      "aliases": [],
+      "legacy": true
+    },
+    "library:getArtists": {
+      "method": "echo.library.getArtists",
+      "permission": "library:read",
+      "arguments": [
+        {
+          "name": "query",
+          "type": "EchoWorkshopPageQuery",
+          "optional": true
+        }
+      ],
+      "result": "EchoWorkshopPage<EchoWorkshopArtist>",
+      "payload": {
+        "spread": "query",
+        "fields": {}
+      },
+      "aliases": [],
+      "legacy": true
+    },
+    "library:getGenres": {
+      "method": "echo.library.getGenres",
+      "permission": "library:read",
+      "arguments": [
+        {
+          "name": "query",
+          "type": "EchoWorkshopPageQuery",
+          "optional": true
+        }
+      ],
+      "result": "EchoWorkshopPage<EchoWorkshopGenre>",
+      "payload": {
+        "spread": "query",
+        "fields": {}
+      },
+      "aliases": [],
+      "legacy": true
+    },
+    "library:getAlbumTracks": {
+      "method": "echo.library.getAlbumTracks",
+      "permission": "library:read",
+      "arguments": [
+        {
+          "name": "id",
+          "type": "string",
+          "optional": false
+        },
+        {
+          "name": "query",
+          "type": "EchoWorkshopPageQuery",
+          "optional": true
+        }
+      ],
+      "result": "EchoWorkshopPage<EchoWorkshopTrack>",
+      "payload": {
+        "spread": "query",
+        "fields": {
+          "id": "id"
+        }
+      },
+      "aliases": [],
+      "legacy": true
+    },
+    "library:getArtistTracks": {
+      "method": "echo.library.getArtistTracks",
+      "permission": "library:read",
+      "arguments": [
+        {
+          "name": "id",
+          "type": "string",
+          "optional": false
+        },
+        {
+          "name": "query",
+          "type": "EchoWorkshopPageQuery",
+          "optional": true
+        }
+      ],
+      "result": "EchoWorkshopPage<EchoWorkshopTrack>",
+      "payload": {
+        "spread": "query",
+        "fields": {
+          "id": "id"
+        }
+      },
+      "aliases": [],
+      "legacy": true
+    },
+    "library:getArtistAlbums": {
+      "method": "echo.library.getArtistAlbums",
+      "permission": "library:read",
+      "arguments": [
+        {
+          "name": "id",
+          "type": "string",
+          "optional": false
+        },
+        {
+          "name": "query",
+          "type": "EchoWorkshopPageQuery",
+          "optional": true
+        }
+      ],
+      "result": "EchoWorkshopPage<EchoWorkshopAlbum>",
+      "payload": {
+        "spread": "query",
+        "fields": {
+          "id": "id"
+        }
+      },
+      "aliases": [],
+      "legacy": true
+    },
+    "library:getGenreTracks": {
+      "method": "echo.library.getGenreTracks",
+      "permission": "library:read",
+      "arguments": [
+        {
+          "name": "id",
+          "type": "string",
+          "optional": false
+        },
+        {
+          "name": "query",
+          "type": "EchoWorkshopPageQuery",
+          "optional": true
+        }
+      ],
+      "result": "EchoWorkshopPage<EchoWorkshopTrack>",
+      "payload": {
+        "spread": "query",
+        "fields": {
+          "id": "id"
+        }
+      },
+      "aliases": [],
+      "legacy": true
+    },
+    "library:getGenreAlbums": {
+      "method": "echo.library.getGenreAlbums",
+      "permission": "library:read",
+      "arguments": [
+        {
+          "name": "id",
+          "type": "string",
+          "optional": false
+        },
+        {
+          "name": "query",
+          "type": "EchoWorkshopPageQuery",
+          "optional": true
+        }
+      ],
+      "result": "EchoWorkshopPage<EchoWorkshopAlbum>",
+      "payload": {
+        "spread": "query",
+        "fields": {
+          "id": "id"
+        }
+      },
+      "aliases": [],
+      "legacy": true
+    },
+    "library:getTrack": {
+      "method": "echo.library.getTrack",
+      "permission": "library:read",
+      "arguments": [
+        {
+          "name": "trackId",
+          "type": "string",
+          "optional": false
+        }
+      ],
+      "result": "EchoWorkshopTrack",
+      "payload": {
+        "spread": null,
+        "fields": {
+          "trackId": "trackId"
+        }
+      },
+      "aliases": [],
+      "legacy": true
+    },
+    "library:getTracksByIds": {
+      "method": "echo.library.getTracksByIds",
+      "permission": "library:read",
+      "arguments": [
+        {
+          "name": "trackIds",
+          "type": "string[]",
+          "optional": false
+        }
+      ],
+      "result": "EchoWorkshopTrack[]",
+      "payload": {
+        "spread": null,
+        "fields": {
+          "trackIds": "trackIds"
+        }
+      },
+      "aliases": [],
+      "legacy": false
+    },
+    "library:getPlaylists": {
+      "method": "echo.library.getPlaylists",
+      "permission": "library:read",
+      "arguments": [],
+      "result": "EchoWorkshopPlaylist[]",
+      "payload": {
+        "spread": null,
+        "fields": {}
+      },
+      "aliases": [],
+      "legacy": true
+    },
+    "library:getPlaylistItems": {
+      "method": "echo.library.getPlaylistItems",
+      "permission": "library:read",
+      "arguments": [
+        {
+          "name": "id",
+          "type": "string",
+          "optional": false
+        },
+        {
+          "name": "query",
+          "type": "EchoWorkshopPageQuery",
+          "optional": true
+        }
+      ],
+      "result": "EchoWorkshopPage<EchoWorkshopPlaylistItem>",
+      "payload": {
+        "spread": "query",
+        "fields": {
+          "id": "id"
+        }
+      },
+      "aliases": [
+        "echo.library.playlists.getItems"
+      ],
+      "legacy": true
+    },
+    "library:getLikedTracks": {
+      "method": "echo.library.getLikedTracks",
+      "permission": "library:read",
+      "arguments": [
+        {
+          "name": "query",
+          "type": "EchoWorkshopPageQuery",
+          "optional": true
+        }
+      ],
+      "result": "EchoWorkshopPage<EchoWorkshopPlaylistItem>",
+      "payload": {
+        "spread": "query",
+        "fields": {}
+      },
+      "aliases": [
+        "echo.library.favorites.getTracks"
+      ],
+      "legacy": true
+    },
+    "library:getLikedTrackIds": {
+      "method": "echo.library.getLikedTrackIds",
+      "permission": "library:read",
+      "arguments": [
+        {
+          "name": "trackIds",
+          "type": "string[]",
+          "optional": false
+        }
+      ],
+      "result": "Record<string, boolean>",
+      "payload": {
+        "spread": null,
+        "fields": {
+          "trackIds": "trackIds"
+        }
+      },
+      "aliases": [
+        "echo.library.favorites.getTrackStates"
+      ],
+      "legacy": true
+    },
+    "library:toggleTrackLiked": {
+      "method": "echo.library.toggleTrackLiked",
+      "permission": "library:control",
+      "arguments": [
+        {
+          "name": "trackId",
+          "type": "string",
+          "optional": false
+        }
+      ],
+      "result": "EchoWorkshopLikedTrackResult",
+      "payload": {
+        "spread": null,
+        "fields": {
+          "trackId": "trackId"
+        }
+      },
+      "aliases": [],
+      "legacy": true
+    },
+    "library:toggleAlbumLiked": {
+      "method": "echo.library.toggleAlbumLiked",
+      "permission": "library:control",
+      "arguments": [
+        {
+          "name": "albumId",
+          "type": "string",
+          "optional": false
+        }
+      ],
+      "result": "EchoWorkshopLikedAlbumResult",
+      "payload": {
+        "spread": null,
+        "fields": {
+          "albumId": "albumId"
+        }
+      },
+      "aliases": [],
+      "legacy": true
+    },
+    "library:createPlaylist": {
+      "method": "echo.library.createPlaylist",
+      "permission": "library:control",
+      "arguments": [
+        {
+          "name": "input",
+          "type": "{ name: string; description?: string }",
+          "optional": false
+        }
+      ],
+      "result": "EchoWorkshopPlaylist",
+      "payload": {
+        "spread": "input",
+        "fields": {}
+      },
+      "aliases": [
+        "echo.library.playlists.create"
+      ],
+      "legacy": true
+    },
+    "library:addTracksToPlaylist": {
+      "method": "echo.library.addTracksToPlaylist",
+      "permission": "library:control",
+      "arguments": [
+        {
+          "name": "playlistId",
+          "type": "string",
+          "optional": false
+        },
+        {
+          "name": "trackIds",
+          "type": "string[]",
+          "optional": false
+        }
+      ],
+      "result": "EchoWorkshopPlaylistItem[]",
+      "payload": {
+        "spread": null,
+        "fields": {
+          "playlistId": "playlistId",
+          "trackIds": "trackIds"
+        }
+      },
+      "aliases": [
+        "echo.library.playlists.addTracks"
+      ],
+      "legacy": true
+    },
+    "library:updatePlaylist": {
+      "method": "echo.library.updatePlaylist",
+      "permission": "library:control",
+      "arguments": [
+        {
+          "name": "playlistId",
+          "type": "string",
+          "optional": false
+        },
+        {
+          "name": "patch",
+          "type": "EchoWorkshopPlaylistPatch",
+          "optional": false
+        }
+      ],
+      "result": "EchoWorkshopPlaylist",
+      "payload": {
+        "spread": "patch",
+        "fields": {
+          "playlistId": "playlistId"
+        }
+      },
+      "aliases": [
+        "echo.library.playlists.update"
+      ],
+      "legacy": true
+    },
+    "library:removePlaylistItems": {
+      "method": "echo.library.removePlaylistItems",
+      "permission": "library:control",
+      "arguments": [
+        {
+          "name": "playlistId",
+          "type": "string",
+          "optional": false
+        },
+        {
+          "name": "itemIds",
+          "type": "string[]",
+          "optional": false
+        }
+      ],
+      "result": "{ affectedCount: number }",
+      "payload": {
+        "spread": null,
+        "fields": {
+          "playlistId": "playlistId",
+          "itemIds": "itemIds"
+        }
+      },
+      "aliases": [
+        "echo.library.playlists.removeItems"
+      ],
+      "legacy": true
+    },
+    "library:playlists:list": {
+      "method": "echo.library.playlists.list",
+      "permission": "library:read",
+      "arguments": [
+        {
+          "name": "query",
+          "type": "EchoWorkshopPageQuery",
+          "optional": true
+        }
+      ],
+      "result": "EchoWorkshopPage<EchoWorkshopPlaylist>",
+      "payload": {
+        "spread": "query",
+        "fields": {}
+      },
+      "aliases": [],
+      "legacy": false
+    },
+    "library:playlists:get": {
+      "method": "echo.library.playlists.get",
+      "permission": "library:read",
+      "arguments": [
+        {
+          "name": "playlistId",
+          "type": "string",
+          "optional": false
+        }
+      ],
+      "result": "EchoWorkshopPlaylist",
+      "payload": {
+        "spread": null,
+        "fields": {
+          "playlistId": "playlistId"
+        }
+      },
+      "aliases": [],
+      "legacy": false
+    },
+    "library:playlists:delete": {
+      "method": "echo.library.playlists.delete",
+      "permission": "library:playlist-delete",
+      "arguments": [
+        {
+          "name": "playlistId",
+          "type": "string",
+          "optional": false
+        }
+      ],
+      "result": "null",
+      "payload": {
+        "spread": null,
+        "fields": {
+          "playlistId": "playlistId"
+        }
+      },
+      "aliases": [],
+      "legacy": false
+    },
+    "library:playlists:moveItem": {
+      "method": "echo.library.playlists.moveItem",
+      "permission": "library:control",
+      "arguments": [
+        {
+          "name": "playlistId",
+          "type": "string",
+          "optional": false
+        },
+        {
+          "name": "itemId",
+          "type": "string",
+          "optional": false
+        },
+        {
+          "name": "position",
+          "type": "number",
+          "optional": false
+        }
+      ],
+      "result": "null",
+      "payload": {
+        "spread": null,
+        "fields": {
+          "playlistId": "playlistId",
+          "itemId": "itemId",
+          "position": "position"
+        }
+      },
+      "aliases": [],
+      "legacy": false
+    },
+    "library:playlists:getRules": {
+      "method": "echo.library.playlists.getRules",
+      "permission": "library:read",
+      "arguments": [
+        {
+          "name": "playlistId",
+          "type": "string",
+          "optional": false
+        }
+      ],
+      "result": "EchoWorkshopSmartRules",
+      "payload": {
+        "spread": null,
+        "fields": {
+          "playlistId": "playlistId"
+        }
+      },
+      "aliases": [],
+      "legacy": false
+    },
+    "library:playlists:previewRules": {
+      "method": "echo.library.playlists.previewRules",
+      "permission": "library:read",
+      "arguments": [
+        {
+          "name": "input",
+          "type": "EchoWorkshopSmartInput",
+          "optional": false
+        }
+      ],
+      "result": "EchoWorkshopSmartPreview",
+      "payload": {
+        "spread": null,
+        "fields": {
+          "input": "input"
+        }
+      },
+      "aliases": [],
+      "legacy": false
+    },
+    "library:playlists:createSmart": {
+      "method": "echo.library.playlists.createSmart",
+      "permission": "library:control",
+      "arguments": [
+        {
+          "name": "input",
+          "type": "EchoWorkshopSmartInput",
+          "optional": false
+        }
+      ],
+      "result": "EchoWorkshopPlaylist",
+      "payload": {
+        "spread": null,
+        "fields": {
+          "input": "input"
+        }
+      },
+      "aliases": [],
+      "legacy": false
+    },
+    "library:playlists:updateRules": {
+      "method": "echo.library.playlists.updateRules",
+      "permission": "library:control",
+      "arguments": [
+        {
+          "name": "playlistId",
+          "type": "string",
+          "optional": false
+        },
+        {
+          "name": "input",
+          "type": "EchoWorkshopSmartInput",
+          "optional": false
+        }
+      ],
+      "result": "EchoWorkshopPlaylist",
+      "payload": {
+        "spread": null,
+        "fields": {
+          "playlistId": "playlistId",
+          "input": "input"
+        }
+      },
+      "aliases": [],
+      "legacy": false
+    },
+    "library:playlists:freeze": {
+      "method": "echo.library.playlists.freeze",
+      "permission": "library:control",
+      "arguments": [
+        {
+          "name": "playlistId",
+          "type": "string",
+          "optional": false
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "optional": true
+        }
+      ],
+      "result": "EchoWorkshopPlaylist",
+      "payload": {
+        "spread": null,
+        "fields": {
+          "playlistId": "playlistId",
+          "name": "name"
+        }
+      },
+      "aliases": [],
+      "legacy": false
+    },
+    "library:favorites:getAlbums": {
+      "method": "echo.library.favorites.getAlbums",
+      "permission": "library:read",
+      "arguments": [
+        {
+          "name": "query",
+          "type": "EchoWorkshopPageQuery",
+          "optional": true
+        }
+      ],
+      "result": "EchoWorkshopPage<EchoWorkshopPlaylistItem>",
+      "payload": {
+        "spread": "query",
+        "fields": {}
+      },
+      "aliases": [],
+      "legacy": false
+    },
+    "library:favorites:getAlbumStates": {
+      "method": "echo.library.favorites.getAlbumStates",
+      "permission": "library:read",
+      "arguments": [
+        {
+          "name": "albumIds",
+          "type": "string[]",
+          "optional": false
+        }
+      ],
+      "result": "Record<string, boolean>",
+      "payload": {
+        "spread": null,
+        "fields": {
+          "albumIds": "albumIds"
+        }
+      },
+      "aliases": [],
+      "legacy": false
+    },
+    "library:favorites:setTrack": {
+      "method": "echo.library.favorites.setTrack",
+      "permission": "library:control",
+      "arguments": [
+        {
+          "name": "trackId",
+          "type": "string",
+          "optional": false
+        },
+        {
+          "name": "liked",
+          "type": "boolean",
+          "optional": false
+        }
+      ],
+      "result": "EchoWorkshopLikedTrackResult",
+      "payload": {
+        "spread": null,
+        "fields": {
+          "trackId": "trackId",
+          "liked": "liked"
+        }
+      },
+      "aliases": [],
+      "legacy": false
+    },
+    "library:favorites:setAlbum": {
+      "method": "echo.library.favorites.setAlbum",
+      "permission": "library:control",
+      "arguments": [
+        {
+          "name": "albumId",
+          "type": "string",
+          "optional": false
+        },
+        {
+          "name": "liked",
+          "type": "boolean",
+          "optional": false
+        }
+      ],
+      "result": "EchoWorkshopLikedAlbumResult",
+      "payload": {
+        "spread": null,
+        "fields": {
+          "albumId": "albumId",
+          "liked": "liked"
+        }
+      },
+      "aliases": [],
+      "legacy": false
+    },
+    "library:favorites:moveTrack": {
+      "method": "echo.library.favorites.moveTrack",
+      "permission": "library:control",
+      "arguments": [
+        {
+          "name": "itemId",
+          "type": "string",
+          "optional": false
+        },
+        {
+          "name": "position",
+          "type": "number",
+          "optional": false
+        }
+      ],
+      "result": "null",
+      "payload": {
+        "spread": null,
+        "fields": {
+          "itemId": "itemId",
+          "position": "position"
+        }
+      },
+      "aliases": [],
+      "legacy": false
+    },
+    "library:tags:list": {
+      "method": "echo.library.tags.list",
+      "permission": "library:read",
+      "arguments": [
+        {
+          "name": "target",
+          "type": "EchoWorkshopTagTarget",
+          "optional": true
+        }
+      ],
+      "result": "EchoWorkshopPersonalTag[]",
+      "payload": {
+        "spread": null,
+        "fields": {
+          "target": "target"
+        }
+      },
+      "aliases": [],
+      "legacy": false
+    },
+    "library:tags:change": {
+      "method": "echo.library.tags.change",
+      "permission": "library:personal-write",
+      "arguments": [
+        {
+          "name": "change",
+          "type": "EchoWorkshopTagChange",
+          "optional": false
+        }
+      ],
+      "result": "null",
+      "payload": {
+        "spread": "change",
+        "fields": {}
+      },
+      "aliases": [],
+      "legacy": false
+    },
+    "library:tags:getItems": {
+      "method": "echo.library.tags.getItems",
+      "permission": "library:read",
+      "arguments": [
+        {
+          "name": "tagId",
+          "type": "string",
+          "optional": false
+        },
+        {
+          "name": "page",
+          "type": "number",
+          "optional": true
+        }
+      ],
+      "result": "EchoWorkshopPage<EchoWorkshopTagItem>",
+      "payload": {
+        "spread": null,
+        "fields": {
+          "tagId": "tagId",
+          "page": "page"
+        }
+      },
+      "aliases": [],
+      "legacy": false
+    },
+    "library:listenLater:list": {
+      "method": "echo.library.listenLater.list",
+      "permission": "library:read",
+      "arguments": [
+        {
+          "name": "query",
+          "type": "{ page?: number; search?: string; completed?: boolean }",
+          "optional": true
+        }
+      ],
+      "result": "EchoWorkshopPage<EchoWorkshopListenLaterEntry>",
+      "payload": {
+        "spread": "query",
+        "fields": {}
+      },
+      "aliases": [],
+      "legacy": false
+    },
+    "library:listenLater:get": {
+      "method": "echo.library.listenLater.get",
+      "permission": "library:read",
+      "arguments": [
+        {
+          "name": "albumId",
+          "type": "string",
+          "optional": false
+        }
+      ],
+      "result": "EchoWorkshopListenLaterEntry | null",
+      "payload": {
+        "spread": null,
+        "fields": {
+          "albumId": "albumId"
+        }
+      },
+      "aliases": [],
+      "legacy": false
+    },
+    "library:listenLater:change": {
+      "method": "echo.library.listenLater.change",
+      "permission": "library:personal-write",
+      "arguments": [
+        {
+          "name": "change",
+          "type": "{ albumId: string; action: 'add' | 'remove' | 'complete' | 'reset' }",
+          "optional": false
+        }
+      ],
+      "result": "null",
+      "payload": {
+        "spread": "change",
+        "fields": {}
+      },
+      "aliases": [],
+      "legacy": false
+    },
+    "library:playQuery": {
+      "method": "echo.library.playQuery",
+      "permission": "queue:control",
+      "arguments": [
+        {
+          "name": "query",
+          "type": "EchoWorkshopPageQuery",
+          "optional": false
+        },
+        {
+          "name": "trackId",
+          "type": "string",
+          "optional": true
+        }
+      ],
+      "result": "EchoWorkshopCollectionPlayResult",
+      "payload": {
+        "spread": null,
+        "fields": {
+          "query": "query",
+          "trackId": "trackId"
+        }
+      },
+      "aliases": [],
+      "legacy": false
+    }
+  }
+}

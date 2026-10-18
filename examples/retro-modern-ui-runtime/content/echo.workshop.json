@@ -9,7 +9,7 @@
     "entry": "theme.json"
   },
   "compatibility": {
-    "minEchoVersion": "26.8.20"
+    "minEchoVersion": "26.10.18"
   },
   "files": [
     {
@@ -19,18 +19,18 @@
     },
     {
       "path": "ui/app.css",
-      "size": 1510,
-      "sha256": "8297927e11ec3ad5efb460dbc3fef51b9bc7b2ff9ef9c801322d810633747b14"
+      "size": 1529,
+      "sha256": "8a7169846ff6d54c0d933a7d23639103650e4ddeae4a371400169858c56f4195"
     },
     {
       "path": "ui/app.js",
-      "size": 6131,
-      "sha256": "ce7e7d193997f90e25bd59ec524ee79797f0bee4950210c85194cb329a930350"
+      "size": 4298,
+      "sha256": "df2c8b600b4e957286546c5cceaa4dba7efa7105622a05e504c8435432b604e8"
     },
     {
       "path": "ui/index.html",
-      "size": 1420,
-      "sha256": "23aacfdbd150297ac483d2fceac07c8205812d5203519938e86caa23c574eda3"
+      "size": 1456,
+      "sha256": "89fb5e8da745597238bc92d437e7717a7a23589cb486c5629cda6ac851bb75b1"
     }
   ],
   "license": {

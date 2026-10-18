@@ -1,5 +1,111 @@
 # ECHO Workshop SDK
 
+## Generic host and streaming controls
+
+Plugins and full theme runtimes may request `sources:direct`, `presence:control`
+and `bridge:control` for direct streaming/queue handoff and the existing Discord,
+Last.fm, ListenBrainz, Stage, OBS, MQTT, HQPlayer and Echo Link controls.
+`echo.ui.notify()` uses the host Workshop notice surface. Authors choose the
+source service and implement its catalog and stream resolution.
+
+`audio:output-read` grants `echo.audio.output.getStatus()`, `listDevices()`,
+`refreshDevices()` and `getDeviceVolume()`. `audio:output-write` grants
+`setOutput(settings)`, `setDeviceVolume(request)` and `setVolumeControlMode(mode)`.
+Output settings cover automatic output, output mode, shared backend, device
+index/name, requested sample rate, latency profile and buffer frames. Changes may
+reopen the route and resolve with Audio Core's returned state. Readback excludes
+media paths and input credentials. See `EchoWorkshopAudioOutputApi` for types.
+
+Plugin `echo.network.request()` supports GET, HEAD, POST, PUT, PATCH, DELETE and
+OPTIONS, including explicitly supplied Authorization. Cross-origin redirects
+strip that header; no ECHO/browser credential is read. Declared `networkHosts`
+still apply. Themes can open plugin pages for networking or full-system tasks.
+Existing `system:full`, `trustedEntry` and `echo.trusted.invoke()` provide
+Node/files/network/child-process access in a separate utility process that ends
+when the plugin is disabled. New permissions require subscriber approval.
+Offline previews use fixtures; real devices, accounts and streams require ECHO.
+
+The current source adds API 2 capability domains. `contracts/capability-catalog.json`
+inventories public actions, permissions, runtime surfaces, events and registration
+entrypoints. `contracts/library.json` owns library signatures, results, aliases and
+limits; its client and declarations are generated. A null minimum version on a
+legacy action retains its original compatibility policy, rather than promising
+support on every host.
+
+The ECHO `26.10.18` library domain includes:
+
+- Validated sort/filter queries and up to 100 rows per page; `getTracksByIds()`
+  accepts at most 200 identities. Queries support format, lyrics, vocal verdict,
+  duplicate, source, folder and personal-tag conditions.
+- `library.playlists`: paged listing, get/create/update, item insertion/removal,
+  manual movement, deletion, and smart-rule read/preview/create/update/freeze.
+  Existing flat methods keep their signatures and use the same host handlers.
+- `library.favorites`: track/album pages, batch states, explicit
+  `setTrack(id, liked)` / `setAlbum(id, liked)`, and manual liked-track movement.
+- `library.tags.list/getItems/change` and `library.listenLater.list/get/change`.
+  Listen Later includes saved progress; use existing `getAlbumTracks()` for
+  paged tracks. Domain `onChanged()` methods return an unsubscribe function and
+  invalidate visible queries while retaining legacy event payloads.
+
+`library.playQuery(query, trackId?)` requires both `library:read` and
+`queue:control`. It stages bounded pages into the existing Core queue and starts
+the chosen matching track after commit. Read failures, unload before commit or
+library changes abort staging (`library-query-stale` for changed data). A later
+cancellation does not roll back a committed queue. Random paging is rejected
+because it does not describe a stable sequence; use the existing shuffle control
+with a stable query. Check host feature availability before showing the action.
+
+Playlist deletion requires `library:playlist-delete`; personal-tag/Listen Later
+writes require `library:personal-write`, declared and approved explicitly.
+Existing library writes retain `library:control`. Path/folder smart rules require
+`library:path`. Smart previews return at most 100 tracks with `hasMore`; saved
+rules retain the host's 1000-track limit. These actions do not write source media.
+CLI/browser/in-app previews share stateful fixtures; smart previews are samples,
+not a second implementation of the host SQL rule engine.
+
+Lyrics UI authors: [P0/P1 authoring interfaces](./lyrics-authoring-interfaces.md) cover local word/line timelines, display preferences, shared artwork colours, runtime package settings, layout/render budgets and explicit current-track offset adjustment. Check host availability; source additions are separate from published SDK assets.
+
+## SMTC, Home and lyrics-source workflows
+
+The same `echo` API is available to approved plugins and theme runtimes in
+shell, lyrics-view and lyrics-background presentations. Declare only the
+permissions used by the package; use `echo.host.getFeatureAvailability(action)`
+to check the current host.
+
+| API | Permission | Host workflow |
+| --- | --- | --- |
+| `echo.mediaSession.setEnabled(enabled)` | `media-session:control` | Enable/disable Windows SMTC or Linux MPRIS |
+| `echo.mediaSession.setLyricsEnabled(enabled)` | `media-session:control` | Windows SMTC lyric-title display |
+| `echo.home.getSettings()`, `getHistory(query)`, `getHistorySummary(query)`, `getStats(query)` | `home:read` | Existing Home preferences, paged history and listening aggregates |
+| `echo.home.updateSettings(patch)` | `home:control` | Existing Home visualizer/background preferences |
+| `echo.lyrics.listProviders()`, `getStoredCandidates(trackId)`, `previewCandidate(trackId, candidateId)` | `lyrics:read` | Registered source discovery and cached candidate inspection |
+| `echo.lyrics.searchProvider(key, trackId, query)`, `searchCandidates(trackId, query, providerId)` | `lyrics:search` | Invoke an enabled source or the host matching service |
+| `echo.lyrics.applyCandidate(trackId, candidateId)`, `applyCustom(trackId, text, format)`, `setOffset(trackId, offsetMs)`, `markInstrumental(trackId)`, `clearCache(trackId)` | `lyrics:write` | Existing lyrics selection/cache operations |
+
+History pages accept 1–100 items (default 20); date filters use `YYYY-MM-DD`.
+Home settings are limited to `homeWaveformVisualizerEnabled`,
+`homeBackgroundMode`, `homeBackgroundAppearance` and `homeBackgroundRendering`.
+The Home interface uses the existing library/navigation/queue APIs for catalog
+reads and playback; declared `page` panels provide custom main pages.
+
+Source discovery includes both manual and automatic Workshop providers. Source
+packages retain their own approval and networking requirements. Search receives
+host track metadata without paths. Applying lyrics updates the database/cache;
+it does not embed tags in original media. SMTC remains synchronized with Audio
+Core playback. `getStatus()` additionally reports `lyricsEnabled` and
+`playbackRate`; lyric-title control reports `unsupported-platform` on MPRIS.
+
+```js
+const sources = await echo.lyrics.listProviders();
+const source = sources.find(value => value.ready);
+const candidates = source ? await echo.lyrics.searchProvider(source.key, trackId) : [];
+const candidate = candidates[0];
+if (candidate?.ttml) await echo.lyrics.applyCustom(trackId, candidate.ttml, 'ttml');
+else if (candidate?.lrc || candidate?.text) {
+  await echo.lyrics.applyCustom(trackId, candidate.lrc ?? candidate.text, 'lrc');
+}
+```
+
 New authors can follow the [first plug-in tutorial in Chinese](./FIRST-PLUGIN.zh-CN.md): create, edit, check and try the result locally in ECHO.
 
 Afterglow scene packs: [format and import guide](./afterglow-scenes.md). Create a `lyrics-style` project with `--preset afterglow`, then import its content ZIP locally or distribute it through Workshop.
@@ -22,6 +128,8 @@ This repository contains the portable developer kit for ECHO Steam Workshop. The
 SDK 1.19 includes the 1.18 additions: a smaller in-app plug-in starter and exposes `echo.library.updatePlaylist(playlistId, { name?, description? })` and `echo.library.removePlaylistItems(playlistId, itemIds)` under `library:control`. The host accepts only local manual playlists; removal checks that every selected item belongs to that playlist and keeps recovery history. Check `echo.host.getFeatureAvailability('library:updatePlaylist')` before showing the edit control on older ECHO builds.
 
 SDK 1.20 adds `echo.audio.getVisualization({ waveformSamples: 2048, spectrum: false, levels: true })` under `audio:spectrum`. Snapshots expose signed mono waveform samples, native channel meters and host limits. Theme and lyrics runtimes can query the same data and select push fields/spacing using `echo:workshop-ui:audio-configure`. See [audio visualization authoring](./lyrics-authoring.md) and the [runtime types](./echo-workshop-ui-runtime.d.ts). The portable preview returns an unavailable waveform when it has no native audio; installing the SDK does not upgrade an older ECHO host.
+
+Current source also provides `echo.audio.getSpectrogram({ trackId })` under `audio:spectrum`: an on-demand whole-current-local-track time/frequency matrix, including the selected CUE range. Its 1024 × 256 Base64 byte matrix is time-major, low-to-high linear 0–24 kHz, -100–0 dBFS, from a pre-DSP mono downmix. Source media is read-only and whole-track PCM is never retained. Check `echo.host.getFeatureAvailability('audio:getSpectrogram')` before calling; portable previews reject without local audio, and older hosts need the corresponding implementation.
 
 In ECHO's Workshop **Create** tab, choose a starting path before filling in the project ID and rights holder:
 
@@ -93,7 +201,9 @@ Theme `--preset` values:
 | `colors` | Light/dark tone overrides | `26.8.15` |
 | `skin` | Declarative chrome, stages and atmosphere (default) | `26.8.15` |
 | `stylesheet` | Packaged CSS scoped to the pack id | `26.8.20` |
-| `runtime` | Sandboxed HTML/CSS/JS replacement UI | `26.8.20` |
+| `runtime` | Sandboxed HTML/CSS/JS replacement UI using the unified SDK | `26.10.18` |
+
+Complete queue interfaces can call `echo.queue.getPage({ offset: 500, limit: 100 })` to read beyond the 500-item snapshot (ECHO `26.10.18`, `queue:read`). Results include `total`, `hasMore`, `sessionId`, `revision`, `currentQueueId` and the requested `items`. Pass both identity fields from the first page when reading subsequent windows; on `playback_queue_read_stale`, discard the old windows and restart. Keep only visible rows. Calls are bounded to 100 items while `get()` and events keep their 500-item snapshot contract. Plugin mocks, browser previews and in-app previews share mutable enqueue/play/move/reorder/remove/clear/previous/next behavior. Progress and theme renders preserve in-app queue edits; changing the runtime entry resets the fixture.
 
 Declared PNG, JPEG, WebP, theme stylesheets and UI runtime files have no count or byte quota. SVG, executables, and stylesheets that pull remote URLs or scripts are still rejected.
 
@@ -103,7 +213,7 @@ Declared PNG, JPEG, WebP, theme stylesheets and UI runtime files have no count o
 
 Plugin `--preset` values: `basic` (default), `complete`, `catalog`, `lyrics`, or `full-trust`.
 
-`catalog` is an author-owned searchable directory of direct HTTP(S) streams. It is not a built-in Netease / Spotify / YouTube restore. The host owns search UI, origin confirmation, queue and Audio Core playback.
+`catalog` is a starter for custom streaming sources. ECHO provides service-neutral interfaces; users and authors choose the service and implement its catalog access and stream resolution in the plug-in. Register `search`, `resolve` and optional `browse` / `listCollection` handlers with `echo.sources.registerProvider()`. Pass the resulting HTTP(S) stream to `playDirect`, `enqueueDirect` or `playQueue`. The host does not block platform hostnames and owns search UI, origin confirmation, queue and Audio Core playback.
 
 Lyrics `--preset` values: `editorial` (default), `compact`, `cinema`, `cover`.
 
@@ -125,7 +235,7 @@ node .\bin\echo-workshop-sdk.mjs scaffold .\my-theme --preset runtime
 
 `npm run check` is the complete local gate: it synchronizes packaged content, validates hashes and schemas, runs the quality report, and executes deterministic fixtures. Use `npm run check -- --json` for one machine-readable result, or `--warn-only` to keep iterating with a passing exit code while failures are still reported; publication still requires a clean check. `doctor`, `validate` and `example list` also accept `--json`. The mock host enforces declared plug-in permissions, so undeclared capability use fails locally. `npm run dev` opens a live author console with gate status, permissions, fixtures, the latest changed file, copyable recovery commands and raw diagnostics; stylesheet, runtime, lyrics, visualizer and DSP projects also get a separate fixture preview. `npm run watch` and the dev console debounce editor save bursts, watch nested files and ignore the generated manifest update. This author-controlled local tool is not the production sandbox and must not be used as proof of Steam-client behavior.
 
-The portable CLI and ECHO host share the plug-in package contract in `contracts/plugin-package-limits.json`. The inner executable/text `.echo` package has no file-count, UTF-8 file-byte or serialized package-byte quota (`null` in the public contract), with `.css`, `.html`, `.js`, `.mjs` and `.json` assets. A `plugin-package` Workshop item may additionally carry hash-listed `.wasm`, `.onnx`, `.bin` and `.data` files under `assets/`, without outer file-count, file-byte or total-byte quotas. These assets are streamed on demand and are package-local: load them with a relative URL such as `new URL('./assets/model.onnx', location.href)`. Native-shell items use the separate `contracts/native-shell-limits.json` surface (512 files, no outer file or total byte quotas). All shared contracts are importable package exports for external tooling. The sandbox entry remains `.js`; a full-trust `trustedEntry` is a separately declared `.mjs` module. Other `.mjs` files may be imported module assets. The inner plug-in `apiVersion` must exactly match the outer Workshop manifest's `compatibility.pluginApiVersion`.
+The portable CLI and ECHO host share the plug-in package contract in `contracts/plugin-package-limits.json`. The inner executable/text `.echo` package has no file-count, UTF-8 file-byte or serialized package-byte quota (`null` in the public contract), with `.css`, `.html`, `.js`, `.mjs` and `.json` assets. From `26.10.18`, a `plugin-package` item may carry hash-listed binary/resources in any content directory, including `dist/`, `models/`, `fonts/` and the legacy `assets/`, without outer file-count, file-byte or total-byte quotas. All declared extensions are accepted, with unknown types served as opaque bytes. Inner packaged text retains precedence on duplicate paths. Nested plug-in pages can load the host `__bridge__.js` in their own directory. CLI sync raises minimum compatibility when it finds external resources outside the legacy layout. These assets stream on demand and remain package-local: load them with a relative URL such as `new URL('./assets/model.onnx', location.href)`. Native-shell items use the separate `contracts/native-shell-limits.json` surface (512 files, no outer file or total byte quotas). All shared contracts are importable package exports for external tooling. The sandbox entry remains `.js`; a full-trust `trustedEntry` is a separately declared `.mjs` module. Other `.mjs` files may be imported module assets. The inner plug-in `apiVersion` must exactly match the outer Workshop manifest's `compatibility.pluginApiVersion`.
 
 Generated projects include VS Code JSON Schema mappings and tasks. Run the default build task for `ECHO Workshop: Check`, or start `ECHO Workshop: Dev console` without remembering CLI paths.
 
@@ -207,11 +317,45 @@ ECHO shows `system:full` as desktop-application-equivalent access during enablem
 
 ## Parameterized custom functions
 
-A declared command may include up to 12 `parameters` (`string`, `number`, `boolean` or `select`) plus an optional `confirm` message. ECHO renders and validates the form in host UI, then passes one structured object to the registered handler. Use this for small tools such as playlist builders, configurable navigation actions or metadata helpers instead of shipping a panel just to collect a few values. Parameterized or confirmation-gated commands are launched from the plug-in function dock; one-click player-bar, track-context and automation actions must continue to target commands that need no interaction.
+Author tools can add functional entry points to an existing `plugin-package` project: `add . --command my-tool --title "My tool"`, `--page tools --title "Tools" --group plugins`, or `--menu-action`, `--player-action`, `--track-action` with `--command-id my-tool`. Commands append a starter registration to the existing source entry; pages generate SDK-backed HTML/CSS/JS. Existing source is preserved and duplicate declarations/files are rejected. Replace the command's initial notification with your business logic; track menu handlers receive sanitized selection arguments. Native pages raise the minimum host version to `26.9.25`; interactive command slots require `26.10.18`, set automatically by the CLI.
+
+Plug-ins and full shell themes may declare `extensions:read` and `extensions:launch` on ECHO `26.10.18` or newer. `echo.extensions.list({ page, pageSize, search, kind })` returns only visible commands and native pages from enabled plug-ins, with display metadata and readiness/interaction flags. `launch(item.key)` rechecks the current entry, uses normal lazy runtime startup, and preserves host forms and confirmation; callers cannot supply hidden command arguments. A launch reply acknowledges acceptance, not completion, and never returns the target command result. Shells leave the replacement interface when opening a native page. Subscribe through `echo.extensions.onChanged()` for revision-only invalidations and release the subscription on disposal. Author previews use fixed fixtures without invoking installed plug-ins.
+
+A declared command may include `parameters` (`string`, `number`, `boolean` or `select`) plus an optional `confirm` message. ECHO renders and validates the form in host UI, then passes a structured values object to the registered handler. From `26.10.18`, the function dock, main-menu shortcuts, player-bar buttons and track menus share this flow, including lazy runtime startup. Cancelling the form does not invoke the command. Parameterized track handlers receive `(values, selection)`; confirmation-only track handlers retain `(selection)`. A single selection is one sanitized track, and a multiple selection is an array (up to 100). Paths require `library:path`. Background automation and automatically computed columns continue to require commands without interaction.
+
+Commands default to a five-second host timeout. From ECHO `26.10.18`, declare `contributes.commands[].timeoutMs` to set the actual deadline, or use `add . --command my-tool --timeout-ms 120000`. CLI and host accept integer milliseconds from 1 to the JavaScript timer maximum (`2147483647`); sync raises minimum host compatibility. This controls host invocation, while local `echo.commands.execute()` remains an ordinary same-runtime call. Runtime theme storage also drops the extra 16 KiB entry / 64 KiB theme quotas; browser Web Storage capacity and JSON/key validation still apply, with saved state preserved on write failure.
 
 Commands can reuse other commands in the same sandbox with `await echo.commands.execute('command-id', input)`, and `echo.commands.list()` returns the runtime's registered command titles. These local composition helpers add no permission and cannot cross into another plug-in. Handlers should still normalize business-level values defensively. The `complete` plug-in preset demonstrates a host-generated form, confirmation, command composition and bounded sandbox storage.
 
 `validate` rejects private, local, wildcard, duplicate and malformed `networkHosts`, and host declarations without `network:request`. Requests resolve and connect to validated public addresses while preserving Host/TLS identity. Prefer HTTPS.
+
+## Full interfaces with the shared SDK
+
+The `runtime` theme preset and sandbox plug-in panels use the same official `echo.*` client, action contract, permission broker and acknowledged large-payload transport. New runtime projects require ECHO `26.10.18` or newer. Load the host-provided client before your compiled application; do not package a copy of `__bridge__.js`:
+
+```html
+<script src="__bridge__.js"></script>
+<script src="app.js"></script>
+```
+
+```js
+const albums = await echo.library.getAlbums({ page: 1, pageSize: 24 });
+await echo.queue.playAlbum(albums.items[0].id);
+const unsubscribe = echo.events.on('playback:status', renderPlayer);
+echo.ui.onDispose(() => { unsubscribe(); renderer.dispose(); });
+```
+
+Declare the corresponding `runtime.capabilities` in `theme.json`. Shell, lyrics-view and lyrics-background runtimes share the plug-in library, queue, playback, lyrics, spectrum, navigation and window-control APIs from ECHO `26.10.18`. Presentation selects placement without another SDK permission whitelist. The official client handles the runtime ready handshake and heartbeat. Runtime `storage` maps to the SDK's `echo.storage` interface under the existing theme namespace; plug-ins continue to declare `fs:plugin`. Use `echo.host.getFeatureAvailability(action)` for context-specific support. Plug-in contribution registration, network providers and full-trust APIs remain plug-in-package features. Existing `echo:workshop-ui:*` packages remain supported.
+
+Use `echo.assets.url(path)`, `.text(path)` or `.arrayBuffer(path)` for files inside your package. Runtime assets use the plug-in MIME map for fonts, images/SVG, text/CSV, gzip data, GLB/glTF geometry and WebAssembly; custom extensions remain opaque binary data. Installed assets and the in-app author preview have no per-file size quota. Preview verification and serving use bounded chunks and streams. Compile application code and bundle libraries as external files; inline JavaScript and dynamic JavaScript evaluation remain blocked. WebGL/canvas rendering, package workers and blob textures can run inside the opaque sandbox. Assets do not grant external networking or filesystem access.
+
+Use `echo.ui.onContextChanged()` for host theme, locale, viewport and reduced-motion changes, `playback:clock` for bounded host-clock samples, and `lyrics:changed` for current lyrics updates. Playback remains owned by Audio Core. Release animation frames, workers and WebGL resources in `echo.ui.onDispose()`. `echo.ui.closePanel()` exits the replacement interface; the host emergency exit remains available. The runtime starter, `retro-modern-ui-runtime` example, CLI fixture preview and in-app preview all use this client.
+
+From `26.10.18`, runtimes also support `echo.ui.getParentPage()` with the same sanitized route/title/plugin-page descriptor as plug-ins. Runtime selection IDs require `library:read`; themes receive no filesystem paths. Plug-ins retain their separately approved `library:path` behavior. `echo.navigation.open('songs', { dismissRuntime: false })` updates the host route while retaining the custom interface. Omission retains the exit default; route validation and navigation permissions still apply.
+
+Custom title bars can query `echo.window.isMaximized()` / `isFullscreen()` and subscribe through `onMaximizedChange()` / `onFullscreenChange()` under `window:control`. Flags and events come from the native window; they add no polling or shadow window state. Check the corresponding action's feature availability when a platform API is absent and release listeners through `echo.ui.onDispose()`. Both author previews simulate these flags and parent-route changes without controlling a real host window or route.
+
+All runtime presentations may additionally declare `audio:dsp-read` / `audio:dsp-write` for the built-in rack through `echo.audio.dsp`, `companion:control` for local companion windows, `sleep-timer:control` for the sleep timer, and `media-session:control` for the system media session. These are opt-in capabilities excluded from starter defaults. Native parameter, entitlement and playback-mode checks remain authoritative; `workshopAudioEffect` still requires a verified plug-in identity. Missing platform services report unavailable. Subscribe through `echo.companion.onState()`, `echo.sleepTimer.onTick()` and `echo.mediaSession.onCommand()`, releasing subscriptions on disposal. Both author previews provide state-only fixtures; timer fixtures update on actions without a background countdown. Use `snippet ui-runtime-controls` for an example.
 
 ## Standalone GitHub mirror
 
@@ -252,7 +396,7 @@ The Lattice theme (`echo.lattice-wall`) can run on the Windows desktop after a v
 
 - Prefer plug-in API `2` for new projects.
 - Declare the oldest ECHO version actually tested in `compatibility.minEchoVersion`.
-- Stylesheet and UI-runtime themes should declare `26.8.20` or newer.
+- Stylesheet themes should declare `26.8.20` or newer. Runtimes using the shared SDK should declare `26.10.18` or newer.
 - Treat versions absent from `echo-workshop-sdk.json` as unsupported.
 - Read [MIGRATING.md](./MIGRATING.md) before raising schema or API versions.
 
@@ -267,3 +411,30 @@ Local-track uploads are no longer supported. Packages requesting `playback:share
 `echo.playback.getRate()` uses `playback:read`; `setRate(rate)` uses `playback:control` and accepts finite 0.5–2 values. Status events include `playbackRate`.
 
 Declare `manifest.contributes.desktopWall = { path: "desktop.html" }` and request `window:desktop-wall`. The HTML is a packaged opaque sandbox entry using `__bridge__.js`. Use `echo.window.getDesktopWall()` / `setDesktopWall(enabled)` from the regular panel. In the desktop entry `ui.getContext().desktop.bottomInset` identifies the desktop surface; `ui.openPanel(id)` switches the declared wall context, while `ui.closePanel()` or disabling the desktop wall closes it. Main and desktop settings share the plug-in namespace. Desktop execution provides the bounded playback/library/queue/lyrics/settings subset, and retains the normal request broker. Only the verified enabled revision with approved capabilities and an active Steam subscription can attach. This extension requires the updated local host; it is not yet published.
+
+
+## Steam Rich Presence configuration
+
+Plugins and theme runtimes with approved `presence:control` can use
+`echo.presence.steam.getSettings()`, `updateSettings(patch)` and `getOptions()`
+in ECHO 26.10.18. The configuration whitelist includes style, emoji prefix,
+four-state templates, sentence rotation, conditional frames, typewriter, away
+status, progress bars and sharing flags. Nested objects merge by field; a supplied
+state's frame array replaces only that state. Empty template text restores its
+built-in text. Unknown fields, invalid shapes and out-of-range values reject
+before writes; the host's existing template grammar rejects as `invalid-template`.
+Use `getOptions()` for choices and limits. These calls persist display settings
+without changing mode, enabling RPC or enabling computer-field collection.
+Readback excludes monitored apps, profiles, hardware values and global settings.
+Offline previews/mock hosts validate configuration structure; the running host
+owns template grammar, privacy and actual Steam publication.
+
+## Add an entirely new page
+
+Run `node .echo-sdk/bin/echo-workshop-sdk.mjs add . --page dashboard --title "My dashboard" --group plugins` in a plug-in project. Edit the generated `src/page-dashboard.html`, `.css` and `.js`; the CLI declares an independent `placement: "page"` panel with its own sidebar entry and `plugin:<manifest.id>:dashboard` route. A package can declare multiple pages with distinct IDs and files. The `--sidebar` command creates the same kind of page.
+
+Users open it from the sidebar, or the plug-in calls `await echo.ui.openPanel('dashboard')`. Opening its own declared page requires no additional navigation permission. The page uses the official capability-checked SDK inside the existing opaque sandbox, with ECHO's sidebar and player still available. Release listeners and timers through `echo.ui.onDispose()` when leaving the page.
+
+## Provider workflows and host changes
+
+Lyrics, metadata and covers share provider discovery and bounded candidate search, preview, apply, reject and cancellation. DSP, Home, Presence, Bridge and media session share permission-filtered change notifications. Existing APIs remain compatible. See [provider workflows](provider-workflows.md) for grants, limits, cancellation and subscription ownership.

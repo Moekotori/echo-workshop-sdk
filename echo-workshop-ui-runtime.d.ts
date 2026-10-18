@@ -1,3 +1,4 @@
+/// <reference path="./echo-workshop-lyrics-authoring.d.ts" />
 /** ECHO Workshop theme UI runtime bridge. Protocol version 1. See echo-workshop-sdk.json. */
 
 /** Optional `lyrics-interaction` init feature. Only accepted from the active lyrics-view frame.
@@ -10,11 +11,24 @@ type EchoWorkshopLyricsInteraction = {
 } & ({ action: 'back' } | { action: 'pointer'; x: number; y: number });
 
 type EchoWorkshopUiCapability =
+  | 'sources:direct' | 'bridge:control' | 'audio:output-read' | 'audio:output-write'
+  | 'presence:control'
+  | 'home:read' | 'home:control' | 'lyrics:search' | 'lyrics:write'
+  | 'extensions:read' | 'extensions:launch'
+  | 'audio:dsp-read' | 'audio:dsp-write'
+  | 'media-session:control' | 'companion:control' | 'sleep-timer:control'
   | 'navigation'
   | 'playback:read'
   | 'playback:control'
   | 'library:read'
   | 'library:control'
+  | 'metadata:read'
+  | 'metadata:search'
+  | 'metadata:write'
+  | 'covers:read'
+  | 'covers:search'
+  | 'covers:write'
+  | 'library:playlist-delete' | 'library:personal-write'
   | 'queue:read'
   | 'queue:control'
   | 'window:control'
@@ -30,6 +44,7 @@ type EchoWorkshopUiCommand =
   | 'ui:close'
   | 'play'
   | 'pause'
+  | 'stop'
   | 'playPause'
   | 'previous'
   | 'next'
@@ -70,6 +85,7 @@ type EchoWorkshopUiCommand =
   | 'lyrics:matchAmll'
   | 'audio:getSpectrum'
   | 'audio:getVisualization'
+  | 'audio:getSpectrogram'
   /** audio:canvas; current local track only, host-owned bounded Canvas analysis. */
   | 'audio:getCanvasProfile'
   | 'audio:getCanvasSpectrum'
@@ -175,6 +191,7 @@ interface EchoWorkshopUiInitMessage {
   protocolVersion: 1;
   theme: { id: string; version: string };
   capabilities: EchoWorkshopUiCapability[];
+  /** Selects host placement. All presentations share declared runtime capabilities from ECHO 26.10.18. */
   presentation?: 'shell' | 'lyrics-background' | 'lyrics-view';
   appearance?: EchoWorkshopUiAppearance;
   features?: Array<'lyrics-events' | 'clock' | 'audio-events' | 'lyrics-interaction' | 'canvas-audio'>;
@@ -354,3 +371,9 @@ interface EchoWorkshopUiErrorMessage { type: 'echo:workshop-ui:error'; protocolV
 type EchoWorkshopUiLyricsResult = EchoWorkshopUiResultMessage<EchoWorkshopUiLyrics | null>;
 /** audio:getVisualization returns a snapshot, without event envelope fields. */
 type EchoWorkshopUiAudioVisualizationResult = EchoWorkshopUiResultMessage<Omit<EchoWorkshopUiAudioMessage, 'type' | 'protocolVersion'>>;
+/** audio:getSpectrogram requires audio:spectrum and payload { trackId } for the current local track. */
+type EchoWorkshopUiSpectrogramResult = EchoWorkshopUiResultMessage<{
+  trackId: string; source: 'local_file_pre_dsp'; sampleRate: 48000; durationSeconds: number;
+  timeBins: 1024; frequencyBins: 256; frequencyScale: 'linear'; minFrequencyHz: 0; maxFrequencyHz: 24000;
+  minDb: -100; maxDb: 0; dataBase64: string;
+}>;

@@ -3,7 +3,7 @@
   "maximumPackageBytes": null,
   "maximumFiles": null,
   "maximumFileBytes": null,
-  "externalAssetPrefix": "assets/",
+  "externalAssetPrefix": "",
   "maximumExternalAssetFileBytes": null,
   "maximumExternalAssetBytes": null,
   "supportedAssetExtensions": [

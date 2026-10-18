@@ -6,6 +6,7 @@ import { access, cp, lstat, mkdir, readFile, readdir, watch, writeFile } from 'n
 import { basename, dirname, extname, isAbsolute, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { officialExampleProjects, createCustomizeGuide, createGitignore } from '../lib/author-guide.mjs';
+import { addAuthorFeature, featureOptions } from '../lib/author-features.mjs';
 import {
   addLyricsSlot,
   addPluginPermission,
@@ -182,7 +183,7 @@ const collectSourceFiles = async (root, current = root) => {
     if (!allowedSourceExtensions.has('*') && !allowedSourceExtensions.has(extname(relativePath).toLowerCase())) fail(`Unsupported source file: ${relativePath}`);
     let content;
     try { content = new TextDecoder('utf-8', { fatal: true }).decode(await readFile(path)); }
-    catch { fail(`Source must be UTF-8 text; put binary payloads in content/assets: ${relativePath}`); }
+    catch { fail(`Source must be UTF-8 text; put binary payloads in the content directory: ${relativePath}`); }
     if (Buffer.byteLength(content) > maximumPluginFileBytes) {
       fail(`Source file exceeds ${maximumPluginFileBytes} bytes: ${relativePath}`);
     }
@@ -234,6 +235,10 @@ const validatePackage = (value, expectedId, expectedApiVersion) => {
     paths.add(key);
   }
   if (!paths.has(manifest.entry.toLowerCase())) fail('Plug-in entry is not packaged');
+  for (const command of manifest.contributes?.commands ?? []) {
+    if (command.timeoutMs !== undefined && (!Number.isInteger(command.timeoutMs) || command.timeoutMs < 1
+      || command.timeoutMs > pluginApiContract.commandExecution.maximumTimeoutMs)) fail('Command timeoutMs is outside the host timer range');
+  }
   const permissions = Array.isArray(manifest.permissions) ? manifest.permissions : [];
   const trustedEntry = typeof manifest.trustedEntry === 'string' ? manifest.trustedEntry.trim() : '';
   if (permissions.includes('system:full') !== Boolean(trustedEntry)) {
@@ -301,16 +306,25 @@ const syncProject = async (rootInput) => {
   const contentRoot = projectPath(root, project.contentDirectory, 'contentDirectory');
   const manifestPath = resolve(contentRoot, manifestFileName);
   const manifest = await readJson(manifestPath);
+  let packagedPaths;
+  let needsCurrentHost = false;
   if (manifest.content?.kind === 'plugin-package') {
     const sourceFiles = await collectSourceFiles(resolve(root, 'src'));
     const existingPackage = await readJson(projectPath(contentRoot, manifest.content.entry, 'content.entry'));
     const packageValue = { ...existingPackage, files: sourceFiles };
     validatePackage(packageValue, manifest.id, manifest.compatibility?.pluginApiVersion);
+    packagedPaths = new Set(sourceFiles.map(file => file.path.toLowerCase()));
+    needsCurrentHost = (packageValue.manifest.contributes?.commands ?? []).some(command => command.timeoutMs !== undefined);
     await writeJson(projectPath(contentRoot, manifest.content.entry, 'content.entry'), packageValue);
   }
+  const inventory = await collectContentInventory(contentRoot, contentRoot, manifest.content?.kind);
+  if (packagedPaths) needsCurrentHost ||= inventory.some(file => file.path.toLowerCase() !== manifest.content.entry.toLowerCase()
+    && !file.path.toLowerCase().startsWith('assets/') && !packagedPaths.has(file.path.toLowerCase()));
   await writeJson(manifestPath, {
     ...manifest,
-    files: await collectContentInventory(contentRoot, contentRoot, manifest.content?.kind),
+    ...(needsCurrentHost && !isEchoVersionAtLeast(manifest.compatibility.minEchoVersion, '26.10.18')
+      ? { compatibility: { ...manifest.compatibility, minEchoVersion: '26.10.18' } } : {}),
+    files: inventory,
   });
   return validateProject(root);
 };
@@ -527,7 +541,15 @@ const addToProject = async (rootInput, options, positional) => {
   const permission = options.get('permission') ?? (positional[2] === 'permission' ? positional[3] : null);
   let nextEntry = current.entry;
   let change = '';
-  if (slot) {
+  let featureMinVersion = null;
+  if (featureOptions.some(name => options.has(name)) && [slot, capability, color, permission].some(Boolean)) {
+    fail('Add one feature or capability per command');
+  }
+  if (featureOptions.some(name => options.has(name))) {
+    const feature = await addAuthorFeature(current, options, projectPath);
+    nextEntry = feature.entry; change = feature.change;
+    featureMinVersion = feature.minEchoVersion;
+  } else if (slot) {
     if (kind !== 'lyrics-style') fail('Slots can only be added to lyrics-style projects');
     nextEntry = addLyricsSlot(current.entry, slot);
     change = `Added lyrics slot ${slot}`;
@@ -544,9 +566,17 @@ const addToProject = async (rootInput, options, positional) => {
     nextEntry = addPluginPermission(current.entry, permission);
     change = `Added plug-in permission ${permission}`;
   } else {
-    fail('add needs --slot, --capability, --color or --permission');
+    fail('add needs --command, --page, --sidebar, --setting, --menu-action, --player-action, --track-action, --slot, --capability, --color or --permission');
   }
   await writeJson(projectPath(current.contentRoot, current.manifest.content.entry, 'content.entry'), nextEntry);
+  if (featureMinVersion && !isEchoVersionAtLeast(current.manifest.compatibility.minEchoVersion, featureMinVersion)) {
+    await writeJson(resolve(current.contentRoot, manifestFileName), { ...current.manifest,
+      compatibility: { ...current.manifest.compatibility, minEchoVersion: featureMinVersion } });
+  }
+  if (permission?.startsWith('extensions:') && !isEchoVersionAtLeast(current.manifest.compatibility.minEchoVersion, '26.10.18')) {
+    await writeJson(resolve(current.contentRoot, manifestFileName), { ...current.manifest,
+      compatibility: { ...current.manifest.compatibility, minEchoVersion: '26.10.18' } });
+  }
   if (permission === 'system:full') {
     const trustedEntry = nextEntry.manifest?.trustedEntry ?? trustedEntryFileName;
     const trustedPath = projectPath(resolve(current.root, 'src'), trustedEntry, 'manifest.trustedEntry');
@@ -812,6 +842,7 @@ const doctor = async () => {
     'lib/cli-report.mjs',
     'lib/author-guide.mjs',
     'lib/mock-host.mjs',
+    'lib/queue-preview.mjs',
     'lib/quality-report.mjs',
     'lib/kind-presets.mjs',
     'lib/author-actions.mjs',

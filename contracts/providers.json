@@ -1,0 +1,12 @@
+{
+  "domain": "providers",
+  "apiVersion": 2,
+  "minimumEchoVersion": "26.10.18",
+  "owner": "Host lyrics service and Library candidate database/cache",
+  "kinds": ["lyrics", "metadata", "covers"],
+  "permissions": ["metadata:read", "metadata:search", "metadata:write", "covers:read", "covers:search", "covers:write"],
+  "limits": { "candidatesPerSearch": 20, "concurrentSearchesPerRuntime": 4, "queryCharacters": 512, "workshopLyricsBytesPerRuntime": 1048576 },
+  "operations": ["providers.list", "candidates.get", "candidates.search", "candidates.preview", "candidates.apply", "candidates.reject", "candidates.cancel"],
+  "events": { "providers-changed": "Refresh provider descriptors.", "candidates-changed": "Refresh candidates for the visible track." },
+  "cancellation": "Caller supplies a requestId scoped to one runtime. Native searches without cancellation finish in their host slot; their results are discarded after cancel. Workshop lookups receive AbortSignal."
+}

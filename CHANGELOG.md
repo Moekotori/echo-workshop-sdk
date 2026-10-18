@@ -1,5 +1,15 @@
 # ECHO Workshop SDK changelog
 
+## 1.21.0 — 2026-10-18
+
+- Added a generated capability catalogue and bounded library, playlist, favorites, personal-tag and listen-later workflows. Existing flat library APIs remain compatible.
+- Unified lyrics, metadata and cover provider discovery, candidate search/preview/apply/reject/cancellation and change subscriptions. Host-owned candidate storage preserves complete lyrics and applies library/cache changes without source-file writes.
+- Shared DSP, Home, Presence, Bridge and media-session invalidations across plugins and themes, with distinct grants and subscription cleanup. Runtime capability discovery reflects mounted host services.
+- Included Home/history/statistics, Steam presence controls, paged queues, declared author settings, source controls, output-device controls and independent plugin pages already available in the current ECHO host.
+- Added host-backed whole-track spectrogram snapshots and lyrics-authoring interfaces for timeline, layout, artwork palette and render budgets. Audio facts and timing remain owned by the host; availability must be checked at runtime.
+- Updated TypeScript declarations, schemas, portable mocks, browser/in-app previews, examples and packaged author guides. New host interfaces require ECHO 26.10.18 or newer. API 1/2 compatibility is retained.
+
+
 ## 1.20.0 — 2026-10-16
 
 - Added `echo.audio.getVisualization(options)` and the matching theme/lyrics query under `audio:spectrum`. Snapshots include up to 2048 signed mono time-domain samples, up to 32 native channel Peak/RMS meters, optional spectrum, and host capability limits.

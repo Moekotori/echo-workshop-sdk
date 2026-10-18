@@ -59,6 +59,8 @@
 
 ## 代码模式和同步
 
+P0/P1 创作接口已接入源码：本地歌词时间轴、显示偏好、共享封面配色、样式独立设置、布局避让、渲染预算和当前曲偏移调整。完整方法、权限、类型和生命周期示例见 [歌词样式接口](./lyrics-authoring-interfaces.md)。这些方法需要包含实现的宿主，源码接入不表示 SDK 已远端发布。
+
 ```json
 {
   "runtime": {
@@ -69,8 +71,8 @@
 }
 ```
 
-支持能力：`playback:read / playback:control / lyrics:read / audio:spectrum / storage`。
-不提供全曲库、全局导航、窗口管理。当前曲 `lyrics:get` 可读，指定其它曲会被拒绝。
+公共 SDK 按 `runtime.capabilities` 授权；shell、lyrics-view 和 lyrics-background 可声明相同的公开运行时能力，完整名单以 `contracts/plugin-api.json` 与清单校验为准。
+旧 `echo:workshop-ui:command` 协议的 `lyrics:get` 在 lyrics-view 中仍只读取当前曲；公共 SDK 的 `echo.lyrics.get()` 与其他查询遵循各自权限。不要从旧消息的限制推断公共 SDK 的支持范围。
 宿主始终提供位于现有标题栏内、不占歌词布局空间的返回箭头以及原播放器；返回沿用歌词页导航，回到进入歌词前的页面，不取消已应用的歌词主题。歌词模式不显示额外的“退出自定义 UI”按钮，仍保留主进程 `Ctrl+Shift+Esc` 紧急退出；出错或 10 秒未 ready/pong 会恢复宿主歌词。完整应用 shell 主题继续显示宿主退出按钮。
 
 新增协议 1 消息（shell 也支持歌词变化和时钟）：

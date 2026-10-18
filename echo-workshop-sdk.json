@@ -1,6 +1,6 @@
 {
   "sdkVersion": 1,
-  "packageVersion": "1.20.0",
+  "packageVersion": "1.21.0",
   "manifest": {
     "type": "echo-workshop-item",
     "schemaVersions": [1],
@@ -17,10 +17,14 @@
     ]
   },
   "plugin": {
+    "queuePaginationMinEchoVersion": "26.10.18",
+    "extensionsMinEchoVersion": "26.10.18",
     "apiVersions": [1, 2],
     "currentApiVersion": 2,
     "declarationFile": "echo-workshop-plugin.d.ts",
     "contractFile": "contracts/plugin-api.json",
+    "capabilityCatalog": "contracts/capability-catalog.json",
+    "libraryDomain": { "contractFile": "contracts/library.json", "declarationFile": "echo-workshop-library.d.ts", "minimumEchoVersion": "26.10.18" },
     "trustedRuntime": {
       "permission": "system:full",
       "entryField": "manifest.trustedEntry",
@@ -43,13 +47,17 @@
       "seek": true,
       "sampleRateRange": [8000, 48000],
       "channels": [1, 2],
-      "externalAssetDirectory": "assets/",
+      "externalAssetDirectory": "",
       "externalAssetExtensions": [".wasm", ".onnx", ".bin", ".data"],
       "maximumExternalAssetFileBytes": null,
       "maximumExternalAssetBytes": null
     }
   },
   "theme": {
+    "unifiedSdkMinEchoVersion": "26.10.18",
+    "clientScript": "__bridge__.js",
+    "runtimePresentations": ["shell", "lyrics-view", "lyrics-background"],
+    "optionalRuntimeCapabilities": ["sources:direct", "bridge:control", "audio:output-read", "audio:output-write", "presence:control", "extensions:read", "extensions:launch", "audio:dsp-read", "audio:dsp-write", "media-session:control", "companion:control", "sleep-timer:control", "home:read", "home:control", "lyrics:search", "lyrics:write"],
     "presets": ["colors", "skin", "stylesheet", "runtime"],
     "stylesheetMinEchoVersion": "26.8.20",
     "partsContract": "contracts/theme-parts.json",
